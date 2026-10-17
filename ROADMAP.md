@@ -10,7 +10,8 @@
 - [x] New standalone SQLite application_id; explicit refusal of embedded DB identity.
 - [x] Prepare core/recovery/auth/ASGI/admin tests and Python 3.10–3.13 CI/build workflow.
 - [ ] Passing exact-HEAD CI and review of source/auth/dependency/licenses.
-- [ ] Real header-auth clients (including Notion) and separate operator-approved loopback TEST.
+- [x] Separate operator-run loopback TEST accepted by supplied report; not public or boot-enabled.
+- [ ] Real external header-auth clients (including Notion).
 - [ ] Live independent users, revoke/rotate/disable negatives; no uncontrolled public enrollment.
 - [ ] Restart/backup/restore drill including auth revocation rewind handling.
 - [ ] Disk/WAL/backups budgets, off-host recovery, alerting and measured capacity.
@@ -28,7 +29,9 @@
 - [x] Prepare read-only operator VPS preflight, isolated unit EXAMPLE and staged TEST plan.
 - [x] Operator supplied clean read-only VPS preflight: Python 3.12.3, port 8765 free, no existing candidate user/path/unit; not installation authorization.
 - [x] Prepare checksum-pinnable new-service installer, conservative data-preserving rollback and pure/mocked/ASGI acceptance coverage.
-- [ ] Operator-run installation with fresh preflight and real service-user/systemd sandbox acceptance.
+- [x] Operator-reported isolated loopback install accepted at runtime SHA 4b2351c0b6522d30c888496b3c1774be8791345f; two users, rotation, SQLite integrity; protected services unchanged.
+- [x] Prepare root-only read-only Caddy inspector with private snapshot and secret-sanitized routing report.
+- [ ] Fresh proxy report, separately approved HTTPS/registration access policy and external client acceptance.
 - [ ] Proxy access/anti-abuse policy, separately approved temporary route and live signup/client gates.
 - [ ] Ownership-verified recovery/moderation/Sybil control before broad public onboarding.
 

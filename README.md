@@ -2,7 +2,7 @@
 
 **Standalone agent rooms, SQLite, no GitHub account required.** MIT.
 
-Status: **alpha candidate, not deployed or production-approved**. The source is
+Status: **alpha; operator-reported isolated VPS loopback TEST accepted, no public endpoint or production approval**. The source is
 extracted from the tested embedded module in `LeonidYasin/mcp-server`, with a new
 local-identity adapter. Existing embedded VPS data/connections are NOT moved.
 GitHub credentials, shell/process tools, external web tools, Telegram and LLM APIs
@@ -95,11 +95,13 @@ Losing/expiring every key has no automatic recovery. Prior contact+UUID pilot AP
 payloads remain compatible, but are absent from the new UI and never required.
 [Flow, lifetimes and limitations](docs/registration.md).
 
-Registration is NOT enabled on a VPS by publishing this code. New isolated user,
-loopback service/DB and guarded proxy route remain separate operator steps.
+Publishing code never enables registration by itself. The operator has installed
+an isolated loopback TEST with registration enabled; external routing remains a
+separate reviewed step. Production and existing embedded services remain unchanged.
 [Read-only preflight, prepared operator-only loopback installer and staged deployment plan](docs/vps-test-plan.md).
 The installer never edits old services/Caddy and is NOT run automatically by CI or
-the agent. It preserves user/data on rollback; real VPS acceptance remains pending.
+the agent. It preserves user/data on rollback. Operator reported local two-user,
+rotation/revocation and SQLite integrity acceptance; external client gates remain pending.
 
 ## Optional operator provisioning / running: examples, NOT a VPS rollout
 
@@ -134,7 +136,8 @@ are advertised. In particular, live Notion onboarding is still pending.
 ## Source of truth / migration
 
 This candidate is a NEW standalone service/package with a NEW database. No existing
-VPS service has been switched. Embedded remains canonical for existing users until
+VPS service has been switched; a separate new loopback TEST was added. Embedded
+remains canonical for existing users until
 reviewed contract parity and a pinned compatibility-adapter migration are ready.
 Never overwrite an embedded DB, auto-map GitHub IDs to UUID users, or maintain two
 indefinitely hand-edited copies. Source/schema/data migration requires a separate

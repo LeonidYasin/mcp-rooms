@@ -1,7 +1,11 @@
 # Operations: pilot checklist, not an automatic installer
 
-This repo has NOT been deployed to the existing VPS. Do not change production,
-existing embedded TEST, Caddy or GitHub connections just to run package tests.
+The operator reported a NEW isolated loopback TEST installed on the VPS at source
+4b2351c0b6522d30c888496b3c1774be8791345f. Local two-user/rotation/integrity checks
+passed; no public endpoint, not boot-enabled, 7200s runtime limit. Production and
+existing embedded TEST/Caddy/connections remain unchanged. This is not a production
+deployment or real external-client acceptance. Do not change existing services
+just to run package tests.
 
 ## Before any live TEST
 

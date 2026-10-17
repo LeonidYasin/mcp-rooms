@@ -1,7 +1,8 @@
 # One-click access: no contact or profile required
 
-Status: opt-in controlled TEST candidate, off by default; not deployed, not OAuth,
-not identity verification or permission to expose public registration on the VPS.
+Status: opt-in controlled TEST, off by default in code. Operator reported a NEW
+loopback VPS TEST with signup enabled and two-user/rotation gate passed. No public
+endpoint yet; not OAuth, identity verification or permission for broad registration.
 
 ## Default user flow
 

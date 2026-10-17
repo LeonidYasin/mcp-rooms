@@ -33,7 +33,9 @@
 - [x] Prepare root-only read-only Caddy inspector with private snapshot and secret-sanitized routing report.
 - [x] Fresh operator proxy report: one host server, no prefix collision, ETag available; rooms active.
 - [x] Prepare explicit 30-minute public-signup TEST route with scoped CAS insert/delete, persistent cleanup/manual fallback and no old auth bypass.
-- [ ] Operator HTTPS-route report and real external-client/two-chat acceptance.
+- [x] Operator HTTPS-route report: local TLS gate passed; timer armed, external client gate still pending.
+- [x] Fix public-signup top-level cross-site navigation regression in source; API/foreign-Origin/iframe protection retained.
+- [ ] Reviewed runtime update for navigation fix and real external-client/two-chat acceptance.
 - [ ] Proxy access/anti-abuse policy, separately approved temporary route and live signup/client gates.
 - [ ] Ownership-verified recovery/moderation/Sybil control before broad public onboarding.
 

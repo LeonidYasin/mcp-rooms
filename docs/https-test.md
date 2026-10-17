@@ -84,3 +84,15 @@ Implementation sources: Caddy API https://caddyserver.com/docs/api (scoped PUT/
 DELETE, ETag/If-Match), transport JSON fields in upstream
 https://github.com/caddyserver/caddy/blob/master/modules/caddyhttp/reverseproxy/httptransport.go.
 CI lifecycle tests are pure/mocked: no real Caddy/systemd/network/VPS mutations.
+
+## Browser navigation regression
+
+Operator's browser screenshot showed `/signup` returning `invalid_origin`. Existing
+runtime source 4b2351c0 rejects any Sec-Fetch-Site: cross-site, including ordinary
+links from chats. Regression fix is scoped ONLY to GET /signup with mode navigate
+and destination document, still rejecting explicit foreign Origin and invalid Host.
+No exception for API/JS/iframes, and no implicit signup. Regression tests simulate
+link navigation -> same-origin JS -> registration and blocked API/subresource cases.
+Code publishing does NOT patch the installed runtime or extend the 30-minute route.
+Until a separately reviewed update, a fresh-tab manually typed address may avoid
+the navigation rejection (Sec-Fetch-Site: none). No security settings need disabling.

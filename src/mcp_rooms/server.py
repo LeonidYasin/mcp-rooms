@@ -74,9 +74,17 @@ class BearerGate:
         if len(hosts) != 1 or not (hosts[0] == self.authority or
                 re.fullmatch(r'(?:127\.0\.0\.1|localhost)(?::[0-9]{1,5})?', hosts[0])):
             raise RequestFailure('invalid_host', 421)
-        if len(origins) > 1 or (origins and origins[0] != self.origin) or 'cross-site' in sites:
-            raise RequestFailure('invalid_origin', 403)
         path, method = scope['path'], scope['method']
+        # A link from another site is a normal top-level navigation to PUBLIC,
+        # read-only signup HTML, not a cross-origin API request. Do not extend
+        # this exception to JS subresources, iframes, registration or credentials.
+        signup_navigation = (method == 'GET' and path == '/signup'
+                             and sites == ['cross-site']
+                             and values(b'sec-fetch-mode') == ['navigate']
+                             and values(b'sec-fetch-dest') == ['document'])
+        if (len(origins) > 1 or (origins and origins[0] != self.origin)
+                or ('cross-site' in sites and not signup_navigation)):
+            raise RequestFailure('invalid_origin', 403)
         if path in {'/signup', '/signup.js', '/register'}:
             if not self.registration_enabled:
                 raise RequestFailure('registration_disabled', 403)

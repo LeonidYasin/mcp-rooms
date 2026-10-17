@@ -268,3 +268,48 @@ def test_one_click_revocation_disable_expiry_and_capacity(setup):
     capped = RoomStore(store.path, clock=lambda: now[0], limits=replace(Limits(), principals=3))
     with pytest.raises(RoomError, match='user_capacity'):
         Enrollment(IdentityStore(capped, RESOURCE)).register({})
+
+
+NAVIGATION = {'Sec-Fetch-Site':'cross-site','Sec-Fetch-Mode':'navigate','Sec-Fetch-Dest':'document'}
+
+
+def test_public_signup_link_navigation_then_same_origin_signup(tmp_path):
+    with TestClient(create_app(tmp_path/'navigation.db', RESOURCE, True), base_url='https://rooms.example') as client:
+        page=client.get('/signup',headers=NAVIGATION)
+        assert page.status_code==200 and 'Создать доступ' in page.text
+        assert page.headers['cache-control']=='no-store'
+        assert "frame-ancestors 'none'" in page.headers['content-security-policy']
+        # Opening HTML alone cannot create an account or reveal credentials.
+        auth=IdentityStore(RoomStore(tmp_path/'navigation.db'),RESOURCE)
+        with auth.store._db() as db:
+            assert db.execute('SELECT COUNT(*) FROM users').fetchone()[0]==0
+            assert db.execute('SELECT COUNT(*) FROM credentials').fetchone()[0]==0
+        script=client.get('/signup.js',headers={'Sec-Fetch-Site':'same-origin','Sec-Fetch-Mode':'no-cors','Sec-Fetch-Dest':'script'})
+        assert script.status_code==200
+        response=client.post('/register',json={},headers={'Origin':'https://rooms.example','Sec-Fetch-Site':'same-origin','Sec-Fetch-Mode':'cors','Sec-Fetch-Dest':'empty'})
+        assert response.status_code==201
+        key=response.json()['server_key']['key']
+        assert client.get('/identity',headers={'Authorization':'Bearer '+key,'Sec-Fetch-Site':'same-origin'}).status_code==200
+
+
+@pytest.mark.parametrize('method,path', [('POST','/register'),('POST','/credentials'),
+    ('DELETE','/credentials/current'),('GET','/identity'),('POST','/mcp'),('GET','/mcp'),('GET','/signup.js')])
+def test_cross_site_navigation_exception_never_applies_to_api_or_scripts(tmp_path,method,path):
+    with TestClient(create_app(tmp_path/'blocked.db',RESOURCE,True),base_url='https://rooms.example') as client:
+        response=client.request(method,path,headers=NAVIGATION)
+        assert response.status_code==403 and response.json()['error']=='invalid_origin'
+
+
+@pytest.mark.parametrize('changes', [{'Sec-Fetch-Mode':'cors'}, {'Sec-Fetch-Dest':'iframe'},
+    {'Sec-Fetch-Dest':'empty'}, {'Origin':'https://foreign.example'}])
+def test_signup_cross_site_fetch_iframe_or_foreign_origin_still_denied(tmp_path,changes):
+    with TestClient(create_app(tmp_path/'nav-denied.db',RESOURCE,True),base_url='https://rooms.example') as client:
+        response=client.get('/signup',headers={**NAVIGATION,**changes})
+        assert response.status_code==403 and response.json()['error']=='invalid_origin'
+
+
+def test_signup_navigation_does_not_enable_registration_or_bypass_host(tmp_path):
+    with TestClient(create_app(tmp_path/'closed-nav.db',RESOURCE),base_url='https://rooms.example') as client:
+        response=client.get('/signup',headers=NAVIGATION)
+        assert response.status_code==403 and response.json()['error']=='registration_disabled'
+        assert client.get('/signup',headers={**NAVIGATION,'Host':'foreign.example'}).status_code==421

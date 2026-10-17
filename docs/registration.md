@@ -74,6 +74,12 @@ appropriate access/challenge policy, proxy per-source/body/connection/time limit
 monitoring and abuse handling. Human contact/profile verification is not a current
 product prerequisite; any future recovery/verification is a separate optional design.
 
+Public signup HTML permits cross-site top-level GET navigation (fetch mode navigate,
+destination document) so links from chats work. This is read-only HTML, never user
+creation/key issuance. Explicit foreign Origin, iframe/subresource/cors fetches,
+register/credentials/identity/MCP and signup JS remain protected; Host validation
+and the registration-enabled gate remain unchanged.
+
 Registration body limit 4 KiB / 10-second read. Host/Origin/cross-site checks, static
 errors, no-store, no-referrer and same-origin CSP apply. Disable/redact proxy and
 application logs of Authorization, request/response bodies. No third-party scripts,

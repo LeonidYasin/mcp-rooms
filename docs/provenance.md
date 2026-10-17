@@ -11,7 +11,8 @@ The source Git blob SHA was verified before local file adaptation.
 
 - store.py: retained transactions/limits/TTL/cursor/cadence/retry/storage guards;
   replaced GitHub-only principal regex with local UUID namespace, added separate
-  application_id and local users/credential tables, changed visibility label.
+  application_id and local users/credential tables, changed visibility label;
+  additive v2 enrollment/budget tables (no embedded identity mapping).
 - maintenance.py: retained consistent snapshot/verify/new-path behavior, added
   standalone application_id and identity tables to validation/counts.
 - test_core.py/test_recovery.py: adapted focused embedded tests to local principals;

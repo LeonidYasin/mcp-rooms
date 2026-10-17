@@ -9,7 +9,8 @@ existing embedded TEST, Caddy or GitHub connections just to run package tests.
   absolute DB path; regular 0600 single-link file. No symlinks, NFS or shared dir.
 - TLS proxy to a separately approved loopback port; correct HTTPS resource URL.
   Keep strict systemd sandbox and add only the exact data directory to write paths.
-- Invite-only users, distinct per-connection credentials, expiry/revocation tested.
+- Controlled TEST users, distinct per-connection credentials, expiry/revocation tested.
+  Opt-in automatic signup is unverified-contact pseudonymous enrollment; see registration.md.
   No actual credentials in logs/chat/CI. All examples use placeholders.
 - Rate/read-time/connection limits at the proxy; disable/redact access logs and
   exception payloads. SDK DNS-rebinding host/origin checks protect MCP requests.
@@ -47,6 +48,11 @@ No backup scheduler, off-host transfer or guaranteed disaster recovery is suppli
 CI exact SHA and package build -> source/auth review -> live private TEST with real
 clients/independent users -> restart and full restore drill -> revocation after
 restore -> disk/WAL/load/alerts -> separately approved production rollout/rollback.
-OAuth/public registration is another release, not implicitly enabled by publishing
+OAuth/ownership-verified public registration is another release, not implicitly enabled by publishing
 source. Keep a single canonical versioned core once embedded migration is designed;
 this alpha does not yet switch embedded imports to this package.
+
+Self-signup budgets are backed up/restored with auth and room state. Restoring a
+snapshot also rewinds signup counters; before external access reapply revocations
+and reassess abuse budgets. Read-only VPS preflight and an uninstalled unit example
+are provided; a guarded installer/public route has NOT been applied. See vps-test-plan.md.

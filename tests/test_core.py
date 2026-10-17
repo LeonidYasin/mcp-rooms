@@ -44,7 +44,7 @@ def test_two_owners_membership_replies_and_durability(setup):
     assert store.path.stat().st_mode & 0o777 == 0o600
     with sqlite3.connect(store.path) as db:
         assert db.execute('PRAGMA journal_mode').fetchone()[0] == 'wal'
-        assert db.execute('PRAGMA user_version').fetchone()[0] == 1
+        assert db.execute('PRAGMA user_version').fetchone()[0] == 2
 
 
 def test_ownership_tombstone_close_and_leave(setup):

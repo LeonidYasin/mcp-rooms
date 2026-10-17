@@ -13,6 +13,7 @@ from .store import RoomError, RoomStore, _id, _text, private_path
 
 SCOPES = frozenset({'rooms:read', 'rooms:write'})
 TOKEN = re.compile(r'rm1_([0-9a-f]{32})\.([A-Za-z0-9_-]{43})')
+UUID_BEARER = re.compile(r'[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}')
 
 
 @dataclass(frozen=True)
@@ -35,7 +36,8 @@ def resource_url(value):
     except ValueError:
         raise RoomError('invalid_resource') from None
     if (parsed.scheme != 'https' or not parsed.hostname or parsed.username is not None
-            or parsed.password is not None or parsed.path != '/mcp'
+            or parsed.password is not None
+            or not re.fullmatch(r'(?:/[A-Za-z0-9_-]+)*/mcp', parsed.path)
             or parsed.query or parsed.fragment or value != value.strip()
             or any(ord(c) < 33 or ord(c) > 126 for c in value)
             or (port is not None and not 1 <= port <= 65535)):
@@ -82,13 +84,18 @@ class IdentityStore:
         return {'credential_id': cid, 'expires_at': expires, 'scopes': scopes}, raw
 
     def authenticate(self, raw):
-        if not isinstance(raw, str) or not TOKEN.fullmatch(raw):
+        if not isinstance(raw, str):
             return None
-        cid = TOKEN.fullmatch(raw).group(1)
+        original, own_uuid = TOKEN.fullmatch(raw), UUID_BEARER.fullmatch(raw)
+        if not original and not own_uuid:
+            return None
         digest = hashlib.sha256(raw.encode('ascii')).hexdigest()
         with self.store._db() as db:
-            row = db.execute('SELECT c.*,u.disabled FROM credentials c JOIN users u ON u.id=c.user_id WHERE c.id=?',
-                             (cid,)).fetchone()
+            query = 'SELECT c.*,u.disabled FROM credentials c JOIN users u ON u.id=c.user_id WHERE '
+            if original:
+                row = db.execute(query + 'c.id=?', (original.group(1),)).fetchone()
+            else:
+                row = db.execute(query + 'c.digest=?', (digest,)).fetchone()
         matches = hmac.compare_digest(digest, row['digest'] if row else '0' * 64)
         if (not row or not matches or row['disabled'] or row['revoked']
                 or row['expires_at'] <= self.store.clock() // 1000

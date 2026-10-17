@@ -27,7 +27,7 @@ def _connect_readonly(path):
 
 
 def _verify(connection):
-    if connection.execute('PRAGMA user_version').fetchone()[0] != 1:
+    if connection.execute('PRAGMA user_version').fetchone()[0] not in (1, 2):
         raise RoomError('unsupported_database_version')
     if connection.execute('PRAGMA application_id').fetchone()[0] != RoomStore.APPLICATION_ID:
         raise RoomError('unsupported_database_identity')
@@ -40,9 +40,11 @@ def _verify(connection):
     tables = {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     if not {'actors', 'rooms', 'members', 'messages', 'users', 'credentials'} <= tables:
         raise RoomError('snapshot_schema_invalid')
+    if connection.execute('PRAGMA user_version').fetchone()[0] == 2 and not {'enrollments', 'signup_budgets'} <= tables:
+        raise RoomError('snapshot_schema_invalid')
     # Only aggregate counts leave the utility; never print message text or tokens.
     return {table: connection.execute('SELECT COUNT(*) FROM ' + table).fetchone()[0]
-            for table in ('actors', 'rooms', 'members', 'messages', 'users', 'credentials')}
+            for table in ('actors', 'rooms', 'members', 'messages', 'users', 'credentials', 'enrollments', 'signup_budgets') if table in tables}
 
 
 def verify_database(path):

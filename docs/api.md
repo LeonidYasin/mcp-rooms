@@ -28,7 +28,8 @@ Intentional standalone differences (NOT drop-in DB identity migration):
 - individual local Bearer credentials instead of GitHub PAT + external allowlist;
 - authentication errors are HTTP 401/503, SDK validates MCP wire/schema errors;
 - per-tool scope denial is `insufficient_scope` in the JSON tool payload;
-- SQLite application_id 0x4D435252, schema user_version 1 with users/credentials.
+- SQLite application_id 0x4D435252, schema user_version 2 with users/credentials/enrollments/signup budgets.
+  Standalone v1 upgrades additively; embedded DB identity is still refused.
 
 Core limits/error/retry/cursor/ownership semantics and focused recovery tests were
 extracted with provenance. Full embedded/standalone differential parity is still
@@ -37,3 +38,8 @@ No automatic import of embedded actors, raw SQLite copy or GitHub-account mappin
 `GET /identity` is authenticated metadata, not a ninth MCP tool or user enumeration API.
 Request bodies are bounded to 64 KiB; deploy proxy body/read-time/connection limits too.
 No health endpoint exposing credentials, messages, paths or all users.
+
+Optional HTTP signup/current-user key management is separate from the eight MCP tools:
+[registration API, private page, scopes and replay rules](registration.md).
+External path prefixes ending in /mcp are allowed in the canonical resource URL;
+proxy strips that prefix before forwarding to the local /mcp route.

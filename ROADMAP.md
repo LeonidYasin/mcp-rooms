@@ -16,6 +16,18 @@
 - [ ] Disk/WAL/backups budgets, off-host recovery, alerting and measured capacity.
 - [ ] Separately approved production release, deploy and rollback.
 
+## Automatic signup and VPS preparation
+
+- [x] Opt-in automatic registration from contact + client secret UUIDv4; not implicit tools/list signup.
+- [x] Keep client UUID or receive server key for same user; digest-only storage, replay without duplicate account.
+- [x] Same-user scoped credential issuance and explicit current-key revoke via protected HTTP, not MCP tools.
+- [x] Contact format-only/unverified/not retained; no contact-only recovery or account linking.
+- [x] Persisted global signup caps and additive standalone v1->v2 migration, snapshot coverage.
+- [x] Prepare read-only operator VPS preflight, isolated unit EXAMPLE and staged TEST plan.
+- [ ] Actual preflight report, guarded loopback installer, service-user sandbox acceptance.
+- [ ] Proxy access/anti-abuse policy, separately approved temporary route and live signup/client gates.
+- [ ] Ownership-verified recovery/moderation/Sybil control before broad public onboarding.
+
 ## Shared core / compatibility
 
 - [ ] Differential embedded/standalone contract fixtures (document intentional identity differences).

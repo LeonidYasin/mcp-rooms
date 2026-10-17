@@ -5,73 +5,161 @@ from functools import partial
 import json
 import logging
 import os
+import re
 from urllib.parse import urlsplit
 import anyio
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 from mcp.types import TextContent
 from pydantic import StrictInt, StrictStr
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from .identity import IdentityStore, resource_url
 from .service import execute
-from .store import RoomStore
+from .store import RoomStore, RoomError
+from .enrollment import Enrollment
 
 CURRENT = ContextVar('rooms_verified_principal', default=None)
 MAX_BODY = 65536
 
 
+class RequestFailure(Exception):
+    def __init__(self, code, status):
+        self.code, self.status = code, status
+
+
+async def read_body(receive, maximum):
+    body = bytearray()
+    with anyio.fail_after(10):
+        while True:
+            message = await receive()
+            if message['type'] == 'http.disconnect':
+                raise RequestFailure('disconnected', 400)
+            body.extend(message.get('body', b''))
+            if len(body) > maximum:
+                raise RequestFailure('body_too_large', 413)
+            if not message.get('more_body', False):
+                return bytes(body)
+
+
 class BearerGate:
-    """Authenticate each HTTP request; no session-as-identity and no token in context."""
-    def __init__(self, app, auth):
+    """Per-request identity; self signup is explicit and opt-in, never implicit login."""
+    def __init__(self, app, auth, registration_enabled=False):
         self.app, self.auth = app, auth
+        self.registration_enabled = registration_enabled
+        self.enrollment = Enrollment(auth)
+        parsed = urlsplit(auth.resource)
+        self.authority, self.origin = parsed.netloc, parsed.scheme + '://' + parsed.netloc
 
     async def __call__(self, scope, receive, send):
         if scope['type'] != 'http':
             return await self.app(scope, receive, send)
-        if scope['path'] not in {'/mcp', '/identity'}:
-            return await JSONResponse({'error': 'not_found'}, status_code=404)(scope, receive, send)
-        headers = scope.get('headers', [])
-        auth_values = [value for key, value in headers if key.lower() == b'authorization']
+        try:
+            return await self.handle(scope, receive, send)
+        except RequestFailure as exc:
+            return await self.reply(scope, receive, send, {'error': exc.code}, exc.status)
+        except TimeoutError:
+            return await self.reply(scope, receive, send, {'error': 'request_timeout'}, 408)
+
+    async def reply(self, scope, receive, send, payload, status=200, headers=None):
+        return await JSONResponse(payload, status_code=status,
+            headers={'Cache-Control': 'no-store', 'Pragma': 'no-cache', **(headers or {})})(scope, receive, send)
+
+    async def handle(self, scope, receive, send):
         if scope.get('query_string'):
-            return await JSONResponse({'error': 'query_not_supported'}, status_code=400)(scope, receive, send)
+            raise RequestFailure('query_not_supported', 400)
+        headers = scope.get('headers', [])
+        def values(name):
+            return [v.decode('latin1') for k, v in headers if k.lower() == name]
+        hosts, origins, sites = values(b'host'), values(b'origin'), values(b'sec-fetch-site')
+        if len(hosts) != 1 or not (hosts[0] == self.authority or
+                re.fullmatch(r'(?:127\.0\.0\.1|localhost)(?::[0-9]{1,5})?', hosts[0])):
+            raise RequestFailure('invalid_host', 421)
+        if len(origins) > 1 or (origins and origins[0] != self.origin) or 'cross-site' in sites:
+            raise RequestFailure('invalid_origin', 403)
+        path, method = scope['path'], scope['method']
+        if path in {'/signup', '/signup.js', '/register'}:
+            if not self.registration_enabled:
+                raise RequestFailure('registration_disabled', 403)
+            if path in {'/signup', '/signup.js'}:
+                if method != 'GET':
+                    raise RequestFailure('method_not_allowed', 405)
+                from .signup_page import HTML, JAVASCRIPT
+                content, media = (HTML, 'text/html') if path == '/signup' else (JAVASCRIPT, 'application/javascript')
+                return await Response(content, media_type=media, headers={
+                    'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff',
+                    'Referrer-Policy': 'no-referrer',
+                    'Content-Security-Policy': "default-src 'none'; script-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+                })(scope, receive, send)
+            if method != 'POST':
+                raise RequestFailure('method_not_allowed', 405)
+            types = values(b'content-type')
+            if len(types) != 1 or types[0].split(';')[0].strip().lower() != 'application/json':
+                raise RequestFailure('json_required', 415)
+            try:
+                payload = json.loads(await read_body(receive, 4096))
+            except (ValueError, UnicodeError):
+                raise RequestFailure('invalid_json', 400) from None
+            try:
+                result = await anyio.to_thread.run_sync(self.enrollment.register, payload)
+            except RoomError as exc:
+                status = 429 if exc.code == 'registration_rate_limited' else (
+                    409 if exc.code == 'registration_unavailable' else
+                    503 if exc.code == 'user_capacity' else 400)
+                return await self.reply(scope, receive, send, {'ok': False, 'error': exc.code, **exc.details}, status)
+            except Exception:
+                return await self.reply(scope, receive, send, {'error': 'registration_unavailable'}, 503)
+            return await self.reply(scope, receive, send, result, 200 if result['already_registered'] else 201)
+        if path not in {'/mcp', '/identity', '/credentials', '/credentials/current'}:
+            raise RequestFailure('not_found', 404)
+        auth_values = values(b'authorization')
         principal = None
         if len(auth_values) == 1:
             try:
-                scheme, raw = auth_values[0].decode('ascii').split(' ', 1)
+                scheme, raw = auth_values[0].split(' ', 1)
                 if scheme.lower() == 'bearer':
                     principal = await anyio.to_thread.run_sync(self.auth.authenticate, raw)
             except (ValueError, UnicodeError):
                 pass
             except Exception:
-                # Never log exception text, token, headers, or DB path.
-                return await JSONResponse({'error': 'authentication_unavailable'}, status_code=503)(scope, receive, send)
+                return await self.reply(scope, receive, send, {'error': 'authentication_unavailable'}, 503)
         if principal is None:
-            return await JSONResponse({'error': 'invalid_token'}, status_code=401,
-                headers={'WWW-Authenticate': 'Bearer realm="mcp-rooms"', 'Cache-Control': 'no-store'})(scope, receive, send)
-        if scope['path'] == '/identity':
-            if scope['method'] != 'GET':
-                return await JSONResponse({'error': 'method_not_allowed'}, status_code=405)(scope, receive, send)
-            return await JSONResponse({'user_id': principal.user_id, 'owner': principal.owner,
-                'credential_id': principal.credential_id, 'scopes': sorted(principal.scopes)},
-                headers={'Cache-Control': 'no-store'})(scope, receive, send)
-        # Bound actual body bytes, not just attacker-controlled Content-Length.
-        body = bytearray()
-        if scope['method'] == 'POST':
-            while True:
-                message = await receive()
-                if message['type'] == 'http.disconnect':
-                    return
-                body.extend(message.get('body', b''))
-                if len(body) > MAX_BODY:
-                    return await JSONResponse({'error': 'body_too_large'}, status_code=413)(scope, receive, send)
-                if not message.get('more_body', False):
-                    break
+            return await self.reply(scope, receive, send, {'error': 'invalid_token'}, 401,
+                                    {'WWW-Authenticate': 'Bearer realm="mcp-rooms"'})
+        if path == '/identity':
+            if method != 'GET':
+                raise RequestFailure('method_not_allowed', 405)
+            return await self.reply(scope, receive, send, {'user_id': principal.user_id, 'owner': principal.owner,
+                'credential_id': principal.credential_id, 'scopes': sorted(principal.scopes)})
+        if path == '/credentials':
+            if method != 'POST':
+                raise RequestFailure('method_not_allowed', 405)
+            body = await read_body(receive, 4096)
+            if body not in (b'', b'{}'):
+                raise RequestFailure('no_arguments_supported', 400)
+            try:
+                metadata, raw = await anyio.to_thread.run_sync(partial(self.auth.issue_token,
+                    principal.user_id, scopes=sorted(principal.scopes)))
+            except RoomError as exc:
+                return await self.reply(scope, receive, send, {'error': exc.code}, 409)
+            except Exception:
+                return await self.reply(scope, receive, send, {'error': 'credential_unavailable'}, 503)
+            return await self.reply(scope, receive, send, {'ok': True, 'key': raw, **metadata,
+                'previous_key_remains_active': True}, 201)
+        if path == '/credentials/current':
+            if method != 'DELETE':
+                raise RequestFailure('method_not_allowed', 405)
+            try:
+                result = await anyio.to_thread.run_sync(self.auth.revoke, principal.credential_id)
+            except Exception:
+                return await self.reply(scope, receive, send, {'error': 'credential_unavailable'}, 503)
+            return await self.reply(scope, receive, send, {'ok': True, **result})
+        body = await read_body(receive, MAX_BODY) if method == 'POST' else b''
         consumed = False
         async def replay():
             nonlocal consumed
-            if scope['method'] == 'POST' and not consumed:
+            if method == 'POST' and not consumed:
                 consumed = True
-                return {'type': 'http.request', 'body': bytes(body), 'more_body': False}
+                return {'type': 'http.request', 'body': body, 'more_body': False}
             return await receive()
         token = CURRENT.set(principal)
         try:
@@ -80,7 +168,7 @@ class BearerGate:
             CURRENT.reset(token)
 
 
-def create_app(database, resource):
+def create_app(database, resource, registration_enabled=False):
     resource = resource_url(resource)
     store = RoomStore(database)
     auth = IdentityStore(store, resource)
@@ -136,7 +224,7 @@ def create_app(database, resource):
         """Only the room owner may close it, deleting its history and membership."""
         return await call('close', room_id=room_id)
 
-    return BearerGate(mcp.streamable_http_app(), auth)
+    return BearerGate(mcp.streamable_http_app(), auth, registration_enabled)
 
 
 def main():
@@ -144,13 +232,14 @@ def main():
     parser.add_argument('--db', default=os.environ.get('MCP_ROOMS_DB'), required=not os.environ.get('MCP_ROOMS_DB'))
     parser.add_argument('--resource', default=os.environ.get('MCP_ROOMS_RESOURCE'), required=not os.environ.get('MCP_ROOMS_RESOURCE'))
     parser.add_argument('--port', type=int, default=8765)
+    parser.add_argument('--enable-registration', action='store_true', help='Opt-in unverified contact/UUID self enrollment; controlled TEST only')
     args = parser.parse_args()
     if not 1 <= args.port <= 65535:
         parser.error('Invalid port')
     os.umask(0o077)
     logging.getLogger('mcp').setLevel(logging.WARNING)
     import uvicorn
-    uvicorn.run(create_app(args.db, args.resource), host='127.0.0.1', port=args.port,
+    uvicorn.run(create_app(args.db, args.resource, args.enable_registration), host='127.0.0.1', port=args.port,
                 access_log=False, log_level='warning', proxy_headers=False)
 
 

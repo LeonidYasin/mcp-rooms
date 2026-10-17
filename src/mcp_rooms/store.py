@@ -124,12 +124,15 @@ class RoomStore:
             db.execute('CREATE TABLE IF NOT EXISTS credentials (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id), digest TEXT NOT NULL UNIQUE, resource TEXT NOT NULL, scopes TEXT NOT NULL, expires_at INTEGER NOT NULL, revoked INTEGER NOT NULL DEFAULT 0)')
             db.execute('CREATE INDEX IF NOT EXISTS credentials_user ON credentials(user_id)')
             db.execute('PRAGMA application_id=' + str(self.APPLICATION_ID))
-            db.execute('PRAGMA user_version=1')
+            # Additive v1->v2 standalone migration; never touches embedded owners.
+            db.execute('CREATE TABLE IF NOT EXISTS enrollments (bootstrap_digest TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id), credential_id TEXT NOT NULL UNIQUE REFERENCES credentials(id), contact_kind TEXT NOT NULL, created_at INTEGER NOT NULL)')
+            db.execute('CREATE TABLE IF NOT EXISTS signup_budgets (scope TEXT NOT NULL, bucket INTEGER NOT NULL, used INTEGER NOT NULL, expires_at INTEGER NOT NULL, PRIMARY KEY(scope,bucket))')
+            db.execute('PRAGMA user_version=2')
 
     @classmethod
     def _validate_identity(cls, db):
         version = db.execute('PRAGMA user_version').fetchone()[0]
-        if version not in (0, 1):
+        if version not in (0, 1, 2):
             raise RoomError('unsupported_database_version')
         app_id = db.execute('PRAGMA application_id').fetchone()[0]
         existing = db.execute("SELECT 1 FROM sqlite_master WHERE type='table'").fetchone()

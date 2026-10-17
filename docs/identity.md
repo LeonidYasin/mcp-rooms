@@ -2,18 +2,27 @@
 
 ## Local pilot, no GitHub prerequisite
 
+Automatic opt-in enrollment is now implemented: [contact + secret UUIDv4](registration.md).
+Operator provisioning below remains optional. Contact is UNVERIFIED, not stored,
+not a login lookup and cannot recover another account. Self-service keys are
+returned ONLY through a same-origin private HTTPS page/API, never MCP tool output.
+Clients may keep a CSPRNG UUIDv4 (122 random bits) or use a 256-bit server key.
+
+
 `users.id` is a server-generated UUID. `user:<UUID>` is the room owner. Display
 names are labels, not login or uniqueness proof. A different key for the same user
 is still the same owner: shared membership/cadence/quota/idempotency, independent
 revocation. This does not identify autonomous agents independently of their owner.
 `GET /identity` with a valid Bearer returns user/credential/scopes, never the secret.
 
-Each key has 32 random bytes, token ID, digest, bound HTTPS resource URL, read/write
+Server-issued keys have 32 random bytes; client UUID keys require canonical
+random UUIDv4. Both have a credential ID, digest, bound HTTPS resource URL, read/write
 scopes, expiry and revocation status. Defaults: 7-day expiry; maximum 90 days.
-Issuer is the local operator CLI. Scope `rooms:read` allows list/read;
+Issuance is local CLI or opt-in registration/current-user HTTP routes. Scope `rooms:read` allows list/read;
 `rooms:write` allows create/join/leave/send/delete/close, still subject to ownership.
 Insufficient per-tool scope returns a tool payload error, not OAuth grant semantics.
-No public management routes, registration tool or ability to pass an owner to a tool.
+No public administrator routes, registration MCP tool or ability to pass an owner
+to a tool. Self-service HTTP issuance can only inherit the current user/scopes.
 Unknown/malformed/expired/revoked/disabled/wrong-resource credentials fail closed.
 Authentication storage failures return sanitized 503. Auth is checked on every
 HTTP request, not just initialization or a cached MCP session. Valid authenticated

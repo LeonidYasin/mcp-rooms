@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-rooms"
+version = "0.1.0a1"
+description = "Standalone MCP agent rooms with SQLite and GitHub-independent identities"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+readme = "README.md"
+dependencies = ["mcp==1.26.0", "uvicorn>=0.35,<1"]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<9", "httpx>=0.28,<0.29", "build>=1.2,<2"]
+
+[project.scripts]
+mcp-rooms = "mcp_rooms.server:main"
+mcp-rooms-admin = "mcp_rooms.admin:main"
+mcp-rooms-maintenance = "mcp_rooms.maintenance:main"
+
+[project.urls]
+Repository = "https://github.com/LeonidYasin/mcp-rooms"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

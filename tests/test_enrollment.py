@@ -63,7 +63,7 @@ def test_contact_is_not_recovery_unique_login_or_ownership(setup):
     assert auth.authenticate('synthetic@example.invalid+' + secret()) is None
 
 
-@pytest.mark.parametrize('payload', [None, [], {}, {'contact': 'bad', 'bootstrap_uuid': secret()},
+@pytest.mark.parametrize('payload', [None, [], {'contact': 'bad', 'bootstrap_uuid': secret()},
     {'contact': 'x@example.invalid', 'bootstrap_uuid': str(uuid.UUID(int=1))},
     {'contact': '+19995550123', 'bootstrap_uuid': str(uuid.UUID(int=0xabcdef, version=4)).upper()},
     {**data(), 'owner': 'user:attacker'}, {**data(), 'issue_server_key': 'yes'},
@@ -181,3 +181,90 @@ def test_self_issued_credentials_cannot_escalate_read_only_scope(tmp_path):
         response = client.post('/credentials', headers=h, json={})
         assert response.status_code == 201
         assert auth.authenticate(response.json()['key']).scopes == frozenset({'rooms:read'})
+
+
+def test_one_click_issues_single_256bit_key_without_profile(setup):
+    store, auth, enroll, now = setup
+    result = enroll.register({})
+    assert set(result) == {'ok', 'user_id', 'owner', 'already_registered', 'server_key'}
+    key = result['server_key']['key']
+    import base64
+    assert len(base64.urlsafe_b64decode(key.split('.')[1] + '=')) == 32
+    assert auth.authenticate(key).user_id == result['user_id']
+    assert auth.authenticate(result['user_id']) is None
+    with store._db() as db:
+        assert db.execute('SELECT COUNT(*) FROM credentials').fetchone()[0] == 1
+        assert db.execute('SELECT COUNT(*) FROM enrollments').fetchone()[0] == 0
+        assert key not in '\n'.join(db.iterdump())
+        assert db.execute('SELECT display_name FROM users').fetchone()[0].startswith('member-')
+
+
+def test_one_click_distinct_users_concurrency_and_shared_quota(setup):
+    store, auth, enroll, now = setup
+    with ThreadPoolExecutor(max_workers=4) as workers:
+        results = list(workers.map(lambda _: enroll.register({}), range(4)))
+    assert len({r['user_id'] for r in results}) == 4
+    assert len({r['server_key']['key'] for r in results}) == 4
+    # Prior pilot enrollment and one-click share the SAME persistent budget.
+    enroll.register(data())
+    with pytest.raises(RoomError, match='registration_rate_limited'):
+        enroll.register({})
+    with store._db() as db:
+        assert db.execute('SELECT COUNT(*) FROM users').fetchone()[0] == 5
+        assert db.execute('SELECT COUNT(*) FROM credentials').fetchone()[0] == 5
+
+
+@pytest.mark.parametrize('payload', [{'user_id':'attacker'}, {'scopes':['rooms:read']},
+    {'contact':'synthetic@example.invalid'}, {'bootstrap_uuid':secret()},
+    {'profile':'optional?'}, {'display_name':'admin'}, {'issue_server_key':True}])
+def test_simple_signup_refuses_claims_and_profile_fields(setup, payload):
+    store, auth, enroll, now = setup
+    with pytest.raises(RoomError): enroll.register(payload)
+    with store._db() as db:
+        assert db.execute('SELECT COUNT(*) FROM users').fetchone()[0] == 0
+        assert db.execute('SELECT COUNT(*) FROM signup_budgets').fetchone()[0] == 0
+
+
+def test_simple_http_full_mcp_flow_and_rotation_without_questionnaire(tmp_path):
+    with TestClient(create_app(tmp_path / 'simple.db', RESOURCE, True), base_url='https://rooms.example') as client:
+        page = client.get('/signup')
+        assert 'Создать доступ' in page.text and 'name="contact"' not in page.text
+        assert 'name="bootstrap_uuid"' not in page.text
+        js = client.get('/signup.js').text
+        assert 'api("register", "POST", {})' in js and 'signupAttempted' in js
+        assert 'localStorage' not in js and 'sessionStorage' not in js
+        response = client.post('/register', json={})
+        assert response.status_code == 201 and response.headers['cache-control'] == 'no-store'
+        result = response.json(); key = result['server_key']['key']
+        h = {'Authorization':'Bearer ' + key}
+        assert client.get('/identity', headers=h).json()['user_id'] == result['user_id']
+        rpc = client.post('/mcp', headers=dict(h, Accept='application/json, text/event-stream'), json={
+            'jsonrpc':'2.0','id':1,'method':'tools/call','params':{'name':'rooms_create','arguments':{'title':'Хочу / предлагаю'}}})
+        room = json.loads(rpc.json()['result']['content'][0]['text'])
+        assert room['ok'] and room['owner'] == result['owner']
+        replacement = client.post('/credentials', headers=h, json={}).json()['key']
+        new_h = {'Authorization':'Bearer ' + replacement}
+        assert client.get('/identity', headers=new_h).json()['user_id'] == result['user_id']
+        assert client.delete('/credentials/current', headers=h).status_code == 200
+        assert client.get('/identity', headers=h).status_code == 401
+        assert client.get('/identity', headers=new_h).status_code == 200
+        rpc = client.post('/mcp', headers=dict(new_h, Accept='application/json, text/event-stream'), json={
+            'jsonrpc':'2.0','id':2,'method':'tools/call','params':{'name':'rooms_read','arguments':{'room_id':room['room_id']}}})
+        assert json.loads(rpc.json()['result']['content'][0]['text'])['ok']
+        # Another empty POST is a new account, NOT recovery of the previous one.
+        other = client.post('/register', json={}).json()
+        assert other['user_id'] != result['user_id'] and other['server_key']['key'] != key
+
+
+def test_one_click_revocation_disable_expiry_and_capacity(setup):
+    store, auth, enroll, now = setup
+    a = enroll.register({}); b = enroll.register({}); c = enroll.register({})
+    auth.revoke(a['server_key']['credential_id'])
+    assert auth.authenticate(a['server_key']['key']) is None
+    auth.disable(b['user_id'])
+    assert auth.authenticate(b['server_key']['key']) is None
+    now[0] += 604800000
+    assert auth.authenticate(c['server_key']['key']) is None
+    capped = RoomStore(store.path, clock=lambda: now[0], limits=replace(Limits(), principals=3))
+    with pytest.raises(RoomError, match='user_capacity'):
+        Enrollment(IdentityStore(capped, RESOURCE)).register({})

@@ -2,11 +2,12 @@
 
 ## Local pilot, no GitHub prerequisite
 
-Automatic opt-in enrollment is now implemented: [contact + secret UUIDv4](registration.md).
-Operator provisioning below remains optional. Contact is UNVERIFIED, not stored,
-not a login lookup and cannot recover another account. Self-service keys are
-returned ONLY through a same-origin private HTTPS page/API, never MCP tool output.
-Clients may keep a CSPRNG UUIDv4 (122 random bits) or use a 256-bit server key.
+Automatic opt-in enrollment uses [one-click server-issued access](registration.md).
+Empty JSON creates a pseudonymous user and one 256-bit random secret, without
+contact, profile, client-generated UUID or GitHub. Self-service keys are returned
+ONLY through a same-origin private HTTPS page/API, never MCP tool output. Operator
+provisioning is optional. Prior contact+UUID pilot payloads remain compatible but
+are not shown in the new UI. New empty POST creates another account, not recovery.
 
 
 `users.id` is a server-generated UUID. `user:<UUID>` is the room owner. Display
@@ -31,12 +32,12 @@ in-flight requests are not retroactively cancelled when a credential is revoked.
 A SHA-256 digest is appropriate for uniformly random 256-bit credentials; this is
 not password storage. Use a password KDF if passwords are ever introduced (not now).
 Bearer credentials are transferable: stolen keys impersonate users until revoked.
-A UUID, display name, shared proxy key or X-User-ID header is NOT authentication.
+A PUBLIC user/room UUID, display name, shared proxy key or X-User-ID header is NOT authentication.
 Admin/host compromise and exfiltrated credential files are outside this boundary.
 
 ## Enrollment / recovery
 
-Operator creates users, issues new per-connection credentials and delivers each
+Optional operator provisioning creates users, issues per-connection credentials and delivers each
 secret once via a private 0600 file. Output refuses existing files, aliases or
 shared directories; failed output delivery revokes the newly issued credential.
 If the process crashes between DB commit and file delivery, an unused active row
@@ -45,7 +46,8 @@ raw secret. No infinite retry of issue-token (it is NOT idempotent).
 
 Rotation: issue new key for SAME user -> connect/test -> explicitly revoke old key.
 Disable user blocks all its credentials without erasing their history. Lost all
-keys: audited operator recovery; no account takeover by claiming an email/name.
+keys: no automatic recovery; any future operator recovery needs audited proof,
+not a claimed email/name. New signup does not recover old membership.
 CLI is only for trusted OS operators. Client tools cannot create or disable users.
 Token files need operator delivery/retention/cleanup; GitHub/CI logs never hold
 real keys. Reverse-proxy logs MUST NOT record Authorization or sensitive query data.
@@ -70,7 +72,8 @@ Pin and test a supported specification revision when implementing it.
 
 All enrolled users can discover/join rooms. No private-room ACL, E2EE, federation,
 strong human uniqueness/Sybil prevention, spam moderation or ownership-verified
-public signup. Opt-in contact/UUID enrollment is pseudonymous, not verified identity.
+public signup. Opt-in one-click enrollment is pseudonymous, not verified identity.
+A biography in a room is optional and never required for want/offer messages.
 Storage/page/user caps do not replace filesystem/connection/abuse budgets.
 Agent text is untrusted and never evaluated as code/commands. The standalone MCP
 registers ONLY eight room tools, no GitHub/write/shell/process/maintenance methods.

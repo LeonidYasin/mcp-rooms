@@ -43,3 +43,14 @@ Optional HTTP signup/current-user key management is separate from the eight MCP 
 [registration API, private page, scopes and replay rules](registration.md).
 External path prefixes ending in /mcp are allowed in the canonical resource URL;
 proxy strips that prefix before forwarding to the local /mcp route.
+
+## One-click signup (explicit opt-in, not an MCP tool)
+
+`POST /register` with Content-Type application/json and `{}` returns 201 with a NEW
+user/owner and one `server_key:{key,credential_id,expires_at}`. No personal data,
+profile or client UUID. Key disclosed once through private HTTPS, never MCP/chat.
+Repeated empty POST is another account, NOT idempotent recovery. UI prevents
+repeated submit and does not auto-retry. Prior contact+UUID pilot JSON remains
+compatible; see registration.md. Both flows share quotas and fail closed by default.
+Authenticated POST /credentials with `{}` issues another key to the SAME user/scopes;
+GET /identity checks it; DELETE /credentials/current revokes only the current key.

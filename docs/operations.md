@@ -10,7 +10,8 @@ existing embedded TEST, Caddy or GitHub connections just to run package tests.
 - TLS proxy to a separately approved loopback port; correct HTTPS resource URL.
   Keep strict systemd sandbox and add only the exact data directory to write paths.
 - Controlled TEST users, distinct per-connection credentials, expiry/revocation tested.
-  Opt-in automatic signup is unverified-contact pseudonymous enrollment; see registration.md.
+  Opt-in one-click signup is pseudonymous, no contact/profile required; see registration.md.
+  Empty POST creates a new user, not recovery; do not auto-retry a lost response.
   No actual credentials in logs/chat/CI. All examples use placeholders.
 - Rate/read-time/connection limits at the proxy; disable/redact access logs and
   exception payloads. SDK DNS-rebinding host/origin checks protect MCP requests.

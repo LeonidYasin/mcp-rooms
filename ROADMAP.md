@@ -11,20 +11,23 @@
 - [x] Prepare core/recovery/auth/ASGI/admin tests and Python 3.10–3.13 CI/build workflow.
 - [ ] Passing exact-HEAD CI and review of source/auth/dependency/licenses.
 - [ ] Real header-auth clients (including Notion) and separate operator-approved loopback TEST.
-- [ ] Live independent users, revoke/rotate/disable negatives; no public enrollment.
+- [ ] Live independent users, revoke/rotate/disable negatives; no uncontrolled public enrollment.
 - [ ] Restart/backup/restore drill including auth revocation rewind handling.
 - [ ] Disk/WAL/backups budgets, off-host recovery, alerting and measured capacity.
 - [ ] Separately approved production release, deploy and rollback.
 
 ## Automatic signup and VPS preparation
 
-- [x] Opt-in automatic registration from contact + client secret UUIDv4; not implicit tools/list signup.
-- [x] Keep client UUID or receive server key for same user; digest-only storage, replay without duplicate account.
+- [x] One-click signup with empty JSON: no contact, questionnaire, GitHub or client UUID; not implicit tools/list signup.
+- [x] One 256-bit server key shown once; stable user UUID separate from secret, digest-only storage.
+- [x] Legacy pilot contact+UUID API compatibility; no required UI fields or contact-based recovery.
+- [x] No automatic signup retries; new POST creates a new user, not recovery. Double-click guard and explicit lost-response warning.
 - [x] Same-user scoped credential issuance and explicit current-key revoke via protected HTTP, not MCP tools.
-- [x] Contact format-only/unverified/not retained; no contact-only recovery or account linking.
+- [x] Profiles/biographies optional room content only; want/offer exchange needs no personal data.
 - [x] Persisted global signup caps and additive standalone v1->v2 migration, snapshot coverage.
 - [x] Prepare read-only operator VPS preflight, isolated unit EXAMPLE and staged TEST plan.
-- [ ] Actual preflight report, guarded loopback installer, service-user sandbox acceptance.
+- [x] Operator supplied clean read-only VPS preflight: Python 3.12.3, port 8765 free, no existing candidate user/path/unit; not installation authorization.
+- [ ] Guarded loopback installer, fresh preflight revalidation and service-user sandbox acceptance.
 - [ ] Proxy access/anti-abuse policy, separately approved temporary route and live signup/client gates.
 - [ ] Ownership-verified recovery/moderation/Sybil control before broad public onboarding.
 

@@ -1,4 +1,4 @@
-"""Opt-in self enrollment. Contact FORMAT checked, ownership explicitly UNVERIFIED."""
+"""Opt-in one-click pseudonymous enrollment; no profile or contact required."""
 import hashlib
 import json
 import re
@@ -27,14 +27,23 @@ class Enrollment:
         self.auth = auth
 
     def register(self, payload):
-        if (not isinstance(payload, dict) or not {'contact', 'bootstrap_uuid'} <= payload.keys()
-                or not payload.keys() <= {'contact', 'bootstrap_uuid', 'issue_server_key'}
-                or type(payload.get('issue_server_key', False)) is not bool):
-            raise RoomError('invalid_registration')
-        kind = contact_kind(payload['contact'])
-        raw = payload['bootstrap_uuid']
-        if not isinstance(raw, str) or not UUID_BEARER.fullmatch(raw):
-            raise RoomError('invalid_bootstrap_uuid')
+        simple = isinstance(payload, dict) and not payload
+        # Keep the previous pilot payload for compatibility, not as a UI requirement.
+        if not simple:
+            if (not isinstance(payload, dict) or not {'contact', 'bootstrap_uuid'} <= payload.keys()
+                    or not payload.keys() <= {'contact', 'bootstrap_uuid', 'issue_server_key'}
+                    or type(payload.get('issue_server_key', False)) is not bool):
+                raise RoomError('invalid_registration')
+            kind = contact_kind(payload['contact'])
+            raw = payload['bootstrap_uuid']
+            if not isinstance(raw, str) or not UUID_BEARER.fullmatch(raw):
+                raise RoomError('invalid_bootstrap_uuid')
+        else:
+            # Fresh independent account on each explicit POST. No hidden profile,
+            # contact-based recovery or user-selected owner/scopes.
+            cid = uuid.uuid4().hex
+            raw = 'rm1_' + cid + '.' + secrets.token_urlsafe(32)
+            kind = None
         digest = hashlib.sha256(raw.encode('ascii')).hexdigest()
         store = self.auth.store
         now = store.clock()
@@ -65,16 +74,24 @@ class Enrollment:
             for scope, period, maximum in BUDGETS:
                 bucket = now // period
                 db.execute('INSERT INTO signup_budgets(scope,bucket,used,expires_at) VALUES (?,?,1,?) ON CONFLICT(scope,bucket) DO UPDATE SET used=used+1', (scope, bucket, (bucket + 1) * period))
-            uid, cid = str(uuid.uuid4()), uuid.uuid4().hex
+            uid = str(uuid.uuid4())
+            if not simple:
+                cid = uuid.uuid4().hex
             db.execute('INSERT INTO users(id,display_name,created_at) VALUES (?,?,?)', (uid, 'member-' + uid[:8], now))
             scopes = json.dumps(['rooms:read', 'rooms:write'])
             db.execute('INSERT INTO credentials(id,user_id,digest,resource,scopes,expires_at) VALUES (?,?,?,?,?,?)', (cid, uid, digest, self.auth.resource, scopes, expires))
-            db.execute('INSERT INTO enrollments VALUES (?,?,?,?,?)', (digest, uid, cid, kind, now))
-            if payload.get('issue_server_key', False):
+            if simple:
+                issued = {'key': raw, 'credential_id': cid, 'expires_at': expires}
+            else:
+                db.execute('INSERT INTO enrollments VALUES (?,?,?,?,?)', (digest, uid, cid, kind, now))
+            if not simple and payload.get('issue_server_key', False):
                 scid = uuid.uuid4().hex
                 secret = 'rm1_' + scid + '.' + secrets.token_urlsafe(32)
                 db.execute('INSERT INTO credentials(id,user_id,digest,resource,scopes,expires_at) VALUES (?,?,?,?,?,?)', (scid, uid, hashlib.sha256(secret.encode('ascii')).hexdigest(), self.auth.resource, scopes, expires))
                 issued = {'key': secret, 'credential_id': scid, 'expires_at': expires}
+        if simple:
+            return {'ok': True, 'user_id': uid, 'owner': 'user:' + uid,
+                    'already_registered': False, 'server_key': issued}
         return self._result(uid, cid, expires, kind, False, issued)
 
     @staticmethod

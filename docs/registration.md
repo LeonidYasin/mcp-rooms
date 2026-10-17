@@ -1,106 +1,92 @@
-# Automatic enrollment: contact + client secret UUID
+# One-click access: no contact or profile required
 
-Status: opt-in controlled TEST mode, not verified email/phone identity, not OAuth,
-not permission to open an unprotected public registration route on the VPS.
+Status: opt-in controlled TEST candidate, off by default; not deployed, not OAuth,
+not identity verification or permission to expose public registration on the VPS.
 
-## User flow
+## Default user flow
 
-1. Open the same-origin HTTPS `/signup` page (under the external route prefix if
-   used, for example `/rooms-test/signup`). Enter email OR E.164 phone and a secret
-   random UUIDv4. The page can generate it on the user's device with crypto.randomUUID().
-2. Submit HTTPS POST `/register`, not an MCP tool call. No credentials in URLs,
-   chat messages, GitHub, SDK tool arguments or tool results. Header/body logs must
-   be disabled/redacted by the operator. Request body limit 4 KiB / 10-second read.
-3. The server automatically creates a NEW server-generated user UUID. This is NOT
-   the entered secret UUID. No operator action needed for each signup.
-4. Continue using the entered UUID as `Authorization: Bearer <secret-UUIDv4>`, OR
-   opt to receive an additional 256-bit server-generated `rm1_...` credential via
-   the private HTTPS response/page. Both credentials refer to the SAME user.
-5. New server key is shown once. UUID stays active to make lost signup responses
-   recoverable without storing/revealing an issued server key again. A replay of
-   signup with the same active UUID returns the same user, no duplicate user or key.
-6. Optionally test the new key via GET `/identity`, then DELETE `/credentials/current`
-   authenticated by the OLD key. The page verifies both keys have the same user
-   and different credential IDs before revocation. Merely issuing a new key never
-   revokes a previous one silently. Self-issued keys inherit current token scopes.
+1. Open same-origin HTTPS `/signup` (e.g. `/rooms-test/signup` under the proxy prefix).
+2. Click **Создать доступ**. The page sends `POST /register` with empty JSON `{}`.
+3. Server atomically creates one new user and ONE 256-bit random `rm1_...` Bearer
+   key. The response contains `ok`, `user_id`, `owner`, `already_registered:false`
+   and `server_key:{key,credential_id,expires_at}`. Only the key digest is stored.
+4. Save the key privately and enter it in the MCP connection's protected Bearer
+   field. Do not send it to a chat, room, tool argument, URL or GitHub issue.
+5. No email, phone, name, questionnaire, GitHub account or self-generated UUID is
+   needed. No per-user operator approval. Public user UUID is metadata, NOT a key.
 
-POST `/credentials` with an authenticated valid credential and empty JSON `{}`
-issues one new key for that SAME user. It accepts no user_id/scopes/owner override.
-Scope inheritance prevents read-only credentials escalating to write. Lifetime
-cap is 20 issued credentials per user including expired/revoked keys; this is an
-alpha budget, not an unlimited key-management platform. Issuance is not idempotent:
-if the response is lost, the old credential stays usable, but an unused key row
-may remain. Do not loop-retry issuance. Current-user credential-list/revoke-by-ID
-UI and garbage collection remain follow-ups.
+The initial use case is exchanging **want / offer** messages in shared rooms.
+A biography is optional ordinary room text, not an enrollment prerequisite or
+matching/embedding profile. No profile tables or forced introduction room added.
+Room messages remain untrusted data, never instructions the receiving agent must run.
 
-Default lifetime is 7 days (including UUID). Rotate with a still-valid credential
-BEFORE all keys expire. Disable user blocks all keys; key revoke is immediate for
-new requests after commit, not retroactive cancellation of in-flight work.
-Expired/revoked/disabled UUIDs cannot re-register to reset an account. If every
-key is lost/expired, there is NO automatic recovery by merely naming the contact;
-operator recovery or a future ownership-verified flow is required.
+## Delivery, repeat requests and recovery
 
-## What the contact means (and does not mean)
+The key is shown only in the immediate private HTTPS response/page. It is not
+saved in browser localStorage/sessionStorage/cookies, logs or plaintext SQLite.
+The page blocks repeated submits, including double clicks, and does NOT retry
+registration automatically. A fresh empty POST ALWAYS creates a new independent
+account; it is NOT an idempotent request and NOT recovery of a previous account.
+If a response is lost after commit, an unused user/key may remain and counts against
+quotas. The server cannot reprint that key. Creating another account is explicit,
+not a silent retry. Do not build loop-retries around this endpoint.
 
-Only format is checked: conservative ASCII email syntax or international phone
-`+` plus 8..15 digits. No SMTP, SMS, email/SMS delivery fees or dependency required.
-The actual contact value is NOT stored, hashed, returned or used for user lookup;
-only the category email/phone and `verified:false` are retained. It is a user-facing
-onboarding field, not a second authentication factor or anti-bot proof.
+Default key lifetime: 7 days. Before expiry, use the valid key with authenticated
+`POST /credentials` and `{}` to issue a replacement for the SAME user and scopes.
+Save/test it with `GET /identity`, then optionally revoke the OLD key with
+`DELETE /credentials/current`. The page compares user IDs and different credential
+IDs and asks for confirmation before revocation. Update all connections using the
+old key. Issuing a replacement never silently revokes the existing key.
 
-Multiple people can enter the same unverified contact: they get different users
-unless they know the SAME secret UUID. This avoids name-squatting/account takeover
-by typing someone else's email/phone. Email-only, phone-only, display-name and
-X-User-ID claims never restore, link or grant another account's data.
+No owner/user/scopes override is accepted. Read-only credentials cannot escalate
+permissions. Lifetime cap: 20 issued credentials per user, including expired/revoked
+rows. Issuance is not idempotent either: if the response is lost the old key stays
+usable, but an unused new row may remain. Current-user list/revoke-by-ID UI and
+credential garbage collection are follow-ups, not implemented features.
 
-If verified/recoverable contact identity is wanted, add a real email challenge or
-other ownership proof with privacy/abuse review. Phone verification commonly needs
-an SMS provider; do not promise a free SMS service. This design deliberately does
-not pretend to send or verify anything. Profiles/contact discovery are not part
-of this schema.
+Disable blocks all a user's keys. Expired/revoked keys are refused on every new
+HTTP request; in-flight requests are not cancelled retroactively. If EVERY key is
+lost or expired there is NO automatic recovery. Starting signup again creates a
+different owner and does not recover membership/history. Future audited recovery
+would need real proof; an email, name, phone or public user UUID is not proof.
 
-## Entropy and storage
+## Earlier pilot API compatibility (not the default UI)
 
-UUID must be canonical lowercase RFC4122 UUIDv4 (random variant), not UUIDv1/3/5,
-UUIDv7, timestamp, room ID or email-derived value. UUIDv4 provides 122 random bits
-ONLY if generated by a CSPRNG; format validation cannot detect a predictable or
-copied example. Prefer the 256-bit server key for a long-term connection. The
-server-generated user ID is PUBLIC metadata and must NEVER be reused as a secret.
-The server cannot prevent users sharing their own Bearer credential.
+The former explicit payload `{contact,bootstrap_uuid,issue_server_key?}` remains
+accepted for compatibility with prior pilot tests. Contact syntax is checked but
+ownership is UNVERIFIED; the contact is not stored, hashed, echoed or used for
+lookup. Only its email/phone category is stored for that legacy enrollment.
+The UUID must be canonical lowercase random RFC4122 UUIDv4 (122 random bits ONLY
+if CSPRNG-generated). Same active secret replays return the same user without
+revealing/reissuing a previous key. Revoked/expired/disabled UUID cannot reenroll.
+Same unverified contact + different UUID gives different users, never account linking.
+No contact or client UUID is required by the new one-click flow. No SMS/email provider.
 
-Only SHA-256 digests are persisted. No plaintext secret, contact, password, external
-provider token, GitHub PAT or session-as-identity. Stable user UUID scopes ownership,
-cadence and quotas across all its credentials. A UUID token is checked on EVERY HTTP
-request. Knowing an email/phone without the secret gives no account access.
+## Abuse limits and transport
 
-## Abuse limits and deployment gates
+Enable only deliberately with `--enable-registration`. Persisted global fixed-window
+successful-signup caps: 5/minute, 30/hour, 100/day; total 1000 users and DB page budget.
+Both flows share transactional quotas across workers/restarts/snapshots. Quotas are
+NOT human uniqueness, anti-Sybil or DoS prevention. An attacker can exhaust the quota.
+Do not impose a questionnaire as fake protection. Before broad opening review an
+appropriate access/challenge policy, proxy per-source/body/connection/time limits,
+monitoring and abuse handling. Human contact/profile verification is not a current
+product prerequisite; any future recovery/verification is a separate optional design.
 
-Registration is OFF by default; enable explicitly with `--enable-registration` only
-on a reviewed isolated TEST. Persisted global fixed-window successful-signup caps:
-5/minute, 30/hour, 100/day, plus total 1000 users and SQLite page budget. Concurrent
-signup with one UUID creates one user atomically; replay doesn't consume budget.
-Budgets are global, not per-IP: forwarded headers aren't trusted as identity.
+Registration body limit 4 KiB / 10-second read. Host/Origin/cross-site checks, static
+errors, no-store, no-referrer and same-origin CSP apply. Disable/redact proxy and
+application logs of Authorization, request/response bodies. No third-party scripts,
+tracking or automatic polling. MCP exposes EIGHT room tools, no admin/signup tool.
+Unknown Bearer on tools/list or tools/call never implicitly creates a user.
 
-These caps bound growth but are NOT anti-Sybil/DoS protection: an attacker can
-consume the quota and block legitimate signup, and fake contact labels are easy.
-Before opening broadly, choose/implement ownership verification and/or invitation/
-challenge policy, proxy per-source/body/connection/time limits and operational
-monitoring. Do not expose a public service just because CI passes.
+A path prefix is routing, NOT browser origin isolation. A dedicated hostname is
+preferred before broad use if other apps on the same host serve untrusted content.
 
-Authentication and registration errors never echo submitted contact/secret. Page
-uses same-origin JS only, CSP, no-referrer, no-store, no tracking or localStorage.
-Host/Origin/cross-site checks apply to registration, credentials and identity too.
-Existing MCP still exposes exactly EIGHT room tools, no auth/admin MCP methods.
+## Schema and backups
 
-## Data/versioning
-
-Standalone schema v2 adds enrollments and signup_budgets, using the SAME private
-SQLite file and consistent snapshot as users/credentials/rooms. v1 standalone gets
-an additive transaction; existing user IDs and credentials remain. Unknown future
-versions or embedded application_id are refused; no automatic GitHub->UUID mapping.
-Backup/restore also rewinds registration quotas and revocations: reapply protected
-revocation records or reissue/revoke before opening a restored service.
-
-A URL path prefix is a routing boundary, NOT browser origin isolation. Apps on the
-same hostname are trusted in this pilot. Prefer a dedicated hostname before broad
-public use if other apps on the VPS serve untrusted content.
+Standalone schema remains v2. One-click uses users/credentials/signup_budgets, with
+no extra profile/contact rows or schema migration. Previous v2 pilot credentials
+remain usable. v1->v2 remains additive. Embedded/foreign database IDs and unknown
+versions are refused, no GitHub-to-UUID mapping. One private consistent SQLite
+snapshot includes auth and room data. Restore rewinds quotas and revocations:
+reapply protected revocations or reissue/revoke before opening a restored service.

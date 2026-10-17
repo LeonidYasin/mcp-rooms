@@ -15,7 +15,7 @@ from their own console after reviewing exact scope and pinned checksum.
 - Proposed canonical external resource: https://leonid-mcp.duckdns.org/rooms-test/mcp.
   Prefix /rooms-test is stripped by a FUTURE separately reviewed Caddy route.
   Public signup would be /rooms-test/signup; it is NOT opened by this preparation.
-- Authentication only rooms-issued Bearer (client UUID or server-issued key), not
+- Authentication uses rooms-issued Bearer (one-click server key by default), not
   GitHub PAT. New endpoint must never forward local user tokens to GitHub or main MCP.
 
 ## Stage 1: read-only operator preflight
@@ -31,13 +31,18 @@ reserve or inactive existing services. Existing candidates must be inspected,
 never deleted/overwritten automatically. Preflight requires root ONLY for the
 operator's bounded local checks, not for running the rooms service.
 
+Operator supplied a clean report for the previous pinned preflight: Python 3.12.3,
+8765 free, candidate user/home/unit absent, 15332 MiB disk and 1165 MiB available
+memory, protected services active. This is a point-in-time report, NOT an installed
+service or public-route approval. Recheck fresh state immediately before mutation.
+
 ## Stage 2: guarded loopback installation — NOT implemented/applied yet
 
 After actual preflight review, prepare a pinned installer with private log/state,
 exclusive lock, exact existing PID/config checks, minimal new user/paths and rollback
 that affects only resources it created. Build/test as new service user in an
 isolated venv; no installs into old venvs. Start ONLY the new unit and confirm:
-8 tools; new app/schema; signup off/on as intended; enrollment and UUID/server-key
+8 tools; new app/schema; signup off/on as intended; one-click empty-JSON enrollment without a profile and same-user key rotation
 identity tests; no-auth/expiry/revoke/disabled/ownership/rotation negatives; actual
 write access inside systemd sandbox. Compare old service PIDs unchanged. No secrets
 printed in operator reports, and no real key issuance through MCP tool output.
@@ -45,7 +50,8 @@ printed in operator reports, and no real key issuance through MCP tool output.
 ## Stage 3: temporary external route / real client gate
 
 Separate approval and fresh sanitized Caddy inspection. A public signup route cannot
-be secured by merely pretending contact is a verified identity. Select an access/
+be secured by one-click registration quotas alone. No phone/email/profile is required
+for exchanging want/offer messages; questionnaires are not security proof. Select an access/
 abuse policy BEFORE opening it. Guard exact prefix, size/time/connection limits,
 header/log redaction, preserved old routes/PIDs and CAS cleanup preserving concurrent
 Caddy changes. Do not replace Caddyfile or restore a stale whole runtime snapshot.

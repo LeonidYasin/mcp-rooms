@@ -99,9 +99,13 @@ Publishing code never enables registration by itself. The operator has installed
 an isolated loopback TEST with registration enabled; external routing remains a
 separate reviewed step. Production and existing embedded services remain unchanged.
 [Read-only preflight, prepared operator-only loopback installer and staged deployment plan](docs/vps-test-plan.md).
-The installer never edits old services/Caddy and is NOT run automatically by CI or
+The loopback installer never edits old services/Caddy and is NOT run automatically by CI or
 the agent. It preserves user/data on rollback. Operator reported local two-user,
 rotation/revocation and SQLite integrity acceptance; external client gates remain pending.
+
+[Temporary HTTPS route scope, public-signup risks and cleanup](docs/https-test.md).
+The separate proxy helper changes only its new runtime route after explicit operator
+execution; the currently recorded state remains loopback-only until a new report.
 
 ## Optional operator provisioning / running: examples, NOT a VPS rollout
 

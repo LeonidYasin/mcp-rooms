@@ -119,6 +119,10 @@ Test real independent new users/clients and token rotation. Never enroll automat
 on an unknown Bearer token in tools/list or tools/call; use explicit signup form.
 This avoids registry probes minting users silently. Existing TEST connections stay.
 
+Prepared explicit 30-minute route helper and exposure/cleanup limitations are in
+[HTTPS TEST scope](https-test.md). Operator supplied the fresh inspector report;
+opening remains a separate root-console action. No route is opened by this commit.
+
 ## Stage 4: release/operations
 
 Auth/source/dependency review, full parity decision, restart/restore/auth-revocation

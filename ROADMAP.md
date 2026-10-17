@@ -31,7 +31,9 @@
 - [x] Prepare checksum-pinnable new-service installer, conservative data-preserving rollback and pure/mocked/ASGI acceptance coverage.
 - [x] Operator-reported isolated loopback install accepted at runtime SHA 4b2351c0b6522d30c888496b3c1774be8791345f; two users, rotation, SQLite integrity; protected services unchanged.
 - [x] Prepare root-only read-only Caddy inspector with private snapshot and secret-sanitized routing report.
-- [ ] Fresh proxy report, separately approved HTTPS/registration access policy and external client acceptance.
+- [x] Fresh operator proxy report: one host server, no prefix collision, ETag available; rooms active.
+- [x] Prepare explicit 30-minute public-signup TEST route with scoped CAS insert/delete, persistent cleanup/manual fallback and no old auth bypass.
+- [ ] Operator HTTPS-route report and real external-client/two-chat acceptance.
 - [ ] Proxy access/anti-abuse policy, separately approved temporary route and live signup/client gates.
 - [ ] Ownership-verified recovery/moderation/Sybil control before broad public onboarding.
 

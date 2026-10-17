@@ -104,3 +104,16 @@ def test_origin_and_host_rejected_by_sdk(setup):
     base = dict(HEADERS, Authorization='Bearer ' + ta)
     assert client.post('/mcp', headers=dict(base, Origin='https://evil.example'), json=payload).status_code in (400, 403, 421)
     assert client.post('/mcp', headers=dict(base, Host='evil.example'), json=payload).status_code in (400, 403, 421)
+
+
+def test_concurrent_sdk_calls_do_not_mix_principals(setup):
+    from concurrent.futures import ThreadPoolExecutor
+    client, auth, a, b, ma, ta, mb, tb = setup
+    def create(index):
+        token, owner = (ta, a) if index % 2 == 0 else (tb, b)
+        result = tool(client, token, 'rooms_create', title='concurrent-' + str(index))
+        assert result['ok'] and result['owner'] == 'user:' + owner
+        return result['room_id']
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        ids = list(pool.map(create, range(8)))
+    assert len(set(ids)) == 8

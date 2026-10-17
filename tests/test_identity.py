@@ -119,11 +119,14 @@ def test_unsafe_embedded_db_is_not_migrated(tmp_path):
         db.execute('CREATE TABLE actors (owner TEXT PRIMARY KEY)')
         db.execute('INSERT INTO actors VALUES (?)', ('github:123',))
         db.execute('PRAGMA user_version=1')
+    path.chmod(0o640)
     with pytest.raises(RoomError, match='unsupported_database_identity'):
         RoomStore(path)
     with sqlite3.connect(path) as db:
         assert db.execute('SELECT owner FROM actors').fetchone()[0] == 'github:123'
         assert db.execute('PRAGMA application_id').fetchone()[0] == 0
+        assert db.execute('PRAGMA journal_mode').fetchone()[0] == 'delete'
+    assert path.stat().st_mode & 0o777 == 0o640
 
 
 @pytest.mark.parametrize('resource', ['http://rooms.example/mcp', 'https://x/mcp?token=x', 'https://a:b@x/mcp', 'https://x/other', 'https://x/mcp#fragment', None])

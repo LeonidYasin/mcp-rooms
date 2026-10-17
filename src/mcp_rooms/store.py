@@ -97,17 +97,19 @@ class RoomStore:
             if (not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or
                     info.st_uid != os.geteuid()):
                 raise RoomError('invalid_database_path')
+            if info.st_size:
+                # Reject an embedded/foreign database BEFORE changing its mode,
+                # journal, schema or application_id. Never auto-migrate identity.
+                existing = sqlite3.connect(self.path.as_uri() + '?mode=ro', uri=True, timeout=5)
+                try:
+                    self._validate_identity(existing)
+                finally:
+                    existing.close()
             os.fchmod(fd, 0o600)
         finally:
             os.close(fd)
         with self._db(write=True, initialize=True) as db:
-            version = db.execute('PRAGMA user_version').fetchone()[0]
-            if version not in (0, 1):
-                raise RoomError('unsupported_database_version')
-            app_id = db.execute('PRAGMA application_id').fetchone()[0]
-            existing = db.execute("SELECT 1 FROM sqlite_master WHERE type='table'").fetchone()
-            if app_id != self.APPLICATION_ID and (app_id != 0 or existing or version != 0):
-                raise RoomError('unsupported_database_identity')
+            self._validate_identity(db)
             for statement in (
                 'CREATE TABLE IF NOT EXISTS actors (owner TEXT PRIMARY KEY, last_send INTEGER)',
                 'CREATE TABLE IF NOT EXISTS rooms (seq INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT UNIQUE NOT NULL, owner TEXT NOT NULL, title TEXT NOT NULL, description TEXT NOT NULL, created_at INTEGER NOT NULL)',
@@ -123,6 +125,16 @@ class RoomStore:
             db.execute('CREATE INDEX IF NOT EXISTS credentials_user ON credentials(user_id)')
             db.execute('PRAGMA application_id=' + str(self.APPLICATION_ID))
             db.execute('PRAGMA user_version=1')
+
+    @classmethod
+    def _validate_identity(cls, db):
+        version = db.execute('PRAGMA user_version').fetchone()[0]
+        if version not in (0, 1):
+            raise RoomError('unsupported_database_version')
+        app_id = db.execute('PRAGMA application_id').fetchone()[0]
+        existing = db.execute("SELECT 1 FROM sqlite_master WHERE type='table'").fetchone()
+        if app_id != cls.APPLICATION_ID and (app_id != 0 or existing or version != 0):
+            raise RoomError('unsupported_database_identity')
 
     @contextmanager
     def _db(self, write=False, initialize=False):

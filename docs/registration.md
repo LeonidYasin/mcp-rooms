@@ -100,3 +100,7 @@ an additive transaction; existing user IDs and credentials remain. Unknown futur
 versions or embedded application_id are refused; no automatic GitHub->UUID mapping.
 Backup/restore also rewinds registration quotas and revocations: reapply protected
 revocation records or reissue/revoke before opening a restored service.
+
+A URL path prefix is a routing boundary, NOT browser origin isolation. Apps on the
+same hostname are trusted in this pilot. Prefer a dedicated hostname before broad
+public use if other apps on the VPS serve untrusted content.

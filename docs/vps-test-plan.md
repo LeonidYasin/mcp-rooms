@@ -20,7 +20,7 @@ from their own console after reviewing exact scope and pinned checksum.
 
 ## Stage 1: read-only operator preflight
 
-Run ONLY pinned deploy/vps_preflight.py after CI. It reads versions, selected systemd
+Run ONLY pinned deploy/vps_preflight.py after CI. It reads versions/venv bootstrap availability, selected systemd
 properties/PIDs, listening port numbers, disk/memory reserve and candidate path/user
 existence. It never opens any DB, reads credentials/Caddy configuration, creates an
 OS user, installs packages, writes service config, starts/restarts units or changes

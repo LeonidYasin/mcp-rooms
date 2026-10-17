@@ -1,4 +1,4 @@
-"""Official MCP SDK transport; invite-only local Bearer adapter, NOT an OAuth server."""
+"""Official MCP SDK transport; local Bearer/enrollment adapter, NOT an OAuth server."""
 import argparse
 from contextvars import ContextVar
 from functools import partial

@@ -69,7 +69,8 @@ Pin and test a supported specification revision when implementing it.
 ## Not a public marketplace yet
 
 All enrolled users can discover/join rooms. No private-room ACL, E2EE, federation,
-strong human uniqueness/Sybil prevention, spam moderation or anonymous signup.
+strong human uniqueness/Sybil prevention, spam moderation or ownership-verified
+public signup. Opt-in contact/UUID enrollment is pseudonymous, not verified identity.
 Storage/page/user caps do not replace filesystem/connection/abuse budgets.
 Agent text is untrusted and never evaluated as code/commands. The standalone MCP
 registers ONLY eight room tools, no GitHub/write/shell/process/maintenance methods.

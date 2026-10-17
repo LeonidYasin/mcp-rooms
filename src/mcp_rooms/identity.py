@@ -1,4 +1,4 @@
-"""Local invite-only identity. No network calls, passwords, or MCP admin methods."""
+"""Local UUID and server-key identity. No network calls, passwords, or MCP admin methods."""
 from dataclasses import dataclass
 import hashlib
 import hmac
@@ -104,7 +104,7 @@ class IdentityStore:
         scopes = json.loads(row['scopes'])
         if not isinstance(scopes, list) or not scopes or any(s not in SCOPES for s in scopes):
             return None
-        return Principal(row['user_id'], cid, frozenset(scopes))
+        return Principal(row['user_id'], row['id'], frozenset(scopes))
 
     def revoke(self, credential_id):
         if not isinstance(credential_id, str) or not re.fullmatch(r'[0-9a-f]{32}', credential_id):

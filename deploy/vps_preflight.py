@@ -1,5 +1,6 @@
 """Operator-run read-only VPS preflight. No install, auth DB, Caddy config, or restart."""
 import json
+import importlib.util
 import os
 from pathlib import Path
 import pwd
@@ -52,7 +53,12 @@ def main():
             account_info = {'exists': False}
         paths = {path: Path(path).exists() or Path(path).is_symlink() for path in
                  ('/home/mcp-rooms-test', '/etc/systemd/system/mcp-rooms-test.service')}
+        tools = {name: shutil.which(name) is not None for name in
+                 ('git', 'curl', 'systemctl', 'systemd-run', 'runuser', 'ss')}
+        modules = {name: importlib.util.find_spec(name) is not None for name in ('venv', 'ensurepip')}
         blockers = []
+        if not all(tools.values()): blockers.append('required_operator_tool_missing')
+        if not all(modules.values()): blockers.append('python_venv_bootstrap_missing')
         if not (3, 10) <= sys.version_info[:2] <= (3, 13): blockers.append('python_outside_ci_matrix')
         if PORT in used: blockers.append('candidate_port_in_use')
         if proposed.get('LoadState') != 'not-found': blockers.append('candidate_unit_already_exists')
@@ -61,6 +67,7 @@ def main():
         if memory_kib is None or memory_kib < 384 * 1024: blockers.append('insufficient_memory_reserve')
         if any(p.get('ActiveState') != 'active' for p in services.values()): blockers.append('existing_service_not_active')
         print(json.dumps({'result': 'ROOMS VPS PREFLIGHT', 'python': sys.version.split()[0],
+            'required_tools_available': tools, 'venv_modules_available': modules,
             'services': services, 'candidate_unit': proposed, 'candidate_port': PORT,
             'candidate_port_free': PORT not in used, 'candidate_user': account_info,
             'existing_candidate_paths': paths, 'disk_free_mib': disk.free // 1024**2,

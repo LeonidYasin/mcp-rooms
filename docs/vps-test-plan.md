@@ -36,16 +36,49 @@ Operator supplied a clean report for the previous pinned preflight: Python 3.12.
 memory, protected services active. This is a point-in-time report, NOT an installed
 service or public-route approval. Recheck fresh state immediately before mutation.
 
-## Stage 2: guarded loopback installation — NOT implemented/applied yet
+## Stage 2: guarded loopback installation — prepared, NOT applied
 
-After actual preflight review, prepare a pinned installer with private log/state,
-exclusive lock, exact existing PID/config checks, minimal new user/paths and rollback
-that affects only resources it created. Build/test as new service user in an
-isolated venv; no installs into old venvs. Start ONLY the new unit and confirm:
-8 tools; new app/schema; signup off/on as intended; one-click empty-JSON enrollment without a profile and same-user key rotation
-identity tests; no-auth/expiry/revoke/disabled/ownership/rotation negatives; actual
-write access inside systemd sandbox. Compare old service PIDs unchanged. No secrets
-printed in operator reports, and no real key issuance through MCP tool output.
+`deploy/vps_install_test.py` is an explicit operator-root-console installer, not an
+agent remote execution tool. Review and checksum-pin its exact revision first.
+It installs runtime source pinned independently to CI-accepted commit
+`4b2351c0b6522d30c888496b3c1774be8791345f`, NEVER the current branch tip. Installer
+CI covers pure/mocked OS behavior and runs the actual loopback acceptance script
+against an in-process ASGI app; it does not claim real systemd/VPS acceptance.
+
+Scope of `--install`:
+- Root-only exclusive lock and fresh resource/protected-state preflight; requires
+  at least 512 MiB available RAM and 2 GiB / 10% free disk. Reject existing user,
+  group, home, unit or occupied 8765; no overwrites or automatic user deletion.
+- Private root-owned state/log/installer copy; creates only the NEW `mcp-rooms-test`
+  account/home/data/venv/app and exact new unit. NO apt, root pip, old venv updates,
+  existing DB opens, Caddy edits, firewall changes or reboots.
+- Fetch exact source, venv/pip, tests, wheel/sdist build and installed-package check
+  as NEW non-root service user in a filesystem/memory/time-bounded transient
+  systemd unit. No project import or build as root. Dependencies come from package
+  indexes with declared constraints, not an audited frozen dependency lock.
+- A new installed-wheel loopback service, registration enabled, strict sandbox,
+  127.0.0.1:8765 only, RuntimeMaxSec=7200, no enable-at-boot. Reject extra unit
+  drop-ins/foreign fragment. systemctl daemon-reload is used; old units are not restarted.
+- Live local HTTP smoke gate as the NEW user: unauthenticated rejection, exactly
+  eight tools, TWO independent one-click users, join/read/write and owner negatives,
+  want/offer exchange, idempotent retry, same-user rotate/revoke and SQLite integrity.
+  Gate keys stay only in process memory and are revoked on success; test user/hash
+  rows remain budgeted. The temporary room is closed. This is NOT an external
+  HTTPS/Notion/two-chat test. Gate creates two users against the global signup budget.
+- Compare old service selected properties/PIDs unchanged. Reports contain no keys.
+
+On caught failure, attempt conservative rollback: stop/remove only our exact new
+unit if unchanged. If unit ownership/hash/fragment/drop-ins differ, STOP for review;
+never force-remove changed resources. Preserve new user/home/database/logs for
+inspection. A later rerun therefore stops on existing resources rather than erasing
+state. Manual rollback command is emitted in a successful report and uses the
+root-private installer copy/state. Rollback does not restore a whole systemd/Caddy
+snapshot and does not delete user data. A crash/power loss/forced interruption still
+needs manual review; runtime limits do not remove files/accounts or roll back setup.
+
+Do not paste private logs wholesale. On STOP return only sanitized result first;
+inspect specific error categories if needed. Successful loopback install is not
+permission to open the public route, merge the draft PR or deploy production.
 
 ## Stage 3: temporary external route / real client gate
 

@@ -97,7 +97,9 @@ payloads remain compatible, but are absent from the new UI and never required.
 
 Registration is NOT enabled on a VPS by publishing this code. New isolated user,
 loopback service/DB and guarded proxy route remain separate operator steps.
-[Read-only preflight and staged deployment plan](docs/vps-test-plan.md).
+[Read-only preflight, prepared operator-only loopback installer and staged deployment plan](docs/vps-test-plan.md).
+The installer never edits old services/Caddy and is NOT run automatically by CI or
+the agent. It preserves user/data on rollback; real VPS acceptance remains pending.
 
 ## Optional operator provisioning / running: examples, NOT a VPS rollout
 

@@ -27,7 +27,8 @@
 - [x] Persisted global signup caps and additive standalone v1->v2 migration, snapshot coverage.
 - [x] Prepare read-only operator VPS preflight, isolated unit EXAMPLE and staged TEST plan.
 - [x] Operator supplied clean read-only VPS preflight: Python 3.12.3, port 8765 free, no existing candidate user/path/unit; not installation authorization.
-- [ ] Guarded loopback installer, fresh preflight revalidation and service-user sandbox acceptance.
+- [x] Prepare checksum-pinnable new-service installer, conservative data-preserving rollback and pure/mocked/ASGI acceptance coverage.
+- [ ] Operator-run installation with fresh preflight and real service-user/systemd sandbox acceptance.
 - [ ] Proxy access/anti-abuse policy, separately approved temporary route and live signup/client gates.
 - [ ] Ownership-verified recovery/moderation/Sybil control before broad public onboarding.
 

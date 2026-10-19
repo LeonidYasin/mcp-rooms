@@ -86,7 +86,8 @@ encryption/off-host backup and automated deletion are separate work.
 This is a limited backup-copy/restart drill, NOT proof of production failover,
 authenticated client behavior after restart, all historical rows, or post-snapshot
 revocation reconciliation. Notion actually read retained dialogue and sent a fresh reply after the operator PASS;
-Qwen must read that reply to finish its post-restart acceptance.
+Qwen reported reading that reply and closing its own ACL fixture, finishing the
+post-restart client acceptance.
 Missing/expired/closed synthetic messages cause STOP before restart. Failed setup
 never authorizes blind overwrite of changed units, full Caddy restore or live DB restore.
 
@@ -96,7 +97,7 @@ key. A disabled user is not re-enabled by issue-token. Restoring an old snapshot
 revive revoked credentials: prove reconciliation on an isolated copy before exposure.
 
 
-## Disposable auth/revocation drill (prepared, live acceptance pending)
+## Disposable auth/revocation drill (operator-reported PASS; real-client follow-up scoped)
 
 `deploy/vps_rooms_auth_drill.py` verifies the checksum-pinned accepted recovery helper,
 24-hour state/route/unit/timer and old services, then runs synthetic logic as the
@@ -126,3 +127,12 @@ for HTTPS, including failure cleanup and an untouched unrelated user/key. It doe
 prove actual Caddy/TLS/network acceptance. Operator PASS and real client recheck must
 follow separately. Off-host encryption, general revocation journal, load/alerts and
 observed 24h cleanup are still open gates.
+
+
+Operator reported the disposable drill PASS with all synthetic keys revoked/users
+disabled. Agent then confirmed the real Notion connection still reads/writes;
+Qwen fresh post-auth read is pending. Snapshots/ledger remain private and retained.
+Do not rerun merely to manufacture more evidence: each run budgets 2 user rows and
+3 credential rows. Observe final route/service/override cleanup. Manual early closure
+and actual calendar-triggered cleanup are different evidence; do not mark both passed
+from one manual command. Neither is broad production or public-registration approval.

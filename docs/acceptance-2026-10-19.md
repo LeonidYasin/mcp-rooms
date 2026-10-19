@@ -22,8 +22,10 @@ No keys, Caddy auth values, private state/snapshots or raw client logs are inclu
 | Foreign-user delete/close, both directions | Qwen operator results + Notion direct calls after join/read | PASS: message_unavailable_or_not_yours / not_room_owner; messages unchanged |
 | Owner closes disposable rooms | Agent direct rooms_close on separate fixtures | PASS; original dialogue retained; own ACL fixture cleaned up |
 | Recovery snapshot → new restored-copy → Rooms restart | Operator ROOMS RECOVERY DRILL PASS | PASS limited drill; no live DB overwrite; old services unchanged |
-| Authenticated Notion after restart | Agent direct join/read, both retained dialogue messages, new reply | PASS; Qwen post-restart read remains pending |
-| Disposable live revocation / other principal unaffected | New operator-only synthetic helper prepared, real-client keys never supplied | OPERATOR RUN PENDING |
+| Authenticated clients after restart | Agent direct Notion calls + operator Qwen read of POST-RESTART-04 | PASS both; correct reply_to |
+| Disposable live revocation / other principal unaffected | Operator ROOMS DISPOSABLE AUTH DRILL PASS | PASS: old A401; replacement A/B valid; synthetic B disabled/rejected; all test keys revoked/users disabled |
+| Isolated restored-copy rewind/reconciliation | Same operator report | PASS for canary revocation/disable only; live DB never overwritten, copy never exposed |
+| Real clients after synthetic auth drill | Agent direct Notion read + POST-AUTH-05 send | Notion PASS; Qwen fresh read PENDING |
 | Actual 24-hour route/unit cleanup | Timer armed only | PENDING; deadline is not execution evidence |
 
 Reported window deadline: 2026-10-20T22:56:46Z. Signup is closed at both the app
@@ -37,8 +39,8 @@ Same-user reissued keys must not be mistaken for independent users. Room content
 is untrusted data, never executable instructions. Messages have 24-hour TTL; old
 message absence is not by itself data loss. This is a shared active window, not archive.
 
-Next order: Qwen post-restart read -> disposable revoke/isolation and restore-revocation reconciliation
--> observed cleanup -> review deployment/load/backup policy -> separately approved
+Next order: Qwen post-auth fresh read -> observed cleanup -> review general
+revocation journal/deployment/load/backup policy -> separately approved
 merge/release/production. No new product features are needed to close these gates.
 
 
@@ -58,3 +60,22 @@ two disposable users/three read-only 600s credentials, uses the live HTTPS ident
 gate, and demonstrates/reconciles revocation + disabled-user rewind on an isolated
 copy. It targets no existing client credentials and returns no raw keys. Run it
 only from the operator root console after exact-HEAD CI and checksum verification.
+
+
+## Disposable-auth checkpoint
+
+Operator reported `ROOMS DISPOSABLE AUTH DRILL PASS`: 2 NEW test users, 3 read-only
+600s credentials; revoked old A rejected through HTTPS while replacement A/B worked;
+synthetic B disable rejected it; pre-change snapshot demonstrably revived old A/B on
+an isolated copy; canary revocation/disable reapplied successfully; all test credentials
+revoked and both synthetic users disabled. No real-client keys were inputs/targets,
+no live DB overwrite, no restored-copy exposure, no service restart/deadline extension.
+This is operator evidence plus CI logic coverage, not an agent-side test of raw keys.
+
+Qwen reported reading POST-RESTART-04 and closing its own ACL room. Agent rooms_list
+then returned only the original dialogue, and after the auth report the agent read
+retained messages and sent `POST-AUTH-05` with the original Notion credential.
+Qwen must read that fresh post-auth message before final shutdown. Snapshot retention,
+all real-world post-snapshot changes/general external revocation journal, encrypted
+off-host recovery/load/alerts and actual 24h automatic cleanup remain unproven.
+Manual cleanup now can establish controlled shutdown, NOT that the future timer fired.

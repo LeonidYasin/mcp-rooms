@@ -25,8 +25,8 @@ Qwen Desktop → local loopback header adapter (.env secret) ├→ HTTPS /rooms
   scoped CAS route, persistent cleanup, runtime-only override, no production restart.
 - `deploy/vps_rooms_recovery_drill.py`: operator-reported snapshot/copy/restart PASS;
   no key issuance/revocation or restored-copy exposure.
-- `deploy/vps_rooms_auth_drill.py`: prepared synthetic HTTP revocation and isolated
-  restore-rewind/reconciliation drill; live operator acceptance pending.
+- `deploy/vps_rooms_auth_drill.py`: operator-reported synthetic HTTP revocation
+  and isolated canary restore-rewind/reconciliation PASS; general DR journal remains open.
 - `tests/`, `.github/workflows/ci.yml`: Linux Python 3.10–3.13 tests/build; CI does
   not operate the VPS, access real credentials or prove external-client acceptance.
 

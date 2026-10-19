@@ -20,10 +20,13 @@
 - [x] Prepare guarded snapshot → restore-to-new-path → Rooms-only restart helper and pure CI contracts.
 - [x] Operator recovery drill: consistent snapshot, restore-to-new-path, integrity/counts/diagnostic messages and Rooms-only restart.
 - [x] Authenticated Notion read and new send after restart.
-- [ ] Qwen reads the new post-restart reply and closes its own ACL canary room.
+- [x] Qwen reported reading the new post-restart reply and closing its own ACL canary; agent list confirms only original room remains.
 - [x] Prepare disposable-user HTTP revocation/isolation and isolated-copy rewind/reconciliation drill; CI fixtures preserve an unrelated principal.
-- [ ] Post-snapshot revocation rewind reconciliation on an isolated restored copy.
-- [ ] Live disposable-credential revocation while the second principal remains usable; never revoke the only real-client key.
+- [x] Operator-observed canary revocation/disabled-user rewind and reconciliation on an isolated restored copy; never overwrite/expose the live DB.
+- [ ] General external revocation/change journal and reconciliation policy for real disaster recovery.
+- [x] Operator live HTTPS disposable old-key revoke, same-user replacement/independent-user isolation, disabled-user rejection and complete canary cleanup.
+- [x] Agent authenticated Notion read and fresh send after synthetic auth drill.
+- [ ] Qwen reads fresh POST-AUTH-05 after synthetic auth drill; original client key preserved.
 - [ ] Disk/WAL/backups budgets, off-host recovery, alerting and measured capacity.
 - [ ] Separately approved production release, deploy and rollback.
 

@@ -25,8 +25,9 @@ No keys, Caddy auth values, private state/snapshots or raw client logs are inclu
 | Authenticated clients after restart | Agent direct Notion calls + operator Qwen read of POST-RESTART-04 | PASS both; correct reply_to |
 | Disposable live revocation / other principal unaffected | Operator ROOMS DISPOSABLE AUTH DRILL PASS | PASS: old A401; replacement A/B valid; synthetic B disabled/rejected; all test keys revoked/users disabled |
 | Isolated restored-copy rewind/reconciliation | Same operator report | PASS for canary revocation/disable only; live DB never overwritten, copy never exposed |
-| Real clients after synthetic auth drill | Agent direct Notion read + POST-AUTH-05 send | Notion PASS; Qwen fresh read PENDING |
-| Actual 24-hour route/unit cleanup | Timer armed only | PENDING; deadline is not execution evidence |
+| Real clients after synthetic auth drill | Agent direct Notion read/send; operator supplied Qwen final answer | Notion PASS; Qwen reported matching ID but DIFFERENT text, exact-read acceptance NOT established |
+| Controlled manual window cleanup | Operator ROOMS HTTPS ROUTE CLEANUP + systemctl properties | PASS: route removed, Rooms inactive/dead PID0, no drop-ins, original 2h limit, DB preserved |
+| Calendar-triggered automatic 24-hour cleanup | Window manually closed early | NOT TESTED; manual cleanup does not prove timer firing |
 
 Reported window deadline: 2026-10-20T22:56:46Z. Signup is closed at both the app
 launch and route levels; existing keys work until revoked/expired. Backend fallback
@@ -79,3 +80,30 @@ Qwen must read that fresh post-auth message before final shutdown. Snapshot rete
 all real-world post-snapshot changes/general external revocation journal, encrypted
 off-host recovery/load/alerts and actual 24h automatic cleanup remain unproven.
 Manual cleanup now can establish controlled shutdown, NOT that the future timer fired.
+
+
+## Controlled shutdown and final client-output discrepancy
+
+Operator executed the checksum-matching private cleanup helper and supplied
+`ROOMS HTTPS ROUTE CLEANUP`: route removed/already absent, no whole-config overwrite,
+Caddyfile unchanged, Rooms DB preserved, Rooms stopped, runtime override removed.
+Selected unit properties: RuntimeMaxUSec=2h, MainPID=0, ActiveState=inactive,
+SubState=dead, DropInPaths empty. This is operator-confirmed manual closure, NOT an
+independent agent inspection or a proof of calendar-triggered cleanup. Existing
+room/identity data are retained; reconnecting now should fail until another approved
+window. No implicit re-opening or production enablement.
+
+The operator's final Qwen answer named message `b8751fba-8776-4b34-950a-156110881c3f`
+and the expected reply_to, but its purported factual text differs from the actual
+successful Notion rooms_send result for that ID:
+
+- Actual sent text starts: `POST-AUTH-05: Notion после теста отзыва одноразовых ключей реально прочитал основной диалог и отправил это сообщение действующим ключом.`
+- Qwen final answer starts: `POST-AUTH-05: Notion подтверждает, что Qwen успешно прочитал сообщение b8751fba-8776-4b34-950a-156110881c3f через rooms_read.`
+
+Do NOT silently accept this as exact tool readback. It may be client paraphrase,
+a report error or another cause; no cause is proven, and no server mutation/loss is
+established by this discrepancy. The server has no room-message edit tool. The endpoint
+is now closed, so no claim of a new live verification is made. Earlier external
+round-trip, bidirectional ACL, restart and disposable-auth evidence remain scoped
+as recorded. Exact Qwen post-auth raw tool-result verification is a follow-up only
+if/when another TEST is approved; do not re-open merely to make the checklist green.

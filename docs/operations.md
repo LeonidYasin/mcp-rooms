@@ -136,3 +136,19 @@ Do not rerun merely to manufacture more evidence: each run budgets 2 user rows a
 3 credential rows. Observe final route/service/override cleanup. Manual early closure
 and actual calendar-triggered cleanup are different evidence; do not mark both passed
 from one manual command. Neither is broad production or public-registration approval.
+
+
+## Latest closure (operator-confirmed manual action)
+
+The operator closed the current window with its exact private cleanup helper.
+Rooms is inactive/dead with PID0, no drop-ins, original RuntimeMaxUSec=2h; the
+route was removed and DB preserved. Do not treat the disconnected endpoint as
+expired/revoked real credentials, reinstall/re-register automatically, or start the
+original signup-enabled unit without another explicit approval. Manual cleanup
+passed; calendar-triggered automatic cleanup is NOT tested.
+
+The last Qwen answer had the expected message ID but changed the actual POST-AUTH-05
+text. Keep exact-read verification open, not a fabricated PASS. A client answer and
+a raw MCP tool result are different evidence; preserve that distinction in future
+acceptance. This does not establish a server edit/corruption defect. See the
+acceptance record; no re-opening was performed to investigate after closure.

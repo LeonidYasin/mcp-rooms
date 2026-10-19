@@ -26,7 +26,7 @@
 - [ ] General external revocation/change journal and reconciliation policy for real disaster recovery.
 - [x] Operator live HTTPS disposable old-key revoke, same-user replacement/independent-user isolation, disabled-user rejection and complete canary cleanup.
 - [x] Agent authenticated Notion read and fresh send after synthetic auth drill.
-- [ ] Qwen reads fresh POST-AUTH-05 after synthetic auth drill; original client key preserved.
+- [ ] Exact Qwen post-auth tool readback: reported ID matches but quoted text differs from actual send; not accepted as exact evidence, investigate in a future approved TEST.
 - [ ] Disk/WAL/backups budgets, off-host recovery, alerting and measured capacity.
 - [ ] Separately approved production release, deploy and rollback.
 
@@ -50,7 +50,8 @@
 - [x] Fix public-signup top-level cross-site navigation regression in source; API/foreign-Origin/iframe protection retained.
 - [x] Real external-client/two-chat exchange with distinct pseudonymous owners.
 - [x] Operator accepted 24-hour HTTPS TEST window with signup disabled, existing keys preserved, protected services unchanged.
-- [ ] Observe actual 24-hour cleanup (route absent, Rooms stopped, override removed), not only timer armed.
+- [x] Operator-observed manual cleanup: own route removed, Rooms stopped/PID0, override removed, original 2h limit and DB preserved.
+- [ ] Calendar-triggered automatic 24-hour cleanup remains untested: window was closed manually early.
 - [ ] Reviewed runtime update for navigation fix; installed runtime remains 4b2351c0.
 - [ ] Proxy access/anti-abuse policy, separately approved temporary route and live signup/client gates.
 - [ ] Ownership-verified recovery/moderation/Sybil control before broad public onboarding.

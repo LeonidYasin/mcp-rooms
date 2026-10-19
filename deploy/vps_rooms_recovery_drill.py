@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import stat
 import subprocess
 import time
@@ -116,6 +117,9 @@ def main():
         h,state=verify_helper(args.window_state)
         before_old=h.old_services(); before_unit=window_checks(h,state)
         initial=fingerprint(DB)
+        disk=shutil.disk_usage(HOME/'data')
+        require(disk.free>=512*1024**2 and disk.free/disk.total>=0.10,
+                'insufficient_disk_reserve_for_snapshots')
         directory=Path(as_user(['mktemp','-d',str(HOME/'data/recovery-drill.XXXXXX')]))
         require(directory.parent==HOME/'data' and directory.resolve()==directory
                 and re.fullmatch(r'recovery-drill\.[A-Za-z0-9]+',directory.name),'unexpected_snapshot_directory')

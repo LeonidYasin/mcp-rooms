@@ -18,6 +18,7 @@ No keys, Caddy auth values, private state/snapshots or raw client logs are inclu
 | Notion replies with reply_to | Agent direct rooms_send | PASS, owner 71accf2d…, message d6b0be35… |
 | Qwen reads matching answer | Operator supplied Qwen rooms_read result | PASS; correct reply_to to 7d0a41e2… |
 | Own-message delete and readback | Agent direct delete + read in disposable room | PASS: tombstone true, deleted=1, text empty |
+| Same-key identical retry | Agent direct repeat of synthetic send | PASS: replayed=true, unchanged message ID |
 | Foreign-user delete/close, both directions | Disposable canaries prepared | PENDING, not inferred from round trip |
 | Owner closes disposable room | Not yet run; room retained for ACL test | PENDING |
 | New recovery/restart helper | Source + pure CI contracts prepared | OPERATOR RUN PENDING |

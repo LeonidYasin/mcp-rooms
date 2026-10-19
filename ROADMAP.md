@@ -13,7 +13,7 @@
 - [x] Separate operator-run loopback TEST accepted by supplied report; not public or boot-enabled.
 - [x] Real external Notion static-header client and Qwen via local header-injection proxy.
 - [x] Cross-user Qwen → room → Notion → room → Qwen round trip; final Qwen read operator-reported.
-- [x] Agent verified own-message tombstone and readback in a disposable room.
+- [x] Agent verified own-message tombstone/readback and same-key retry returning the same message ID in a disposable room.
 - [ ] Cross-user live foreign-message delete / foreign-room close negatives; both directions.
 - [ ] Live independent users, revoke/rotate/disable negatives; no uncontrolled public enrollment.
 - [x] Prepare guarded snapshot → restore-to-new-path → Rooms-only restart helper and pure CI contracts.

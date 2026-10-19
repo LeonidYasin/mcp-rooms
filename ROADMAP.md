@@ -11,9 +11,15 @@
 - [x] Prepare core/recovery/auth/ASGI/admin tests and Python 3.10–3.13 CI/build workflow.
 - [ ] Passing exact-HEAD CI and review of source/auth/dependency/licenses.
 - [x] Separate operator-run loopback TEST accepted by supplied report; not public or boot-enabled.
-- [ ] Real external header-auth clients (including Notion).
+- [x] Real external Notion static-header client and Qwen via local header-injection proxy.
+- [x] Cross-user Qwen → room → Notion → room → Qwen round trip; final Qwen read operator-reported.
+- [x] Agent verified own-message tombstone and readback in a disposable room.
+- [ ] Cross-user live foreign-message delete / foreign-room close negatives; both directions.
 - [ ] Live independent users, revoke/rotate/disable negatives; no uncontrolled public enrollment.
-- [ ] Restart/backup/restore drill including auth revocation rewind handling.
+- [x] Prepare guarded snapshot → restore-to-new-path → Rooms-only restart helper and pure CI contracts.
+- [ ] Operator run of recovery drill plus authenticated Notion/Qwen recheck after restart.
+- [ ] Post-snapshot revocation rewind reconciliation on an isolated restored copy.
+- [ ] Live disposable-credential revocation while the second principal remains usable; never revoke the only real-client key.
 - [ ] Disk/WAL/backups budgets, off-host recovery, alerting and measured capacity.
 - [ ] Separately approved production release, deploy and rollback.
 
@@ -35,7 +41,10 @@
 - [x] Prepare explicit 30-minute public-signup TEST route with scoped CAS insert/delete, persistent cleanup/manual fallback and no old auth bypass.
 - [x] Operator HTTPS-route report: local TLS gate passed; timer armed, external client gate still pending.
 - [x] Fix public-signup top-level cross-site navigation regression in source; API/foreign-Origin/iframe protection retained.
-- [ ] Reviewed runtime update for navigation fix and real external-client/two-chat acceptance.
+- [x] Real external-client/two-chat exchange with distinct pseudonymous owners.
+- [x] Operator accepted 24-hour HTTPS TEST window with signup disabled, existing keys preserved, protected services unchanged.
+- [ ] Observe actual 24-hour cleanup (route absent, Rooms stopped, override removed), not only timer armed.
+- [ ] Reviewed runtime update for navigation fix; installed runtime remains 4b2351c0.
 - [ ] Proxy access/anti-abuse policy, separately approved temporary route and live signup/client gates.
 - [ ] Ownership-verified recovery/moderation/Sybil control before broad public onboarding.
 

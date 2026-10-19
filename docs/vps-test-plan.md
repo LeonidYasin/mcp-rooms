@@ -1,5 +1,21 @@
 # Isolated VPS TEST: preparation, not deployment authorization
 
+## Latest accepted evidence (2026-10-19)
+
+Temporary external HTTPS and real Notion/Qwen clients now passed. The latest operator
+report accepted `deploy/vps_rooms_window_24h.py`: 24-hour HTTPS access, registration
+DISABLED, existing keys preserved, only Rooms TEST restarted, protected services
+unchanged, persistent cleanup timer armed. Reported deadline: 2026-10-20T22:56:46Z.
+This is a historical acceptance record, NOT a claim the route is currently open.
+The underlying installed code is still 4b2351c0; navigation fix is source-only.
+The earlier 30-minute public-signup helper described below remains a legacy option,
+NOT the recommended window for extended client troubleshooting. Do not rerun the
+installer or keep renewing short windows to diagnose a client missing auth headers.
+See [acceptance and open gates](acceptance-2026-10-19.md), [Qwen](qwen-client.md),
+and [operations](operations.md). Do not merge/deploy production on this evidence alone.
+
+## Historical preparation / original helper
+
 Target host: existing operator-managed Ubuntu VPS. Keep mcp-server.service,
 mcp-test.service, Caddy and existing databases/credentials unchanged. No execution
 through run_python/run_command/SSH/background; operator runs any root script only

@@ -1,11 +1,13 @@
 # Operations: pilot checklist, not an automatic installer
 
-The operator reported a NEW isolated loopback TEST installed on the VPS at source
-4b2351c0b6522d30c888496b3c1774be8791345f. Local two-user/rotation/integrity checks
-passed; no public endpoint, not boot-enabled, 7200s runtime limit. Production and
-existing embedded TEST/Caddy/connections remain unchanged. This is not a production
-deployment or real external-client acceptance. Do not change existing services
-just to run package tests.
+The operator installed an isolated Rooms TEST at runtime source
+4b2351c0b6522d30c888496b3c1774be8791345f. Subsequent temporary HTTPS, real Notion
+and Qwen-through-local-proxy, and a distinct-owner round trip passed. The latest
+operator report accepted a 24-hour existing-account window: signup disabled,
+not boot-enabled, Rooms-only restart, cleanup timer armed; actual cleanup is pending.
+Original unit remains two-hour/registration-enabled, temporarily overridden in /run.
+Production and old embedded services remain unchanged. This is NOT production
+acceptance. See acceptance-2026-10-19.md for evidence attribution and pending gates.
 
 ## Before any live TEST
 
@@ -60,4 +62,34 @@ this alpha does not yet switch embedded imports to this package.
 Self-signup budgets are backed up/restored with auth and room state. Restoring a
 snapshot also rewinds signup counters; before external access reapply revocations
 and reassess abuse budgets. Read-only VPS preflight and an uninstalled unit example
-are provided; a guarded installer/public route has NOT been applied. See vps-test-plan.md.
+are provided. The guarded installer and temporary route HAVE been operator-applied;
+publishing later source does not update that runtime. See vps-test-plan.md.
+
+
+## Guarded recovery drill (prepared; operator acceptance pending)
+
+`deploy/vps_rooms_recovery_drill.py --run --window-state /root/OWN_WINDOW/state.json`
+is operator-console-only. It requires the exact accepted 24-hour helper checksum,
+private state ownership, accepted/unexpired window with >15 minutes remaining,
+unchanged original unit plus only its own runtime override/route, expected runtime
+source, active cleanup timer and old services. It does not import project code as root.
+
+As the service OS user it uses the installed maintenance CLI to make a consistent
+NEW private snapshot and a SECOND verified restored-copy path. It compares integrity,
+FK/schema checks, aggregate counts and two synthetic round-trip messages, then
+restarts ONLY Rooms TEST and verifies the same live messages and DB integrity.
+The live DB is never replaced, the restored copy never listens, no keys are issued
+or revoked, and the HTTPS deadline is not extended. New snapshot files contain
+private/auth data; do not upload them. They remain for operator review; retention,
+encryption/off-host backup and automated deletion are separate work.
+
+This is a limited backup-copy/restart drill, NOT proof of production failover,
+authenticated client behavior after restart, all historical rows, or post-snapshot
+revocation reconciliation. Real Notion/Qwen calls must follow the operator PASS.
+Missing/expired/closed synthetic messages cause STOP before restart. Failed setup
+never authorizes blind overwrite of changed units, full Caddy restore or live DB restore.
+
+Before a live key-revocation drill, use disposable users/credentials or prove a
+second working credential for the real principal. Do not revoke the only Notion/Qwen
+key. A disabled user is not re-enabled by issue-token. Restoring an old snapshot can
+revive revoked credentials: prove reconciliation on an isolated copy before exposure.

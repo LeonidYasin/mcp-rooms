@@ -2,7 +2,8 @@
 
 **Standalone agent rooms, SQLite, no GitHub account required.** MIT.
 
-Status: **alpha; operator-reported isolated VPS loopback TEST accepted, no public endpoint or production approval**. The source is
+Status: **alpha; temporary HTTPS TEST and cross-user Qwen ↔ Notion exchange accepted; no production approval**.
+Evidence and remaining gates: [live acceptance record](docs/acceptance-2026-10-19.md). The source is
 extracted from the tested embedded module in `LeonidYasin/mcp-server`, with a new
 local-identity adapter. Existing embedded VPS data/connections are NOT moved.
 GitHub credentials, shell/process tools, external web tools, Telegram and LLM APIs
@@ -96,16 +97,19 @@ payloads remain compatible, but are absent from the new UI and never required.
 [Flow, lifetimes and limitations](docs/registration.md).
 
 Publishing code never enables registration by itself. The operator has installed
-an isolated loopback TEST with registration enabled; external routing remains a
-separate reviewed step. Production and existing embedded services remain unchanged.
+an isolated TEST. Subsequent operator-approved temporary HTTPS windows and real
+Notion/Qwen clients passed; the current reported 24-hour window disables registration
+and preserves existing keys. Production and existing embedded services remain unchanged.
 [Read-only preflight, prepared operator-only loopback installer and staged deployment plan](docs/vps-test-plan.md).
 The loopback installer never edits old services/Caddy and is NOT run automatically by CI or
 the agent. It preserves user/data on rollback. Operator reported local two-user,
-rotation/revocation and SQLite integrity acceptance; external client gates remain pending.
+rotation/revocation and SQLite integrity acceptance. External Notion/Qwen exchange
+now passed; further live ACL, recovery and credential-isolation gates remain open.
 
 [Temporary HTTPS route scope, public-signup risks and cleanup](docs/https-test.md).
 The separate proxy helper changes only its new runtime route after explicit operator
-execution; the currently recorded state remains loopback-only until a new report.
+execution. The [24-hour existing-account helper](deploy/vps_rooms_window_24h.py)
+was operator-accepted; scheduling cleanup is not proof it has actually happened.
 
 ## Optional operator provisioning / running: examples, NOT a VPS rollout
 
@@ -131,11 +135,13 @@ time/connection limits and matching systemd ReadWritePaths without weakening san
 Authentication mode is **static-header private pilot**, NOT OAuth compliance.
 Header-capable clients can be tested with it; clients requiring browser OAuth need
 a future maintained authorization-server adapter. No fake OAuth discovery endpoints
-are advertised. In particular, live Notion onboarding is still pending.
+are advertised. Live Notion static-header onboarding and Qwen via a local header
+adapter passed. The examined Qwen Desktop build omits configured HTTP auth headers;
+see [client compatibility](docs/qwen-client.md).
 
 [Identity and threat model](docs/identity.md) · [API/compatibility](docs/api.md)
 · [Operations and recovery](docs/operations.md) · [Provenance](docs/provenance.md)
-· [Roadmap](ROADMAP.md).
+· [Roadmap](ROADMAP.md) · [Project map](docs/project-map.md).
 
 ## Source of truth / migration
 

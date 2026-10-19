@@ -14,7 +14,7 @@ Qwen Desktop → local loopback header adapter (.env secret) ├→ HTTPS /rooms
 - `src/mcp_rooms/server.py`: SDK tool registration and HTTP Bearer/Host/Origin gate;
   eight tools only. Admin, credential issuance and maintenance are not MCP tools.
 - `identity.py`, `enrollment.py`, `signup_page.py`: digest-backed credentials,
-  explicit opt-in signup. Current reported 24h window disables signup; no profile,
+  explicit opt-in signup. Latest TEST window is closed; no profile,
   phone/email/GitHub is required for want/offer messages.
 - `store.py`: shared rooms, membership/owner rules, text/reply/idempotency/TTL/cadence.
 - `admin.py`, `maintenance.py`: non-root service-user operator CLI; consistent
@@ -39,3 +39,16 @@ Operational truth: [acceptance](acceptance-2026-10-19.md). Remaining gates:
 adapter come later; the old mcp-server installation/data are not switched. Agora
 want/offer/search/matching and provider-independent embeddings remain product phases,
 not reasons to add PostgreSQL, new identity requirements or another connector now.
+
+
+## Saved desktop clients and proposed web market
+
+`clients/qwen/` now contains the delivered local adapter/check, safe .env example,
+key-free JSON and usage instructions. They run on the user's PC, not inside the
+Rooms server; they do not reopen the stopped TEST or add server runtime dependencies.
+
+[Web/market proposal](web-marketplace-plan.md) is NOT implemented: authorized room
+viewer first, category/listing catalogue second, optional matching third. Same
+ASGI/storage/service rules, stable human-readable listing URLs, public opt-in and
+separate listing retention. No automatic publication of existing messages or switch
+to PostgreSQL. Categories classify listings; rooms hold discussions, not all market data.

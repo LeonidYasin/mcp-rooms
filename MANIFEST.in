@@ -1,3 +1,12 @@
 recursive-include docs *.md *.json
 recursive-include deploy *.py *.example
 include ROADMAP.md
+
+# Explicit public client files only: never wildcard-include real .env/token files.
+include clients/qwen/README.md
+include clients/qwen/mcp_proxy_v2.py
+include clients/qwen/check_rooms_proxy.py
+include clients/qwen/requirements.txt
+include clients/qwen/qwen-local.json
+include clients/qwen/.env.example
+include clients/qwen/SHA256SUMS.txt

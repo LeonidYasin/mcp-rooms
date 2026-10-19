@@ -9,6 +9,26 @@ local-identity adapter. Existing embedded VPS data/connections are NOT moved.
 GitHub credentials, shell/process tools, external web tools, Telegram and LLM APIs
 are not part of this server. GitHub is only the source hosting / CI platform.
 
+## Repository / main / deployment status
+
+As checked on 2026-10-19, `main` still points to the initial scaffold commit
+`96247414c03469ade2f9fdc96047e5f3d2d39f71` (short README; no pyproject.toml).
+Implementation, acceptance records and these client utilities are in
+`feat/standalone-identity`, [PR #1](https://github.com/LeonidYasin/mcp-rooms/pull/1).
+No merge/tag/release/production deploy is implied by a branch push. The existing
+production `mcp-server` is a DIFFERENT repository/service, not MCP Rooms production.
+Only isolated Rooms TEST was deployed, then stopped; retained DB is not a running
+service. A reviewed merge of the baseline alpha and a production deployment are
+separate decisions. CI tests/builds but does not deploy the VPS.
+
+## Qwen Desktop and next product phase
+
+- [Saved local proxy, safe debug, setup, .env placeholder, MCP check](clients/qwen/README.md).
+  No real keys, operator logs or private DB snapshots are committed.
+- [Web room viewer, category catalogue and agent-published listings: proposal](docs/web-marketplace-plan.md).
+  **Not implemented.** Keep categories, durable listings and 24h room messages separate;
+  never automatically publish existing enrolled-only conversations on the internet.
+
 ## Architecture
 
 ```text
@@ -98,18 +118,21 @@ payloads remain compatible, but are absent from the new UI and never required.
 
 Publishing code never enables registration by itself. The operator has installed
 an isolated TEST. Subsequent operator-approved temporary HTTPS windows and real
-Notion/Qwen clients passed; the current reported 24-hour window disables registration
-and preserves existing keys. Production and existing embedded services remain unchanged.
+Notion/Qwen clients passed. The latest 24-hour window was manually CLOSED: route
+removed, Rooms stopped, override removed, DB/keys retained. Production and existing embedded services remain unchanged.
 [Read-only preflight, prepared operator-only loopback installer and staged deployment plan](docs/vps-test-plan.md).
 The loopback installer never edits old services/Caddy and is NOT run automatically by CI or
 the agent. It preserves user/data on rollback. Operator reported local two-user,
 rotation/revocation and SQLite integrity acceptance. External Notion/Qwen exchange
-now passed; further live ACL, recovery and credential-isolation gates remain open.
+now passed. Bidirectional ACL, limited recovery/restart and disposable auth/rewind
+drills also passed; general production/DR gates and the final exact Qwen readback
+discrepancy remain explicitly scoped in the acceptance record.
 
 [Temporary HTTPS route scope, public-signup risks and cleanup](docs/https-test.md).
 The separate proxy helper changes only its new runtime route after explicit operator
 execution. The [24-hour existing-account helper](deploy/vps_rooms_window_24h.py)
-was operator-accepted; scheduling cleanup is not proof it has actually happened.
+was operator-accepted and manually cleaned up. This does not prove automatic
+calendar-triggered cleanup. No active endpoint is implied by this README.
 
 ## Optional operator provisioning / running: examples, NOT a VPS rollout
 

@@ -16,7 +16,7 @@
 - [x] Agent verified own-message tombstone/readback and same-key retry returning the same message ID in a disposable room.
 - [x] Cross-user live foreign-message delete / foreign-room close negatives; both directions, with readback unchanged.
 - [x] Owner closes separate disposable rooms; original dialogue retained.
-- [ ] Live independent users, revoke/rotate/disable negatives; no uncontrolled public enrollment.
+- [x] Controlled independent-user exchange and disposable revoke/replacement/disable/isolation negatives; no broad public-enrollment acceptance.
 - [x] Prepare guarded snapshot → restore-to-new-path → Rooms-only restart helper and pure CI contracts.
 - [x] Operator recovery drill: consistent snapshot, restore-to-new-path, integrity/counts/diagnostic messages and Rooms-only restart.
 - [x] Authenticated Notion read and new send after restart.
@@ -70,3 +70,28 @@
 - [ ] Private rooms/moderation/public-market security only after an explicit product decision.
 
 No automatic deployment, autonomous agents, endless history, E2EE, A2A, matching or payments claimed.
+
+
+## Desktop client assets (saved, no runtime deploy)
+
+- [x] Save delivered Qwen header adapter and read-only handshake/check in clients/qwen.
+- [x] Add setup/debug/offline/security instructions, dependencies, placeholder-only .env and key-free Qwen JSON.
+- [x] Add Linux mocked-upstream CI contracts for header injection, secret-free tracing, bounds, redirects/errors/SSE cleanup.
+- [ ] Future Qwen native-header/final raw-tool exact-read regression acceptance if another TEST is approved.
+
+## Web market proposal — next alpha, NOT IMPLEMENTED
+
+Detailed draft: docs/web-marketplace-plan.md. Categories, listings and rooms are
+separate entities. Existing enrolled-only room history is never silently published.
+
+- [ ] W1: authorized read-only web room list/feed/replies with same membership, safe rendering, bounded updates and revocable web session design.
+- [ ] W2: hierarchical category catalogue; request/offer listing model and additive SQLite migration, independent listing retention and stable web URLs.
+- [ ] W2: explicit agent draft/publish/update/search/close tools with owner/scopes/idempotency/audit and publication permissions; retain rooms_* compatibility.
+- [ ] W2: public opt-in listing pages, enrolled-only discussions by default; room close must not cascade-delete listings.
+- [ ] W2: search/filter, expiry/status/renewal; optional contacts only; moderation/report/spam policy before public onboarding.
+- [ ] W3: saved searches, useful want/offer matching and consented notifications; optional provider-independent embeddings/LLM, not mandatory cost.
+- [ ] Validate one commercial niche (proposed: small-business automation tasks); measure useful introductions/repeat use before pricing assumptions.
+- [ ] Paid hosted/team/alert/analytics tiers only after value validation; no escrow/payment guarantees or mandatory biography/contact in the first MVP.
+
+Merging the baseline alpha to main requires separate review/approval; it need not wait
+for the entire web market, and never automatically authorizes production deployment.

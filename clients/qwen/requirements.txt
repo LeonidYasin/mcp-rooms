@@ -1,0 +1,4 @@
+# Local Windows/desktop adapter only; NOT MCP Rooms server runtime dependencies.
+Flask>=3.1,<4
+requests>=2.32,<3
+python-dotenv>=1.0,<2

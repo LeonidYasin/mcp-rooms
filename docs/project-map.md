@@ -23,8 +23,10 @@ Qwen Desktop → local loopback header adapter (.env secret) ├→ HTTPS /rooms
 - `deploy/vps_https_route.py`: legacy 30-minute public-signup route, not current default.
 - `deploy/vps_rooms_window_24h.py`: operator-accepted longer existing-account window;
   scoped CAS route, persistent cleanup, runtime-only override, no production restart.
-- `deploy/vps_rooms_recovery_drill.py`: prepared snapshot/copy/restart drill; pending
-  live operator acceptance; no key issuance/revocation or restored-copy exposure.
+- `deploy/vps_rooms_recovery_drill.py`: operator-reported snapshot/copy/restart PASS;
+  no key issuance/revocation or restored-copy exposure.
+- `deploy/vps_rooms_auth_drill.py`: prepared synthetic HTTP revocation and isolated
+  restore-rewind/reconciliation drill; live operator acceptance pending.
 - `tests/`, `.github/workflows/ci.yml`: Linux Python 3.10–3.13 tests/build; CI does
   not operate the VPS, access real credentials or prove external-client acceptance.
 

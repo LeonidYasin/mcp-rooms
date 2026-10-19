@@ -14,10 +14,14 @@
 - [x] Real external Notion static-header client and Qwen via local header-injection proxy.
 - [x] Cross-user Qwen → room → Notion → room → Qwen round trip; final Qwen read operator-reported.
 - [x] Agent verified own-message tombstone/readback and same-key retry returning the same message ID in a disposable room.
-- [ ] Cross-user live foreign-message delete / foreign-room close negatives; both directions.
+- [x] Cross-user live foreign-message delete / foreign-room close negatives; both directions, with readback unchanged.
+- [x] Owner closes separate disposable rooms; original dialogue retained.
 - [ ] Live independent users, revoke/rotate/disable negatives; no uncontrolled public enrollment.
 - [x] Prepare guarded snapshot → restore-to-new-path → Rooms-only restart helper and pure CI contracts.
-- [ ] Operator run of recovery drill plus authenticated Notion/Qwen recheck after restart.
+- [x] Operator recovery drill: consistent snapshot, restore-to-new-path, integrity/counts/diagnostic messages and Rooms-only restart.
+- [x] Authenticated Notion read and new send after restart.
+- [ ] Qwen reads the new post-restart reply and closes its own ACL canary room.
+- [x] Prepare disposable-user HTTP revocation/isolation and isolated-copy rewind/reconciliation drill; CI fixtures preserve an unrelated principal.
 - [ ] Post-snapshot revocation rewind reconciliation on an isolated restored copy.
 - [ ] Live disposable-credential revocation while the second principal remains usable; never revoke the only real-client key.
 - [ ] Disk/WAL/backups budgets, off-host recovery, alerting and measured capacity.

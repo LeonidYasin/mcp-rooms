@@ -66,7 +66,7 @@ are provided. The guarded installer and temporary route HAVE been operator-appli
 publishing later source does not update that runtime. See vps-test-plan.md.
 
 
-## Guarded recovery drill (prepared; operator acceptance pending)
+## Guarded recovery drill (operator-reported PASS; client follow-up scoped)
 
 `deploy/vps_rooms_recovery_drill.py --run --window-state /root/OWN_WINDOW/state.json`
 is operator-console-only. It requires the exact accepted 24-hour helper checksum,
@@ -85,7 +85,8 @@ encryption/off-host backup and automated deletion are separate work.
 
 This is a limited backup-copy/restart drill, NOT proof of production failover,
 authenticated client behavior after restart, all historical rows, or post-snapshot
-revocation reconciliation. Real Notion/Qwen calls must follow the operator PASS.
+revocation reconciliation. Notion actually read retained dialogue and sent a fresh reply after the operator PASS;
+Qwen must read that reply to finish its post-restart acceptance.
 Missing/expired/closed synthetic messages cause STOP before restart. Failed setup
 never authorizes blind overwrite of changed units, full Caddy restore or live DB restore.
 
@@ -93,3 +94,35 @@ Before a live key-revocation drill, use disposable users/credentials or prove a
 second working credential for the real principal. Do not revoke the only Notion/Qwen
 key. A disabled user is not re-enabled by issue-token. Restoring an old snapshot can
 revive revoked credentials: prove reconciliation on an isolated copy before exposure.
+
+
+## Disposable auth/revocation drill (prepared, live acceptance pending)
+
+`deploy/vps_rooms_auth_drill.py` verifies the checksum-pinned accepted recovery helper,
+24-hour state/route/unit/timer and old services, then runs synthetic logic as the
+service OS user. Two NEW users, three read-only 600s credentials; no Qwen/Notion key
+is an input. The live HTTPS /identity gate must reject old A after revocation while
+replacement A and independent B still work. Disabling synthetic B rejects it without
+breaking replacement A. Existing user/credential rows are never targeted.
+
+A pre-revocation SQLite snapshot is copied to a new isolated DB. Direct authentication
+on this copy demonstrates revived old A and B; reapplying the canary revocation and
+user disable must reject them while replacement A still works. This proves the hazard
+and a LIMITED canary reconciliation, NOT reconciliation of every possible real change
+since a production snapshot. No restored-copy HTTP server is opened; live DB is not
+replaced, service is not restarted, registration stays closed and deadline unchanged.
+
+Finally revoke all three synthetic keys and disable both synthetic users in live and
+restored copies. Keys stay in subprocess memory/HTTPS headers; never argv/env/stdout,
+files, tool arguments or logs. A private ledger contains only generated test user/key
+IDs and phases for interrupted-run review. Forced termination/power loss can interrupt
+cleanup: review the ledger; issued keys expire after at most 600s. Even cleaned test
+rows remain budgeted (2 users, 3 credentials), not silently deleted. Private snapshots
+contain real DB/auth metadata and historical canary state; preserve permissions and
+apply a retention policy. Do not publish them or expose a pre-reconciliation copy.
+
+CI runs the SAME canary logic on temporary DBs with a direct-auth probe substituted
+for HTTPS, including failure cleanup and an untouched unrelated user/key. It does NOT
+prove actual Caddy/TLS/network acceptance. Operator PASS and real client recheck must
+follow separately. Off-host encryption, general revocation journal, load/alerts and
+observed 24h cleanup are still open gates.

@@ -67,6 +67,7 @@ nav:
     - Рынок возможностей: docs/opportunity-model.md
     - Позиционирование: docs/project-positioning.md
     - План поставки: docs/delivery-plan.md
+    - До деплоя: docs/deployment-readiness.md
     - Roadmap: ROADMAP.md
     - Архитектурное решение: docs/decisions/001-marketplace-foundation.md
     - Первый реальный сценарий: docs/first-sale-acceptance.md
@@ -81,6 +82,7 @@ nav:
     - Private photo files: docs/media-private-files.md
     - Private media staging: docs/media-staging.md
     - Reviewed media cleanup: docs/media-cleanup.md
+    - Photo draft preview: docs/photo-drafts.md
     - Web: docs/web-marketplace-plan.md
     - Отдельный admin MCP: docs/admin-mcp-design.md
   - Комнаты и клиенты:

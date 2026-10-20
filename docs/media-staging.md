@@ -16,10 +16,10 @@ credential audience/resource and fixed normalization policy. Category ancestry m
 remain active. A private opaque UUID media_id is distinct from the private blob key;
 responses never return a filesystem path or blob key. Guessed IDs do not authorize reads.
 
-Initialization explicitly adds independent version2 `media_stage_schema` and
-`media_stages` tables to the existing snapshot database. It requires market schema2;
+Initialization explicitly adds independent version3 `media_stage_schema` and
+`media_stages` tables and positional `media_draft_photos` links to the existing snapshot database. It requires market schema2;
 partial/future namespaces fail closed. Room schema/application_id/user_version are
-unchanged. An explicit additive1→2 migration adds cleanup phases; there is no automatic
+unchanged. An explicit additive1/2→3 migration preserves cleanup phases and adds photo links; there is no automatic
 request-triggered migration. [Retention contract](media-cleanup.md). Neither current server startup nor an HTTP request creates these tables.
 
 ## State machine / transaction boundaries
@@ -66,7 +66,7 @@ made about a revocation occurring after that check and before network delivery.
 ## Candidate admission budgets
 
 - Global128 rows /32MiB reserved derivative bytes.
-- Per owner16 rows /8MiB reserved derivative bytes.
+- Per owner16 rows /16MiB reserved derivative bytes.
 - Each operation reserves the maximum2MiB derivative budget before decoding.
 - TTL10 minutes, capped by draft expiry, never extended on retry.
 
@@ -82,11 +82,11 @@ OS filesystem/network sandbox and fleet concurrency remain separate gates.
 
 ## Explicit non-goals / next slice
 
-Photos are **staged, not attached**. They do not mutate a draft revision/content or
-preview and cannot be published. Draft APIs still reject `media_ids`; old consent
-intents remain invalid for any future live publisher. Existing text drafts remain
-compatible. A draft revision change conservatively makes this staged result
-unavailable: future attachment needs a new versioned transaction, not a bypass.
+The staging API itself does not attach photos. [PhotoDraftStore](photo-drafts.md)
+now provides an explicit opt-in versioned attachment boundary; generic draft APIs
+still reject client-supplied media IDs and photo-unaware updates. Attachment uses
+its own revision/receipt and fixed draft-retention promotion, not staging replay.
+Private intents are not live-publication consent.
 
 Still required: attach/idempotency/revision and ordered media preview hashes;
 explicit orphan recovery, receipt compaction/scheduling and DB+files recovery;

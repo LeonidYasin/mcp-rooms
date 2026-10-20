@@ -124,6 +124,21 @@
       ]
     },
     {
+      "id": "photo_drafts",
+      "title": "Фото версии объявления и точный preview",
+      "stage": "SOURCE",
+      "summary": "Подготовлены atomic ordered attachment, photo-aware text edit, verified preview и private intent v2. Не публикация; legacy редактор фото не обходит.",
+      "doc": "docs/photo-drafts.md",
+      "source": "src/mcp_rooms/photo_drafts.py",
+      "evidence": null,
+      "depends_on": [
+        "drafts",
+        "media_stage",
+        "media_files",
+        "media_cleanup"
+      ]
+    },
+    {
       "id": "media",
       "title": "Хранение и права на фото",
       "stage": "SPEC",
@@ -136,7 +151,8 @@
         "worker",
         "media_files",
         "media_stage",
-        "media_cleanup"
+        "media_cleanup",
+        "photo_drafts"
       ]
     },
     {

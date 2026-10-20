@@ -222,6 +222,8 @@ class DraftStore:
             row = self._owned(db, principal.user_id, listing_id, now)
             if row['status'] != 'draft':
                 raise DomainError('draft_not_editable')
+            if json.loads(row['content']).get('media_ids'):
+                raise DomainError('photo_editor_required')
             if row['revision'] != expected_revision:
                 raise DomainError('revision_conflict')
             if now < row['updated_at']:
@@ -331,6 +333,8 @@ class DraftStore:
 
 
     def _preview(self, db, row):
+        if json.loads(row['content']).get('media_ids'):
+            raise DomainError('photo_preview_required')
         record = json.loads(_json(self._record(row)))
         self._category(db, row['category_id'], record['listing']['content']['category'])
         path, category_id = [], row['category_id']

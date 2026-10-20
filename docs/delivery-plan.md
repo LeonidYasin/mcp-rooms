@@ -161,3 +161,9 @@ from public launch messaging.
 проекты, стартапы и инвесторы — будущие отдельные домены, не готовые API.
 [M2a photo normalizer](media-image-safety.md) готовится отдельно от публичной загрузки,
 media storage и worker isolation. Наличие конвертера не означает готовность M2/публикации.
+
+
+## Текущая оценка до развёртывания
+
+[Различие loopback TEST / внешнего TEST / production и7 этапов до полезного TEST](deployment-readiness.md).
+Текущий photo attachment/private preview не заменяет live publisher и готовый web.

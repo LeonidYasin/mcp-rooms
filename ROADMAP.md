@@ -249,3 +249,15 @@ Documentation publication is not application rollout or approval to merge main.
 - [ ] Operator/admin authorization, scheduling and approved OS TEST; no automatic cleanup enabled.
 
 [Cleanup boundary](docs/media-cleanup.md). No VPS, main, live schema migration or public maintenance API.
+
+
+## M2c.1 — versioned photo attachment / private intent
+
+- [x] Prepare media schema3, atomic ordered photo links/content/revision/receipt.
+- [x] Prepare photo-aware text edits, verified preview/private intent v2, legacy bypass refusal.
+- [x] Prepare retention promotion/detach, eight-photo budget and revoke/race/intent fixtures.
+- [ ] Accept exact-SHA GitHub CI; record evidence.
+- [ ] Live publisher needs a new notice/consent contract, atomic consume/state/audit and public projection.
+
+[Photo boundary](docs/photo-drafts.md); [remaining deployment milestones](docs/deployment-readiness.md).
+No main, VPS, public upload/publication or new real scope issuance changed.

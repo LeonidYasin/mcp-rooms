@@ -46,8 +46,9 @@ stateDiagram-v2
 
 A parallel cleanup phase (`live`, `purging`, `purged`) preserves the original upload
 state/receipt. This avoids pretending a failed upload later succeeded. Explicit
-schema migration1→2 adds only cleanup columns in the same SQLite transaction; room
-schema identifiers are unchanged. Reads/staging refuse schema1 until explicit
+schema migration1→2 introduced cleanup columns; the current explicit1/2→3
+migration also preserves/adds photo links atomically. Room
+schema identifiers are unchanged. Reads/staging refuse legacy schemas until explicit
 initialization. Partial/future schemas are not repaired automatically.
 
 1. Under the root guard, recheck the reviewed snapshot; briefly mark candidates

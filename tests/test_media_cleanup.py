@@ -292,6 +292,7 @@ def legacy_v1(x):
         begin = old_sql.index("cleanup_state TEXT")
         end = old_sql.index('UNIQUE(user_id,client_id)', begin)
         legacy = old_sql[:begin] + old_sql[end:]
+        db.execute('DROP TABLE media_draft_photos')
         db.execute('DROP INDEX media_stages_owner')
         db.execute('ALTER TABLE media_stages RENAME TO legacy_copy')
         db.execute(legacy)
@@ -312,7 +313,7 @@ def test_explicit_v1_migration_preserves_rows_and_files(env):
     x.service.initialize()
     assert rows(x)[0]['cleanup_state'] == 'live' and x.service.read(x.a, result['media_id']) == data
     with x.store._db() as db:
-        assert db.execute('SELECT version FROM media_stage_schema').fetchone()[0] == 2
+        assert db.execute('SELECT version FROM media_stage_schema').fetchone()[0] == 3
         assert not db.execute('PRAGMA foreign_key_check').fetchall()
 
 

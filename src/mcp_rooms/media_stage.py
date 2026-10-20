@@ -17,10 +17,11 @@ TTL_MS = 600000
 MAX_ROWS = 128
 MAX_OWNER_ROWS = 16
 MAX_BYTES = 32 * 1024 * 1024
-MAX_OWNER_BYTES = 8 * 1024 * 1024
+MAX_OWNER_BYTES = 16 * 1024 * 1024
 MAX_RECEIPTS = 512
 MAX_OWNER_RECEIPTS = 128
-_TABLES = {'media_stage_schema', 'media_stages'}
+_BASE_TABLES = {'media_stage_schema', 'media_stages'}
+_TABLES = _BASE_TABLES | {'media_draft_photos'}
 
 
 class MediaStageStore:
@@ -39,14 +40,18 @@ class MediaStageStore:
             names = {r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
             found = names & _TABLES
             if found:
-                if found != _TABLES:
+                if not _BASE_TABLES <= found:
                     raise DomainError('unsupported_media_schema')
-                version = self._schema(db, allow_v1=True)
+                version = self._schema(db, allow_legacy=True)
+                if found != (_BASE_TABLES if version < 3 else _TABLES):
+                    raise DomainError('unsupported_media_schema')
                 if version == 1:
                     db.execute("ALTER TABLE media_stages ADD COLUMN cleanup_state TEXT NOT NULL DEFAULT 'live' CHECK(cleanup_state IN ('live','purging','purged'))")
                     db.execute('ALTER TABLE media_stages ADD COLUMN cleanup_started_at INTEGER')
                     db.execute('ALTER TABLE media_stages ADD COLUMN purged_at INTEGER')
-                    db.execute('UPDATE media_stage_schema SET version=2 WHERE singleton=1')
+                if version < 3:
+                    self._create_photo_links(db)
+                    db.execute('UPDATE media_stage_schema SET version=3 WHERE singleton=1')
                 return
             db.execute('CREATE TABLE media_stage_schema(singleton INTEGER PRIMARY KEY CHECK(singleton=1),version INTEGER NOT NULL)')
             db.execute('''CREATE TABLE media_stages(
@@ -64,16 +69,25 @@ class MediaStageStore:
                 CHECK(state!='staged' OR (blob_key IS NOT NULL AND sha256 IS NOT NULL
                     AND byte_size>0 AND width>0 AND height>0)))''')
             db.execute('CREATE INDEX media_stages_owner ON media_stages(user_id)')
-            db.execute('INSERT INTO media_stage_schema VALUES (1,2)')
+            self._create_photo_links(db)
+            db.execute('INSERT INTO media_stage_schema VALUES (1,3)')
 
     @staticmethod
-    def _schema(db, *, allow_v1=False):
+    def _create_photo_links(db):
+        db.execute('''CREATE TABLE media_draft_photos(
+            draft_id TEXT NOT NULL REFERENCES market_drafts(id),
+            position INTEGER NOT NULL CHECK(position>=0 AND position<8),
+            media_id TEXT NOT NULL UNIQUE REFERENCES media_stages(id),
+            PRIMARY KEY(draft_id,position))''')
+
+    @staticmethod
+    def _schema(db, *, allow_legacy=False):
         try:
             rows = db.execute('SELECT singleton,version FROM media_stage_schema').fetchall()
         except sqlite3.OperationalError:
             raise DomainError('media_migration_required') from None
         if (len(rows) != 1 or rows[0][0] != 1
-                or rows[0][1] not in ((1, 2) if allow_v1 else (2,))):
+                or rows[0][1] not in ((1, 2, 3) if allow_legacy else (3,))):
             raise DomainError('unsupported_media_schema')
         return rows[0][1]
 

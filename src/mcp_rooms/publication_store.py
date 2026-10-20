@@ -47,6 +47,9 @@ class PublicationStore:
                 user_id TEXT NOT NULL REFERENCES users(id), credential_id TEXT NOT NULL,
                 client_id TEXT NOT NULL, action TEXT NOT NULL CHECK(action IN ('publish','withdraw')),
                 epoch INTEGER NOT NULL, created_at INTEGER NOT NULL,
+                intent_id TEXT, preview_digest TEXT,
+                CHECK((action='publish' AND intent_id IS NOT NULL AND preview_digest IS NOT NULL)
+                   OR (action='withdraw' AND intent_id IS NULL AND preview_digest IS NULL)),
                 UNIQUE(user_id,client_id))''')
             db.execute('INSERT INTO publication_schema VALUES (1,1)')
 
@@ -167,13 +170,14 @@ class PublicationStore:
                     raise DomainError('publication_consent_unavailable')
                 result = dict(listing_id=listing_id, publication_revision=epoch+1, state='active', published_at=now)
                 self.drafts._receipt(db,actor,client_id,'publish_listing',digest,result,now)
-                self._audit(db,actor,listing_id,client_id,'publish',epoch+1,now)
+                self._audit(db,actor,listing_id,client_id,'publish',epoch+1,now,
+                            intent_id=intent_id,preview_digest=document['digest'])
                 return {**result,'replayed':False}
 
     @staticmethod
-    def _audit(db, actor, listing_id, client_id, action, epoch, now):
-        db.execute('INSERT INTO publication_audit(listing_id,user_id,credential_id,client_id,action,epoch,created_at) VALUES (?,?,?,?,?,?,?)',
-                   (listing_id,actor.user_id,actor.credential_id,client_id,action,epoch,now))
+    def _audit(db, actor, listing_id, client_id, action, epoch, now, *, intent_id=None, preview_digest=None):
+        db.execute('INSERT INTO publication_audit(listing_id,user_id,credential_id,client_id,action,epoch,created_at,intent_id,preview_digest) VALUES (?,?,?,?,?,?,?,?,?)',
+                   (listing_id,actor.user_id,actor.credential_id,client_id,action,epoch,now,intent_id,preview_digest))
 
     def withdraw(self, actor, listing_id, *, expected_publication_revision, client_id):
         identifier(listing_id); identifier(client_id)

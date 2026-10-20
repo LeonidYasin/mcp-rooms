@@ -56,6 +56,8 @@ def test_new_consent_contract_and_atomic_allowlisted_publication(market):
     assert preview['schema'] == PUBLICATION_SCHEMA != private['schema']
     assert preview['public_transport_enabled'] is False and preview['publication_epoch'] == 0
     assert preview['digest'] != private['digest']
+    assert preview['card_preview']['published_at'] is None
+    assert 'owner' not in preview['card_preview'] and 'user_id' not in preview['card_preview']
     consent = approve(x,preview)
     assert consent['published'] is False and not audit(x)
     fails('listing_unavailable',lambda:x.market.public_get(x.draft_id))
@@ -74,6 +76,8 @@ def test_new_consent_contract_and_atomic_allowlisted_publication(market):
         assert db.execute('SELECT consumed_at FROM publication_consents').fetchone()[0] == x.now[0]
         assert not db.execute('PRAGMA foreign_key_check').fetchall()
     assert [r['action'] for r in audit(x)] == ['publish']
+    assert audit(x)[0]['intent_id'] == consent['intent_id']
+    assert audit(x)[0]['preview_digest'] == preview['digest']
     assert x.drafts.get(x.a,x.draft_id)['listing']['visibility'] == 'private'
 
 

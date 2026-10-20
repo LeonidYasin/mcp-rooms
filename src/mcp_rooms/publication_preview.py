@@ -26,6 +26,7 @@ def publication_preview(record, category_path, resource, photos, epoch):
     document = dict(schema=PUBLICATION_SCHEMA, resource=resource, notice=NOTICE,
                     record=record, category_path=category_path, photos=photos,
                     publication_epoch=epoch, audience='public_web_and_agents',
+                    card_preview=public_card(record,category_path,photos,epoch+1,None),
                     publication_transaction_available=True, public_transport_enabled=False)
     digest = sha256((PUBLICATION_SCHEMA+'\0'+canonical_json(document)).encode()).hexdigest()
     return {**document, 'digest': digest}

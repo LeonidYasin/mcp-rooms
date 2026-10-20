@@ -7,7 +7,8 @@
 ## Новое согласие, не повышение старого intent
 
 Схема `mcp-rooms/live-publication-consent/v1` отличается от обоих private intents.
-Preview включает точный private record, публичные поля/порядок и проверенные
+Preview включает точный private record, отдельный allowlisted card_preview (время
+будущей публикации ещё не назначено), публичные поля/порядок и проверенные
 фото, путь категории, resource, notice и текущую publication epoch. Notice объясняет:
 будущая публичная карточка доступна всем, текст/география/фото видны, личные данные
 введённые в эти поля тоже станут публичными; снятие не уничтожает чужие копии.
@@ -22,7 +23,7 @@ Preview включает точный private record, публичные пол�
 `publish` заново проверяет владельца, права, категорию, срок, version/epoch,
 ordered manifest и bytes. Затем **в одной SQLite write transaction** повторяет
 проверки, одноразово потребляет согласие, сохраняет публичный снимок, command receipt
-и audit. При ошибке любого шага не должно оставаться частичной публикации/consumption.
+и audit с intent ID и preview digest (без secret). При ошибке любого шага не должно оставаться частичной публикации/consumption.
 Checksum I/O проходит под shared root guard, но вне SQLite write transaction.
 Срок согласия <=5 минут и не позже draft/media expiry; подтверждение не продлевает
 жизнь объявления. No public endpoint is enabled by this internal transaction.

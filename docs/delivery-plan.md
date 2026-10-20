@@ -166,4 +166,5 @@ media storage и worker isolation. Наличие конвертера не оз
 ## Текущая оценка до развёртывания
 
 [Различие loopback TEST / внешнего TEST / production и7 этапов до полезного TEST](deployment-readiness.md).
-Текущий photo attachment/private preview не заменяет live publisher и готовый web.
+Текущий [publication core](ci-m2c2.md) принят в CI; это не готовый web/transport.
+До полезного внешнего TEST остаётся ориентировочно6 крупных интеграционных этапов.

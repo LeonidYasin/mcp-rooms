@@ -1,7 +1,7 @@
 # MCP Rooms roadmap
 
-Current checkpoint: [M2c.1 CI](docs/ci-m2c1.md), versioned private photo drafts.
-Next: live publisher, then the [7 milestones to useful external TEST](docs/deployment-readiness.md).
+Current checkpoint: [M2c.2 CI](docs/ci-m2c2.md), internal publication/withdrawal core.
+Next: user adapters/auth, then the [6 remaining milestones to useful external TEST](docs/deployment-readiness.md).
 Older sections retain historical acceptance boundaries; they are not promises of a live service.
 
 ## Source extraction / private-pilot alpha
@@ -261,19 +261,19 @@ Documentation publication is not application rollout or approval to merge main.
 - [x] Prepare photo-aware text edits, verified preview/private intent v2, legacy bypass refusal.
 - [x] Prepare retention promotion/detach, eight-photo budget and revoke/race/intent fixtures.
 - [x] Exact-SHA CI at `0153bd98`: Python3.12 427 passed/2 warnings; Python3.10 378 passed/30 skipped/2 warnings; matrix +14-diagram docs QA green. [Evidence](docs/ci-m2c1.md).
-- [ ] Live publisher needs a new notice/consent contract, atomic consume/state/audit and public projection.
+- [x] Internal live publisher/new notice/consent/consume/state/audit and public projection accepted in M2c.2; external adapters remain absent.
 
 [Photo boundary](docs/photo-drafts.md); [remaining deployment milestones](docs/deployment-readiness.md).
 No main, VPS, public upload/publication or new real scope issuance changed.
 
 
-## M3a — publication transaction and withdrawal core
+## M2c.2 — publication transaction and withdrawal core
 
 - [x] Prepare new notice/schema and explicit short-lived live-publication consent.
 - [x] Prepare atomic consume/public snapshot/receipt/audit and monotonic publication epoch.
 - [x] Freeze private mutation while active; withdraw before editing/reconfirming.
 - [x] Prepare allowlisted public getters/photo checks without enabling a transport.
-- [ ] Accept exact-SHA CI: stale/private consent, revoke/race, rollback and private/public isolation.
+- [x] Exact-SHA CI `bc6d9d75`: Python3.12 470 passed/2 warnings; Python3.10 421 passed/30 skipped/2 warnings; matrix +15-diagram docs QA green. [Evidence](docs/ci-m2c2.md).
 - [ ] User auth/adapters/upload, actual web UI, private responses, admin and approved TEST.
 
 [Publication core boundaries](docs/live-publication.md). No real listing, VPS or main changed.

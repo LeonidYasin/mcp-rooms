@@ -23,25 +23,26 @@ unit с синтетическими данными. Это **не** сайт о
 
 ### Внешний TEST с первым полезным сценарием
 
-После текущего этапа [photo attachment + private preview](photo-drafts.md) оценка —
-**7 крупных этапов, включая сам TEST-деплой**. Это верхняя граница ранее названного
-предварительного диапазона 5–7, а не 7 оставшихся коммитов. Оценка пересматривается
-при найденном blocker, а не за счёт пропуска security gates.
+После [M2c.2 publication core](live-publication.md) ориентир — **6 крупных этапов,
+включая сам TEST-деплой**. Из прежних 7 завершено транзакционное ядро публикации:
+new-schema consent, consume/snapshot/receipt/audit, withdrawal и проверяемая public
+projection. Это internal CI, а не публичный web или завершённая интеграционная приёмка.
+Один этап может включать несколько коммитов/прогонов; найденные blockers меняют оценку,
+а не отменяют security gates.
 
-| № | Этап | Проверяемый результат |
+| № | Оставшийся этап | Проверяемый результат |
 | --- | --- | --- |
-| 1 | Live publisher и публичная проекция | Новое согласие; атомарный recheck/consume/state/audit; публикация/снятие; только разрешённые публичные поля/фото. Старые private intents не переиспользуются. |
-| 2 | Общие пользовательские adapters/auth | User MCP и HTTP над одними сервисами; bounded streaming upload, least-privilege issuance, revoke/expiry, browser session/CSRF/rate limits. |
-| 3 | Рабочий web | Лента/категории/карточка, реальные фото, мобильная форма, preview и явное подтверждение. Не нынешний статический макет/сайт документации. |
-| 4 | Приватные отклики | Два независимых пользователя, участники/ACL, нет утечки переписки в общие rooms или публичную карточку. |
-| 5 | Отдельный admin MCP | Отдельные audience/ключи/scopes, typed moderation/hide/disable/complaints/audit. Никакого shell, произвольного Python или SQL. |
-| 6 | Приёмка и пакет эксплуатации | E2E/negative/abuse CI, OS sandbox и адекватные VPS лимиты, DB+files restore и revocation reconciliation, квоты/retention, закреплённый артефакт и checksum/operator install+rollback. |
-| 7 | Одобренный изолированный TEST-деплой | Свежий preflight; отдельный пользователь/unit/БД/root/порт; loopback smoke; HTTPS только после проверки; реальное чтение/публикация/отклик с явным согласием владельца. |
+| 1 | Общие пользовательские adapters/auth | User MCP и HTTP над одними сервисами; bounded streaming upload, least-privilege issuance, revoke/expiry, browser session/CSRF/rate limits. |
+| 2 | Рабочий web | Лента/категории/карточка, реальные фото, мобильная форма, точный card preview и явное подтверждение. Не нынешний статический макет/сайт документации. |
+| 3 | Приватные отклики | Два независимых пользователя, участники/ACL, нет утечки переписки в общие rooms или публичную карточку. |
+| 4 | Отдельный admin MCP | Отдельные audience/ключи/scopes, typed moderation/hide/disable/complaints/audit. Никакого shell, произвольного Python или SQL. |
+| 5 | Приёмка и пакет эксплуатации | E2E/negative/abuse CI, OS sandbox и адекватные VPS лимиты, DB+files restore и revocation reconciliation, квоты/retention, закреплённый артефакт и checksum/operator install+rollback. |
+| 6 | Одобренный изолированный TEST-деплой | Свежий preflight; отдельный пользователь/unit/БД/root/порт; loopback smoke; HTTPS только после проверки; реальное чтение/публикация/отклик с явным согласием владельца. |
 
-Этапы 1–5 — ещё не реализованные полностью пакеты, а не галочки по наличию SPEC.
-Шаг 6 включает интеграцию; не выдаём отсутствие падений в прежних комнатах за новую
-приёмку публикации. По мере появления исходников тесты/документы обновляются вместе
-с ними. Источники статусов: [карта компонентов](project-map.md), [ROADMAP](../ROADMAP.md),
+Этапы 1–4 — ещё не реализованные полностью пакеты, а не галочки по наличию SPEC.
+Шаг 5 включает интеграцию; не выдаём успешные unit-тесты publisher за рабочий сайт.
+По мере появления исходников тесты/документы обновляются вместе с ними.
+Источники статусов: [карта компонентов](project-map.md), [ROADMAP](../ROADMAP.md),
 [канонический план](delivery-plan.md), exact-SHA CI evidence.
 
 ## До production

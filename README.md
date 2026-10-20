@@ -49,10 +49,11 @@ is specified, not yet an executed integration suite.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [M2c.1](docs/ci-m2c1.md), source `0153bd98`: Python3.12
-427 tests passed. Ordered private photos, photo-aware edits/preview and short-lived
-private intent are versioned together. Not a public upload or publication API.
-[Deployment estimate: technical loopback vs useful external TEST](docs/deployment-readiness.md).
+**Latest accepted checkpoint:** [M2c.2](docs/ci-m2c2.md), source `bc6d9d75`: Python3.12
+470 tests passed. New explicit publication consent, atomic consume/snapshot/receipt/audit,
+withdrawal and checked public read/photo primitives. This is an internal opt-in core,
+**not an enabled listing HTTP/MCP endpoint or a deployed marketplace**.
+[Six remaining stages to useful external TEST](docs/deployment-readiness.md).
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).
@@ -260,6 +261,7 @@ and private manifests with fresh credential/draft checks. This is not an
 upload/publish API. [Reviewed retention](docs/ci-m2b4.md) adds dry-run, durable
 quota reclamation and retained receipts, not automatic orphan deletion or a public
 admin capability. [Versioned private attachment/preview](docs/ci-m2c1.md) now passes CI;
-live publication consent, OS sandbox, orphan recovery, receipt compaction and full
+[Publication core](docs/ci-m2c2.md) also passes CI; external auth/adapters, OS sandbox,
+orphan recovery, receipt compaction and full
 DB+files restore remain separate gates. No Rooms
 production deployment is claimed.

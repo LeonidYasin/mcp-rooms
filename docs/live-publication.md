@@ -1,4 +1,4 @@
-# M3a — транзакционное ядро публикации и снятия
+# M2c.2 — транзакционное ядро публикации и снятия
 
 Внутренний opt-in `PublicationStore`, не запущенный web/API. HTTP/MCP adapters,
 выдача listing-scopes, web сессии, каталог/search и приватные отклики ещё не включены.
@@ -112,5 +112,5 @@ sequenceDiagram
 ```
 
 См. [план деплоя](deployment-readiness.md), [частные фото](photo-drafts.md),
-[admin boundary](admin-mcp-design.md). CI evidence добавляется только по результатам
-точного SHA, а не по наличию этого описания.
+[admin boundary](admin-mcp-design.md). [Exact-SHA CI evidence](ci-m2c2.md) фиксирует принятую версию; документация
+сама по себе не является приёмкой работающего web.

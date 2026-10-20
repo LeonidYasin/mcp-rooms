@@ -78,8 +78,20 @@ with sync_playwright() as pw:
     page.screenshot(path=str(SHOTS/'home-dark.png'),full_page=False)
     # Built-in local search must return a known document.
     page.set_viewport_size({'width':1440,'height':1050})
-    page.locator('input[data-md-component="search-query"]').fill('фотографий')
-    page.wait_for_function('document.querySelectorAll(".md-search-result__link").length > 0',timeout=30000)
+    # Fresh page + settled local JS/index, then real keyboard input. A single fill
+    # immediately after navigation can precede Material's async subscriptions.
+    page.goto(base+'/')
+    page.wait_for_load_state('networkidle')
+    query = page.locator('input[data-md-component="search-query"]')
+    query.focus()
+    page.wait_for_load_state('networkidle')
+    query.press_sequentially('фотографий', delay=80)
+    try:
+        page.wait_for_function('document.querySelectorAll(".md-search-result__link").length > 0',timeout=30000)
+    except Exception:
+        page.screenshot(path=str(SHOTS/'search-failure.png'),full_page=False)
+        (SHOTS/'search-failure.txt').write_text(page.locator('.md-search').inner_text())
+        raise
     page.screenshot(path=str(SHOTS/'search.png'),full_page=False)
     browser.close()
 server.shutdown()

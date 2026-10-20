@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "channel": "development",
+  "runtime_note": "Rooms TEST остановлен. Marketplace ещё не опубликован. Production MCP Rooms отсутствует.",
+  "components": [
+    {
+      "id": "identity",
+      "title": "Локальная идентификация",
+      "stage": "TEST",
+      "summary": "UUID, ключи агентов, scopes и отзыв; без обязательного GitHub. Проверено в прежнем изолированном пилоте.",
+      "doc": "docs/identity.md",
+      "source": "src/mcp_rooms/identity.py",
+      "evidence": "docs/acceptance-2026-10-19.md",
+      "depends_on": []
+    },
+    {
+      "id": "rooms",
+      "title": "Общие комнаты",
+      "stage": "TEST",
+      "summary": "Восемь rooms_*; только допущенные участники. Это не приватные переговоры и не публичный архив. TEST остановлен.",
+      "doc": "docs/api.md",
+      "source": "src/mcp_rooms/store.py",
+      "evidence": "docs/acceptance-2026-10-19.md",
+      "depends_on": [
+        "identity"
+      ]
+    },
+    {
+      "id": "qwen",
+      "title": "Qwen ↔ Notion",
+      "stage": "TEST",
+      "summary": "Локальный адаптер для Qwen; реальный обмен и права проверены в историческом TEST. Не обещание доступного сейчас endpoint.",
+      "doc": "clients/qwen/README.md",
+      "source": "clients/qwen/mcp_proxy_v2.py",
+      "evidence": "docs/acceptance-2026-10-19.md",
+      "depends_on": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "drafts",
+      "title": "Приватные объявления",
+      "stage": "CI",
+      "summary": "Черновик, revision CAS, повтор команды, квоты, категории, навигация и архив. Внутренний opt-in слой, не публичный API.",
+      "doc": "docs/private-draft-lifecycle.md",
+      "source": "src/mcp_rooms/draft_store.py",
+      "evidence": "docs/ci-m1b1.md",
+      "depends_on": [
+        "identity"
+      ]
+    },
+    {
+      "id": "intent",
+      "title": "Предпросмотр и намерение",
+      "stage": "CI",
+      "summary": "Точная версия, digest, отдельный scope и короткий срок. Всегда published=false; живую публикацию не разрешает.",
+      "doc": "docs/publication-intent.md",
+      "source": "src/mcp_rooms/preview_contract.py",
+      "evidence": "docs/ci-m1b2.md",
+      "depends_on": [
+        "drafts"
+      ]
+    },
+    {
+      "id": "normalize",
+      "title": "Подготовка фотографий",
+      "stage": "CI",
+      "summary": "JPEG/PNG → новый JPEG: лимиты, EXIF orientation, удаление метаданных. Не upload endpoint и не OS sandbox.",
+      "doc": "docs/media-image-safety.md",
+      "source": "src/mcp_rooms/media_image.py",
+      "evidence": "docs/ci-m2a.md",
+      "depends_on": []
+    },
+    {
+      "id": "worker",
+      "title": "Изоляция декодера",
+      "stage": "SPEC",
+      "summary": "Нужны OS CPU/RAM/timeout, ограниченная очередь и завершение зависшего worker. До публичной загрузки обязательно.",
+      "doc": "docs/media-image-safety.md",
+      "source": null,
+      "evidence": null,
+      "depends_on": [
+        "normalize"
+      ]
+    },
+    {
+      "id": "media",
+      "title": "Хранение и права на фото",
+      "stage": "SPEC",
+      "summary": "Private staging, opaque media_id, владение, квоты, manifest, retention и reconciliation FS/DB.",
+      "doc": "docs/media-image-safety.md",
+      "source": null,
+      "evidence": null,
+      "depends_on": [
+        "identity",
+        "worker"
+      ]
+    },
+    {
+      "id": "publish",
+      "title": "Публикация объявления",
+      "stage": "SPEC",
+      "summary": "Новое согласие с фото, одноразовое потребление intent, транзакция публикации и audit. Старое намерение не использовать.",
+      "doc": "docs/marketplace-conformance.md",
+      "source": null,
+      "evidence": null,
+      "depends_on": [
+        "intent",
+        "media"
+      ]
+    },
+    {
+      "id": "web",
+      "title": "Web и пользовательский MCP",
+      "stage": "SPEC",
+      "summary": "Одна карточка и одни правила, защищённые сессии, публичная allowlist-проекция, поиск и доступная галерея.",
+      "doc": "docs/web-marketplace-plan.md",
+      "source": null,
+      "evidence": null,
+      "depends_on": [
+        "publish"
+      ]
+    },
+    {
+      "id": "response",
+      "title": "Приватный отклик",
+      "stage": "SPEC",
+      "summary": "Отдельные участники/ACL/retention. Не превращать общие Rooms в личную переписку.",
+      "doc": "docs/delivery-plan.md",
+      "source": null,
+      "evidence": null,
+      "depends_on": [
+        "drafts",
+        "identity"
+      ]
+    },
+    {
+      "id": "admin",
+      "title": "Отдельный admin MCP",
+      "stage": "SPEC",
+      "summary": "Отдельный вход, audience, credentials и роли; typed операции, подтверждение, audit. Никакого shell/SQL/root.",
+      "doc": "docs/admin-mcp-design.md",
+      "source": null,
+      "evidence": null,
+      "depends_on": [
+        "identity"
+      ]
+    },
+    {
+      "id": "pilot",
+      "title": "Первая настоящая публикация",
+      "stage": "SPEC",
+      "summary": "Реальная вещь, честные фото и условия, независимый поиск/отклик, отдельное разрешение на TEST. Не обещание продажи.",
+      "doc": "docs/first-sale-acceptance.md",
+      "source": null,
+      "evidence": null,
+      "depends_on": [
+        "web",
+        "response",
+        "admin"
+      ]
+    },
+    {
+      "id": "opportunities",
+      "title": "Следующие рынки",
+      "stage": "SPEC",
+      "summary": "Услуги, работа, команды, проекты, стартапы, партнёры и инвесторы. По спросу; не реализовывать все вертикали в MVP.",
+      "doc": "docs/opportunity-model.md",
+      "source": null,
+      "evidence": null,
+      "depends_on": [
+        "pilot"
+      ]
+    }
+  ]
+}

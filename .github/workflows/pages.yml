@@ -1,0 +1,66 @@
+name: Documentation Pages
+on:
+  push:
+    branches: [feat/standalone-identity]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: docs-${{ github.event_name == 'pull_request' && github.ref || 'publish' }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install documentation tools only
+        run: |
+          python -m pip install -r tools/docs/requirements.txt
+          python -m playwright install --with-deps chromium
+          npm install --prefix /tmp/docs-mermaid --ignore-scripts --no-audit --no-fund mermaid@12.2.0
+      - name: Prepare public allowlisted sources
+        run: |
+          python tools/docs/prepare.py
+          mkdir -p .pages-src/assets/mermaid
+          cp -R /tmp/docs-mermaid/node_modules/mermaid/dist/. .pages-src/assets/mermaid/
+          cp /tmp/docs-mermaid/node_modules/mermaid/LICENSE .pages-src/assets/mermaid/LICENSE
+      - name: Strict build
+        run: python -m mkdocs build --strict
+      - name: Validate rendered site
+        run: python tools/docs/check_site.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: docs-preview-${{ github.sha }}
+          path: |
+            .pages-site
+            .pages-qa
+          include-hidden-files: true
+          retention-days: 14
+      - uses: actions/upload-pages-artifact@v4
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/feat/standalone-identity'
+        with:
+          path: .pages-site
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/feat/standalone-identity'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Read existing Pages configuration
+        uses: actions/configure-pages@v5
+      - name: Deploy documentation only
+        id: deployment
+        uses: actions/deploy-pages@v4

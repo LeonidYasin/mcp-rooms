@@ -1,0 +1,93 @@
+site_name: MCP Rooms · Карта проекта
+site_description: Версионируемая документация открытого MCP-first рынка возможностей
+site_url: https://leonidyasin.github.io/mcp-rooms/
+repo_url: https://github.com/LeonidYasin/mcp-rooms
+repo_name: LeonidYasin/mcp-rooms
+docs_dir: .pages-src
+site_dir: .pages-site
+use_directory_urls: true
+strict: true
+theme:
+  name: material
+  language: ru
+  font: false
+  palette:
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: white
+      accent: blue
+      toggle:
+        icon: material/weather-night
+        name: Тёмная тема
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: black
+      accent: light blue
+      toggle:
+        icon: material/weather-sunny
+        name: Светлая тема
+  features:
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+plugins:
+  - search:
+      lang: [ru, en]
+markdown_extensions:
+  - admonition
+  - tables
+  - attr_list
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: diagram-src
+          format: !!python/name:pymdownx.superfences.fence_code_format
+extra_css:
+  - assets/project.css
+extra_javascript:
+  - path: assets/diagrams.js
+    type: module
+validation:
+  nav:
+    omitted_files: info
+  links:
+    anchors: info
+nav:
+  - Обзор: index.md
+  - Карта и архитектура:
+    - Карта компонентов: map.md
+    - Подробная mindmap: docs/product-mindmap.md
+    - Архитектура и ER: docs/architecture-graph.md
+    - Карта исходников: docs/project-map.md
+  - Продукт и план:
+    - Рынок возможностей: docs/opportunity-model.md
+    - Позиционирование: docs/project-positioning.md
+    - План поставки: docs/delivery-plan.md
+    - Roadmap: ROADMAP.md
+    - Архитектурное решение: docs/decisions/001-marketplace-foundation.md
+    - Первый реальный сценарий: docs/first-sale-acceptance.md
+  - Контракты:
+    - Приёмочные требования: docs/marketplace-conformance.md
+    - Приватные черновики: docs/draft-storage-design.md
+    - Lifecycle: docs/private-draft-lifecycle.md
+    - Согласие и intent: docs/publication-intent.md
+    - Фотографии: docs/media-image-safety.md
+    - Web: docs/web-marketplace-plan.md
+    - Отдельный admin MCP: docs/admin-mcp-design.md
+  - Комнаты и клиенты:
+    - Identity: docs/identity.md
+    - API комнат: docs/api.md
+    - Регистрация: docs/registration.md
+    - Qwen Desktop: clients/qwen/README.md
+    - Эксплуатация: docs/operations.md
+  - Проверки и исследования:
+    - Исторический пилот: docs/acceptance-2026-10-19.md
+    - CI M1a: docs/ci-m1a.md
+    - CI lifecycle: docs/ci-m1b1.md
+    - CI intent: docs/ci-m1b2.md
+    - CI photo: docs/ci-m2a.md
+    - Итоги исследования: docs/marketplace-research-final.md
+    - Проверка кандидатов: docs/candidate-source-checks.md
+  - Как обновляется сайт: docs/documentation-site.md

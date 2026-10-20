@@ -191,3 +191,14 @@ blocked by token HTTP403; README/package description updated in the working bran
 
 [Opportunity boundaries](docs/opportunity-model.md), [photo safety contract](docs/media-image-safety.md).
 About is proposed text for the owner's manual update, not an API metadata mutation.
+
+
+## Documentation website / living project map
+
+- [x] Prepare MkDocs/Material site with source-linked component registry, mindmap, architecture, roadmap and contracts.
+- [x] Exact source SHA and history on every page; version manifest and Markdown content digests.
+- [x] Prepare build/QA/artifact/deploy workflow; PR never deploys; source remains alpha branch.
+- [ ] Exact-SHA docs build, diagram/link/mobile/search smoke and visual review evidence.
+- [ ] Owner enables Pages Actions source and approved branch environment; successful deploy and external URL/SHA verified.
+
+Documentation publication is not application rollout or approval to merge main.

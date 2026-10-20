@@ -15,3 +15,8 @@ secrets/
 
 # Public placeholder only; real .env and .env.* remain ignored.
 !clients/qwen/.env.example
+
+# Generated documentation only
+.pages-src/
+.pages-site/
+.pages-qa/

@@ -167,3 +167,15 @@ admin MCP or live migration is implied. [Storage design](docs/draft-storage-desi
 
 [Lifecycle/migration contract](docs/private-draft-lifecycle.md). Archiving is not physical
 erasure, publication or proof of sale. No VPS change or listing scopes issued by signup.
+
+## M1b.2 source — exact private preview / bounded intent
+
+- [x] Prepare deterministic preview of exact record/category path/resource/policy notice; untrusted text is not HTML.
+- [x] Prepare separate listings:publish permission checks, short-lived private intent, replay without deadline extension and fresh validity read.
+- [x] Prepare negative/revoke/expiry/revision/category/resource/rollback/concurrency fixtures; no publication or scope issuance.
+- [ ] Exact-SHA CI of this source slice.
+- [ ] Actual publisher: new live-publication notice/media manifest, transactional recheck+one-time consume+state transition/audit, approved public API.
+
+[Intent contract](docs/publication-intent.md). [Positioning](docs/project-positioning.md):
+technical test item is not the public brand hero. GitHub About update attempted but
+blocked by token HTTP403; README/package description updated in the working branch.

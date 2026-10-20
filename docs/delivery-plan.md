@@ -145,3 +145,12 @@ retention contracts, а не открытие доступа на VPS.
 [Личный список/категории/архив](private-draft-lifecycle.md): SOURCE +
 [CI на code SHA 104d5a5c](ci-m1b1.md), 8/8 checks, Python3.12 226 passed/2 warnings. Full M1b не завершён: content-bound publication consent и retention/deletion/retry
 policy остаются следующими. Не перескакивать к public integration из-за наличия archive.
+
+## M1b.2 — preview/intent boundary
+
+[Private publication intent](publication-intent.md) is prepared as source: full version
+binding with category/resource/policy digest and separate publish scope. It never
+changes public state. CI acceptance and remaining M1b retention/delete/retry policy
+are separate gates; actual M2 publish needs new media-ready notice/manifest and atomic
+intent consumption. [Positioning](project-positioning.md) separates technical first item
+from public launch messaging.

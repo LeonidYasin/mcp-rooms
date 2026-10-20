@@ -77,3 +77,11 @@ server startup exists. Generic IdentityStore issuance still rejects listing scop
 `draft_store.py`: own list/category read/private archive; `tests/test_draft_lifecycle.py`
 adds pagination/migration/archive/concurrency negatives. [Lifecycle design](private-draft-lifecycle.md).
 Market namespace v2 is explicit opt-in; no RoomStore startup/version changes or public API.
+
+### M1b.2 source increment / positioning
+
+`preview_contract.py` defines canonical private preview/digest (not signature/HTML);
+DraftStore records/checks short-lived publication intent without publishing.
+`tests/test_publication_intent.py` covers scope/version/hash/expiry/resource/isolation.
+[Intent design](publication-intent.md), [public positioning](project-positioning.md).
+No listing scopes issued by signup and no new routes/tools.

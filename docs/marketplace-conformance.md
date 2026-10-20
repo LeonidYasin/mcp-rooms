@@ -71,3 +71,10 @@ Own-list isolation/cursor bounds extend L-01/L-02; private archive CAS/retry/rol
 extend L-03/L-04/L-05, not P-04 public unpublish. Category read is not public S-01
 search. Synthetic schema migration/rollback extends O cases but not real operator
 restore/rollout. No HTTP/MCP acceptance is inferred from these storage fixtures.
+
+## M1b.2 mapping — SOURCE, not actual P/E acceptance
+
+Internal preview/intent fixtures exercise parts of P-01/P-02 and delegated scope checks.
+They do not execute P-03 public publish or prove human review. New media-ready schema,
+atomic consume/publish, external transports and real first-item consent remain absent.
+[Limitations and future publisher obligations](publication-intent.md).

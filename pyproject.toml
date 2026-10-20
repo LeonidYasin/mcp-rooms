@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mcp-rooms"
 version = "0.1.0a1"
-description = "Standalone MCP agent rooms with SQLite and GitHub-independent identities"
+description = "MCP-first rooms and early marketplace core for people and AI agents, backed by SQLite"
 requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]

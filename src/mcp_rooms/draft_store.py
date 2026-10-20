@@ -16,6 +16,7 @@ import uuid
 from .domain import DomainError, Principal, identifier
 from .identity import resource_url
 from .listing_contract import Listing, ListingContent, create_draft
+from .preview_contract import canonical_json as _json, make_preview, PREVIEW_SCHEMA
 
 SCHEMA_VERSION = 2
 TABLES = ('market_schema', 'market_categories', 'market_drafts', 'market_commands')
@@ -26,10 +27,6 @@ CATEGORIES = (
     ('toilets', 'plumbing', 'things', 'Унитазы'),
     ('services', None, 'services', 'Услуги'),
 )
-
-
-def _json(value):
-    return json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(',', ':'), allow_nan=False)
 
 
 def _bounded_integer(value, minimum, maximum, code):
@@ -331,3 +328,91 @@ class DraftStore:
             result = json.loads(_json(self._record(self._owned(db, principal.user_id, listing_id, now))))
             self._receipt(db, principal, client_id, 'archive', digest, result, now)
             return {**result, 'replayed': False}
+
+
+    def _preview(self, db, row):
+        record = json.loads(_json(self._record(row)))
+        self._category(db, row['category_id'], record['listing']['content']['category'])
+        path, category_id = [], row['category_id']
+        # _category checked existence, active ancestry, depth and cycles above.
+        while category_id is not None:
+            category = db.execute('SELECT * FROM market_categories WHERE id=?', (category_id,)).fetchone()
+            path.append({field: category[field] for field in ('id', 'parent_id', 'root', 'title')})
+            category_id = category['parent_id']
+        return make_preview(record, list(reversed(path)), self.resource)
+
+    def preview(self, principal, listing_id):
+        """Private read of current version; no publication, token or auth grant."""
+        with self.store._db() as db:
+            self._schema(db)
+            now = self.store.clock()
+            self._authorize(db, principal, 'listings:read', now)
+            row = self._owned(db, principal.user_id, listing_id, now)
+            if row['status'] != 'draft':
+                raise DomainError('draft_not_editable')
+            return self._preview(db, row)
+
+    def confirm_publication_intent(self, principal, listing_id, *, expected_revision,
+                                   preview_digest, client_id):
+        """Persist intent ONLY. No public state transition or one-time consumption.
+
+        A scoped agent can make this call: it does NOT prove a human saw the UI.
+        Adapters must obtain explicit owner approval before exercising this power.
+        """
+        identifier(listing_id)
+        _bounded_integer(expected_revision, 1, 2**63-1, 'invalid_revision')
+        if not isinstance(preview_digest, str) or not re.fullmatch('[0-9a-f]{64}', preview_digest):
+            raise DomainError('invalid_preview_digest')
+        payload = {'id': listing_id, 'expected_revision': expected_revision,
+                   'preview_digest': preview_digest, 'resource': self.resource,
+                   'schema': PREVIEW_SCHEMA}
+        with self.store._db(write=True) as db:
+            self._schema(db)
+            now = self.store.clock()
+            self._authorize(db, principal, 'listings:publish', now)
+            digest, replay = self._retry(db, principal, client_id, 'confirm_publication_intent', payload)
+            if replay is not None:
+                return {**replay, 'replayed': True}
+            row = self._owned(db, principal.user_id, listing_id, now)
+            if row['status'] != 'draft':
+                raise DomainError('draft_not_editable')
+            if row['revision'] != expected_revision:
+                raise DomainError('revision_conflict')
+            if now < row['updated_at']:
+                raise DomainError('invalid_timestamp')
+            if self._preview(db, row)['digest'] != preview_digest:
+                raise DomainError('preview_conflict')
+            result = {'kind': 'publication_intent', 'schema': PREVIEW_SCHEMA,
+                      'resource': self.resource, 'intent_id': client_id,
+                      'listing_id': listing_id, 'revision': expected_revision,
+                      'preview_digest': preview_digest, 'recorded_at': now,
+                      'valid_until': min(now + 300000, row['expires_at']),
+                      'published': False}
+            self._receipt(db, principal, client_id, 'confirm_publication_intent', digest, result, now)
+            return {**result, 'replayed': False}
+
+    def get_publication_intent(self, principal, listing_id, intent_id):
+        """Revalidate intent now. NOT permission to publish from another service.
+
+        A future publisher must revalidate and consume within its OWN mutation
+        transaction, after media/security checks. Never check here then publish
+        later as an independent write; that would create a TOCTOU race.
+        """
+        identifier(intent_id)
+        with self.store._db() as db:
+            self._schema(db)
+            now = self.store.clock()
+            self._authorize(db, principal, 'listings:publish', now)
+            row = self._owned(db, principal.user_id, listing_id, now)
+            receipt = db.execute('SELECT result FROM market_commands WHERE user_id=? AND client_id=? AND operation=?',
+                                 (principal.user_id, intent_id, 'confirm_publication_intent')).fetchone()
+            if row['status'] != 'draft' or not receipt:
+                raise DomainError('publication_intent_unavailable')
+            intent = json.loads(receipt['result'])
+            if (intent.get('kind') != 'publication_intent' or intent.get('schema') != PREVIEW_SCHEMA
+                    or intent.get('resource') != self.resource or intent.get('intent_id') != intent_id
+                    or intent.get('listing_id') != listing_id or intent.get('revision') != row['revision']
+                    or not intent['recorded_at'] <= now < intent['valid_until']
+                    or intent.get('preview_digest') != self._preview(db, row)['digest']):
+                raise DomainError('publication_intent_unavailable')
+            return intent

@@ -1,6 +1,11 @@
 # MCP Rooms
 
-**Standalone agent rooms, SQLite, no GitHub account required.** MIT.
+**MCP-first marketplace for people and AI agents — built on shared rooms and SQLite.** MIT.
+
+People and agents will use the same listings and rules through web and MCP.
+**Alpha:** shared-room pilot accepted; private listing core tested in CI; public web
+marketplace is still in development. No GitHub account is required for room users.
+[Positioning and launch policy](docs/project-positioning.md).
 
 Status: **alpha; temporary HTTPS TEST and cross-user Qwen ↔ Notion exchange accepted; no production approval**.
 Evidence and remaining gates: [live acceptance record](docs/acceptance-2026-10-19.md). The source is
@@ -42,17 +47,16 @@ is specified, not yet an executed integration suite.
   [M1b.1 CI evidence](docs/ci-m1b1.md): code SHA `104d5a5c`, 8/8 checks;
   Python3.12 226 tests passed, 2 warnings. Still no public listing API.
   Not registered in MCP/HTTP; current enrollment still cannot issue listing scopes.
+- [M1b.2 private preview/intent](docs/publication-intent.md): exact content/revision/
+  category/resource binding; separate publish scope, short TTL; still published=false.
 - Shared domain primitives keep legacy RoomError/Principal aliases. No room schema
   version or default startup migration change. CI evidence is separate from source.
 
 ## Qwen Desktop and next product phase
 
-[Completed reuse research / candidate decision gates](docs/marketplace-research-final.md):
-HivePress + ListingHive + official WordPress MCP Adapter is the first evaluation candidate;
-Apache OsclassPoint and a minimal own Python/SQLite domain are also candidates.
-[Source-level checks / equal build-vs-reuse comparison](docs/candidate-source-checks.md).
-No stack switch, implementation or deployment approved.
-
+[Reuse research](docs/marketplace-research-final.md) and [source checks](docs/candidate-source-checks.md)
+led to [ADR-001](docs/decisions/001-marketplace-foundation.md): continue a bounded own
+Python/SQLite domain. Ready engines remain references/fallbacks, not an active stack switch.
 
 - [Saved local proxy, safe debug, setup, .env placeholder, MCP check](clients/qwen/README.md).
 - [Detailed product mindmap / first-sale milestones](docs/product-mindmap.md).

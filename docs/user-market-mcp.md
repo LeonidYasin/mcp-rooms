@@ -91,4 +91,4 @@ scopes, но bytes staging пока подготавливает trusted fixture
 browser session/CSRF и явный onboarding grant; public card/photo/search delivery с
 no-store/escape/rate controls; отдельный admin MCP; OS/recovery/load/E2E и VPS approval.
 См. [deployment plan](deployment-readiness.md), [publication core](live-publication.md),
-[identity](identity.md). Exact-SHA acceptance фиксируется отдельно после CI.
+[identity](identity.md). [Exact-SHA acceptance](ci-m3a1.md) фиксирует проверенный срез, не готовность внешнего сервиса.

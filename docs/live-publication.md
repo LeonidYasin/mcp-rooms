@@ -1,7 +1,9 @@
 # M2c.2 — транзакционное ядро публикации и снятия
 
-Внутренний opt-in `PublicationStore`, не запущенный web/API. HTTP/MCP adapters,
-выдача listing-scopes, web сессии, каталог/search и приватные отклики ещё не включены.
+Внутренний opt-in `PublicationStore`, не запущенный публичный web/API. Отдельный
+[user MCP adapter](user-market-mcp.md) проверен в CI как явная composition API;
+HTTP upload, browser sessions, auto market onboarding, каталог/search и приватные
+отклики ещё не включены.
 Никакая настоящая вещь не опубликована этим кодовым срезом.
 
 ## Новое согласие, не повышение старого intent

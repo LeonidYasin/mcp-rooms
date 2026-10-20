@@ -159,7 +159,7 @@
       "id": "publish",
       "title": "Публикация объявления",
       "stage": "CI",
-      "summary": "CI: new-schema consent, atomic consume/snapshot/receipt/audit, withdrawal, epoch/replay и allowlisted public read/photo primitives. Internal opt-in; нет HTTP/MCP endpoint.",
+      "summary": "CI: consent/consume/snapshot/receipt/audit, withdrawal и epoch. Пользовательский MCP проверен отдельно как opt-in; публичного HTTP/web ещё нет.",
       "doc": "docs/live-publication.md",
       "source": "src/mcp_rooms/publication_store.py",
       "evidence": "docs/ci-m2c2.md",
@@ -171,11 +171,11 @@
     {
       "id": "user_market_mcp",
       "title": "Пользовательский MCP объявлений",
-      "stage": "SOURCE",
-      "summary": "Подготовлены opt-in12 listing tools над текущим Bearer/ContextVar: отдельные scopes, typed inputs, same DB/resource, безопасное делегирование. Не HTTP upload или auto market onboarding.",
+      "stage": "CI",
+      "summary": "CI:12 opt-in listing tools +8 rooms, actual Bearer/SDK/ContextVar, отдельные scopes, typed inputs, same DB/resource и bounded self-delegation. Не upload/browser/onboarding или CLI deploy.",
       "doc": "docs/user-market-mcp.md",
       "source": "src/mcp_rooms/market_tools.py",
-      "evidence": null,
+      "evidence": "docs/ci-m3a1.md",
       "depends_on": [
         "identity",
         "publish",

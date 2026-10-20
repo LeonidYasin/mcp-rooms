@@ -49,10 +49,10 @@ is specified, not yet an executed integration suite.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [M2c.2](docs/ci-m2c2.md), source `bc6d9d75`: Python3.12
-470 tests passed. New explicit publication consent, atomic consume/snapshot/receipt/audit,
-withdrawal and checked public read/photo primitives. This is an internal opt-in core,
-**not an enabled listing HTTP/MCP endpoint or a deployed marketplace**.
+**Latest accepted checkpoint:** [M3a.1](docs/ci-m3a1.md), source `405d2a34`: Python3.12
+501 tests passed. A separately composed user MCP adds12 scoped listing tools to8
+rooms, over actual Bearer/official SDK, with safe self-delegation. Default CLI stays
+rooms-only; signup does not grant listing scopes. No public web/upload or VPS rollout.
 [Six remaining stages to useful external TEST](docs/deployment-readiness.md).
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).

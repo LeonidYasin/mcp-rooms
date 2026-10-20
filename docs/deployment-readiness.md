@@ -39,6 +39,10 @@ projection. Это internal CI, а не публичный web или завер
 | 5 | Приёмка и пакет эксплуатации | E2E/negative/abuse CI, OS sandbox и адекватные VPS лимиты, DB+files restore и revocation reconciliation, квоты/retention, закреплённый артефакт и checksum/operator install+rollback. |
 | 6 | Одобренный изолированный TEST-деплой | Свежий preflight; отдельный пользователь/unit/БД/root/порт; loopback smoke; HTTPS только после проверки; реальное чтение/публикация/отклик с явным согласием владельца. |
 
+В этапе1 уже принят [opt-in user MCP/auth срез](ci-m3a1.md):12 listing tools,
+actual Bearer и bounded delegation. HTTP upload, browser sessions/CSRF и автоматический
+marketplace onboarding ещё остаются; целиком этап1 не закрыт.
+
 Этапы 1–4 — ещё не реализованные полностью пакеты, а не галочки по наличию SPEC.
 Шаг 5 включает интеграцию; не выдаём успешные unit-тесты publisher за рабочий сайт.
 По мере появления исходников тесты/документы обновляются вместе с ними.

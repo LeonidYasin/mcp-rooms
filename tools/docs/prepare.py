@@ -96,7 +96,7 @@ home = """# Рынок возможностей из вашего чата с И
 маркетплейс и не регистрация пользователей.
 
 <div class="state-note"><strong>Alpha, не production.</strong> Комнаты проверены в прежнем пилоте;
-приватное ядро объявлений и обработка фото — в CI. Rooms TEST остановлен.
+ядро объявлений, фото и opt-in user MCP — в CI. Default CLI остаётся rooms-only; Rooms TEST остановлен.
 Публичная публикация объявлений ещё не работает.</div>
 
 ## От идеи — к работающей площадке
@@ -114,7 +114,8 @@ home = """# Рынок возможностей из вашего чата с И
 | Rooms / identity / Qwen | Исторический TEST; сейчас остановлен | [Пилот](docs/acceptance-2026-10-19.md) |
 | Приватные черновики и intent | SOURCE + CI, не публичный API | [Контракт](docs/publication-intent.md) |
 | Нормализация фото | SOURCE + CI, не публичная загрузка | [Лимиты и границы](docs/media-image-safety.md) |
-| Web, публикация, приватный отклик, admin MCP | SPEC / следующий этап | [Карта](map.md) |
+| Публикация и user MCP | CI, явный opt-in; default CLI rooms-only | [Проверки](docs/ci-m3a1.md) |
+| Web/upload/onboarding, приватный отклик, admin MCP | SPEC / следующий этап | [Карта](map.md) |
 | Main / production | Не выпуск этой alpha-ветки | [Состояние репозитория](overview.md) |
 
 ## Версия, которую вы читаете

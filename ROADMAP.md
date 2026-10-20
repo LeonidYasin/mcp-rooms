@@ -1,7 +1,7 @@
 # MCP Rooms roadmap
 
-Current checkpoint: [M2c.2 CI](docs/ci-m2c2.md), internal publication/withdrawal core.
-Next: user adapters/auth, then the [6 remaining milestones to useful external TEST](docs/deployment-readiness.md).
+Current checkpoint: [M3a.1 CI](docs/ci-m3a1.md), opt-in authenticated listing MCP.
+Next: bounded HTTP upload/user auth/session/onboarding; [6 remaining milestones to useful external TEST](docs/deployment-readiness.md).
 Older sections retain historical acceptance boundaries; they are not promises of a live service.
 
 ## Source extraction / private-pilot alpha
@@ -285,7 +285,7 @@ No main, VPS, public upload/publication or new real scope issuance changed.
 - [x] Separate explicit listing-scope policy; default rooms-only issuer/app/signup unchanged.
 - [x] Atomic self-delegation rechecks; no broader scopes/later expiry than source key.
 - [x] Prepare actual Bearer/ASGI workflow, cross-user/scopes/revoke/race/binding tests.
-- [ ] Accept exact-SHA CI and record evidence.
+- [x] Exact-SHA CI `405d2a34`: Python3.12 501 passed/2 warnings; Python3.10 452 passed/30 skipped/2 warnings; matrix +15-diagram docs QA green. [Evidence](docs/ci-m3a1.md).
 - [ ] Bounded streaming upload, HTTP/browser/session/onboarding, web/search and approved TEST.
 
 [User MCP boundary](docs/user-market-mcp.md). No default CLI enablement, live keys, main or VPS changed.

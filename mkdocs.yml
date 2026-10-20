@@ -74,6 +74,7 @@ nav:
     - Lifecycle: docs/private-draft-lifecycle.md
     - Согласие и intent: docs/publication-intent.md
     - Фотографии: docs/media-image-safety.md
+    - Media worker и storage: docs/media-storage-design.md
     - Web: docs/web-marketplace-plan.md
     - Отдельный admin MCP: docs/admin-mcp-design.md
   - Комнаты и клиенты:

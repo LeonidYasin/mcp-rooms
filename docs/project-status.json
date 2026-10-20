@@ -76,7 +76,7 @@
       "title": "Изоляция декодера",
       "stage": "SPEC",
       "summary": "Нужны OS CPU/RAM/timeout, ограниченная очередь и завершение зависшего worker. До публичной загрузки обязательно.",
-      "doc": "docs/media-image-safety.md",
+      "doc": "docs/media-storage-design.md",
       "source": null,
       "evidence": null,
       "depends_on": [
@@ -88,7 +88,7 @@
       "title": "Хранение и права на фото",
       "stage": "SPEC",
       "summary": "Private staging, opaque media_id, владение, квоты, manifest, retention и reconciliation FS/DB.",
-      "doc": "docs/media-image-safety.md",
+      "doc": "docs/media-storage-design.md",
       "source": null,
       "evidence": null,
       "depends_on": [

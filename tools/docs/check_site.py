@@ -64,7 +64,7 @@ with sync_playwright() as pw:
             page.screenshot(path=str(SHOTS/f'{name}-{label}.png'),full_page=False)
         if label=='mobile':
             page.goto(base+'/')
-            page.locator('label[for="__drawer"]').first.click()
+            page.locator('.md-header label[for="__drawer"]').click()
             page.screenshot(path=str(SHOTS/'menu-mobile.png'),full_page=False)
     page.emulate_media(color_scheme='dark')
     page.goto(base+'/')

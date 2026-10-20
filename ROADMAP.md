@@ -237,3 +237,15 @@ Documentation publication is not application rollout or approval to merge main.
 - [ ] Reviewable reconciliation/retention and safe budget reclamation/recovery.
 
 [Staging boundary](docs/media-staging.md): no public API, attach, scope issuance or VPS migration.
+
+
+## M2b.4 — reviewed retention and quota reclamation
+
+- [x] Prepare bounded read-only plan and exact snapshot/store binding.
+- [x] Prepare PURGING/PURGED, durable absence before quota release, retained bounded receipts.
+- [x] Coordinate stage writes with cleanup, including late worker and interrupted cleanup fixtures.
+- [ ] Accept exact-SHA GitHub CI; record evidence.
+- [ ] Explicit orphan recovery, complete DB+files restore and receipt compaction policy.
+- [ ] Operator/admin authorization, scheduling and approved OS TEST; no automatic cleanup enabled.
+
+[Cleanup boundary](docs/media-cleanup.md). No VPS, main, live schema migration or public maintenance API.

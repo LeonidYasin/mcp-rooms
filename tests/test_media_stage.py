@@ -148,8 +148,8 @@ def test_change_during_decode_never_commits_staged(env, kind, code):
     x.worker.hook = change
     fails(code, lambda: upload(x))
     row = rows(x)[0]
-    assert row['state'] == 'failed' and row['blob_key']
-    assert len(list(x.root.iterdir())) == 1  # private failed derivative retained, not exposed
+    assert row['state'] == 'failed' and row['blob_key'] is None
+    assert not list(x.root.iterdir())  # fresh pre-write gate rejects changed rights
 
 
 def test_no_write_lock_held_during_worker(env):
@@ -284,12 +284,12 @@ def test_invalid_input_before_reservation(env, change, code):
 
 def test_revoke_after_file_write_before_commit(env, monkeypatch):
     x = env
-    put = x.files.put
+    put = x.files._put_locked
     def revoke(photo):
         receipt = put(photo)
         x.auth.revoke(x.a.credential_id)
         return receipt
-    monkeypatch.setattr(x.files, 'put', revoke)
+    monkeypatch.setattr(x.files, '_put_locked', revoke)
     fails('authentication_required', lambda: upload(x))
     assert rows(x)[0]['state'] == 'failed' and len(list(x.root.iterdir())) == 1
 

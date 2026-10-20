@@ -18,14 +18,16 @@ MAX_ROWS = 128
 MAX_OWNER_ROWS = 16
 MAX_BYTES = 32 * 1024 * 1024
 MAX_OWNER_BYTES = 8 * 1024 * 1024
+MAX_RECEIPTS = 512
+MAX_OWNER_RECEIPTS = 128
 _TABLES = {'media_stage_schema', 'media_stages'}
 
 
 class MediaStageStore:
     """Internal service. Inject one trusted file store and reused decode worker.
 
-    Lifetime admission includes expired/failed rows until reviewed maintenance;
-    failures cannot release budget while orphan bytes might remain. No auto-cleanup.
+    Expired/failed rows keep quota until explicit reviewed maintenance. Purged
+    tombstones retain idempotency receipts; their separate lifetime cap is bounded.
     """
     def __init__(self, drafts, files, worker):
         self.drafts, self.store = drafts, drafts.store
@@ -39,7 +41,12 @@ class MediaStageStore:
             if found:
                 if found != _TABLES:
                     raise DomainError('unsupported_media_schema')
-                self._schema(db)
+                version = self._schema(db, allow_v1=True)
+                if version == 1:
+                    db.execute("ALTER TABLE media_stages ADD COLUMN cleanup_state TEXT NOT NULL DEFAULT 'live' CHECK(cleanup_state IN ('live','purging','purged'))")
+                    db.execute('ALTER TABLE media_stages ADD COLUMN cleanup_started_at INTEGER')
+                    db.execute('ALTER TABLE media_stages ADD COLUMN purged_at INTEGER')
+                    db.execute('UPDATE media_stage_schema SET version=2 WHERE singleton=1')
                 return
             db.execute('CREATE TABLE media_stage_schema(singleton INTEGER PRIMARY KEY CHECK(singleton=1),version INTEGER NOT NULL)')
             db.execute('''CREATE TABLE media_stages(
@@ -51,20 +58,24 @@ class MediaStageStore:
                 created_at INTEGER NOT NULL, expires_at INTEGER NOT NULL,
                 policy TEXT NOT NULL, blob_key TEXT, sha256 TEXT, byte_size INTEGER,
                 width INTEGER, height INTEGER,
+                cleanup_state TEXT NOT NULL DEFAULT 'live' CHECK(cleanup_state IN ('live','purging','purged')),
+                cleanup_started_at INTEGER, purged_at INTEGER,
                 UNIQUE(user_id,client_id), CHECK(created_at<expires_at),
                 CHECK(state!='staged' OR (blob_key IS NOT NULL AND sha256 IS NOT NULL
                     AND byte_size>0 AND width>0 AND height>0)))''')
             db.execute('CREATE INDEX media_stages_owner ON media_stages(user_id)')
-            db.execute('INSERT INTO media_stage_schema VALUES (1,1)')
+            db.execute('INSERT INTO media_stage_schema VALUES (1,2)')
 
     @staticmethod
-    def _schema(db):
+    def _schema(db, *, allow_v1=False):
         try:
             rows = db.execute('SELECT singleton,version FROM media_stage_schema').fetchall()
         except sqlite3.OperationalError:
             raise DomainError('media_migration_required') from None
-        if len(rows) != 1 or tuple(rows[0]) != (1, 1):
+        if (len(rows) != 1 or rows[0][0] != 1
+                or rows[0][1] not in ((1, 2) if allow_v1 else (2,))):
             raise DomainError('unsupported_media_schema')
+        return rows[0][1]
 
     def _gate(self, db, actor, draft_id, revision, scope):
         self.drafts._schema(db)
@@ -84,7 +95,7 @@ class MediaStageStore:
     def _live(self, row, now):
         if now < row['created_at']:
             raise DomainError('invalid_timestamp')
-        if (row['expires_at'] <= now or row['policy'] != POLICY
+        if (row['cleanup_state'] != 'live' or row['expires_at'] <= now or row['policy'] != POLICY
                 or row['resource'] != self.drafts.resource):
             raise DomainError('media_unavailable')
         if row['state'] == 'reserved':
@@ -117,9 +128,13 @@ class MediaStageStore:
                     raise DomainError('idempotency_conflict')
                 self._live(row, now)
                 return dict(row), True
+            total_receipts = db.execute('SELECT COUNT(*) FROM media_stages').fetchone()[0]
+            owner_receipts = db.execute('SELECT COUNT(*) FROM media_stages WHERE user_id=?', (actor.user_id,)).fetchone()[0]
+            if total_receipts >= MAX_RECEIPTS or owner_receipts >= MAX_OWNER_RECEIPTS:
+                raise DomainError('media_receipt_capacity')
             for owner, count_cap, bytes_cap in ((None, MAX_ROWS, MAX_BYTES),
                                                (actor.user_id, MAX_OWNER_ROWS, MAX_OWNER_BYTES)):
-                where, params = ('', ()) if owner is None else (' WHERE user_id=?', (owner,))
+                where, params = (" WHERE cleanup_state!='purged'", ()) if owner is None else (" WHERE cleanup_state!='purged' AND user_id=?", (owner,))
                 count, used = db.execute('SELECT COUNT(*),COALESCE(SUM(reserved_bytes),0) FROM media_stages'+where, params).fetchone()
                 if count >= count_cap or used + MAX_OUTPUT_BYTES > bytes_cap:
                     raise DomainError('media_admission_capacity')
@@ -138,9 +153,9 @@ class MediaStageStore:
             with self.store._db(write=True) as db:
                 self._schema(db)
                 if receipt is None:
-                    db.execute("UPDATE media_stages SET state='failed' WHERE id=? AND state='reserved'", (media_id,))
+                    db.execute("UPDATE media_stages SET state='failed' WHERE id=? AND state='reserved' AND cleanup_state='live'", (media_id,))
                 else:
-                    db.execute("UPDATE media_stages SET state='failed',blob_key=?,sha256=?,byte_size=?,width=?,height=? WHERE id=? AND state='reserved'",
+                    db.execute("UPDATE media_stages SET state='failed',blob_key=?,sha256=?,byte_size=?,width=?,height=? WHERE id=? AND state='reserved' AND cleanup_state='live'",
                                (receipt.blob_key, receipt.sha256, receipt.byte_size,
                                 receipt.width, receipt.height, media_id))
         except (sqlite3.Error, DomainError):
@@ -168,25 +183,40 @@ class MediaStageStore:
         receipt = None
         try:
             normalized = self.worker.normalize(payload, declared_type)
-            receipt = self.files.put(normalized)
-            with self.store._db(write=True) as db:
-                now, _ = self._gate(db, actor, draft_id, expected_revision, 'listings:write')
-                fresh = db.execute('SELECT * FROM media_stages WHERE id=? AND user_id=?',
-                                   (row['id'], actor.user_id)).fetchone()
-                if fresh and now < fresh['created_at']:
-                    raise DomainError('invalid_timestamp')
-                if (not fresh or fresh['state'] != 'reserved' or fresh['expires_at'] <= now
-                        or fresh['digest'] != digest or fresh['policy'] != POLICY
-                        or fresh['resource'] != self.drafts.resource):
-                    raise DomainError('media_unavailable')
-                db.execute("UPDATE media_stages SET state='staged',blob_key=?,sha256=?,byte_size=?,width=?,height=? WHERE id=? AND state='reserved'",
-                           (receipt.blob_key, receipt.sha256, receipt.byte_size,
-                            receipt.width, receipt.height, row['id']))
-                result = dict(db.execute('SELECT * FROM media_stages WHERE id=?', (row['id'],)).fetchone())
+            # Lock order is ROOT -> short DB transaction. Cleanup takes the same
+            # guard, so an expired in-flight decode can never write after purge.
+            with self.files._guard():
+                try:
+                    with self.store._db() as db:
+                        now, _ = self._gate(db, actor, draft_id, expected_revision, 'listings:write')
+                        self._reservation(db, row['id'], actor.user_id, digest, now)
+                    receipt = self.files._put_locked(normalized)
+                    with self.store._db(write=True) as db:
+                        now, _ = self._gate(db, actor, draft_id, expected_revision, 'listings:write')
+                        self._reservation(db, row['id'], actor.user_id, digest, now)
+                        db.execute("UPDATE media_stages SET state='staged',blob_key=?,sha256=?,byte_size=?,width=?,height=? WHERE id=? AND state='reserved' AND cleanup_state='live'",
+                                   (receipt.blob_key, receipt.sha256, receipt.byte_size,
+                                    receipt.width, receipt.height, row['id']))
+                        result = dict(db.execute('SELECT * FROM media_stages WHERE id=?', (row['id'],)).fetchone())
+                except Exception:
+                    # Persist a known failed derivative before releasing the root
+                    # lock. An actual crash can still leave an orphan for review.
+                    self._failed(row['id'], receipt)
+                    raise
             return self._public(result)
         except Exception:
-            self._failed(row['id'], receipt)
+            if receipt is None:
+                self._failed(row['id'], None)
             raise
+
+    def _reservation(self, db, media_id, user_id, digest, now):
+        row = db.execute('SELECT * FROM media_stages WHERE id=? AND user_id=?', (media_id, user_id)).fetchone()
+        if row and now < row['created_at']:
+            raise DomainError('invalid_timestamp')
+        if (not row or row['state'] != 'reserved' or row['cleanup_state'] != 'live'
+                or row['expires_at'] <= now or row['digest'] != digest
+                or row['policy'] != POLICY or row['resource'] != self.drafts.resource):
+            raise DomainError('media_unavailable')
 
     def read(self, actor, media_id):
         """Internal authenticated read; no HTTP headers, public serving or attachment."""

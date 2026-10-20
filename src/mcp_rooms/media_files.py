@@ -127,7 +127,8 @@ class PrivatePhotoFiles:
                     raise DomainError('media_storage_quota')
         return count, total
 
-    def put(self, photo):
+    @staticmethod
+    def _validate_photo(photo):
         # Only an internal normalizer/worker result, not arbitrary request bytes.
         if (type(photo) is not NormalizedPhoto or type(photo.data) is not bytes
                 or not 0 < len(photo.data) <= MAX_OUTPUT_BYTES
@@ -136,75 +137,90 @@ class PrivatePhotoFiles:
                 or photo.content_type != 'image/jpeg' or photo.source_format not in ('PNG', 'JPEG')
                 or any(type(v) is not int or not 1 <= v <= OUTPUT_SIDE for v in (photo.width, photo.height))):
             raise DomainError('media_derivative_invalid')
+    def put(self, photo):
+        self._validate_photo(photo)
         with self._guard():
-            count, total = self._inventory()
-            if count >= MAX_FILES or total + len(photo.data) > MAX_TOTAL_BYTES:
-                raise DomainError('media_storage_quota')
-            key = uuid.uuid4().hex + '.jpg'
-            fd = None
-            created = False
-            try:
-                fd = os.open(key, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW
-                             | os.O_CLOEXEC | os.O_NONBLOCK, 0o600, dir_fd=self._fd)
-                created = True
-                # Restrictive umask may remove owner permissions: set on our new fd only.
-                os.fchmod(fd, 0o600)
-                offset = 0
-                while offset < len(photo.data):
-                    written = os.write(fd, photo.data[offset:])
-                    if written <= 0:
-                        raise OSError('short write')
-                    offset += written
-                os.fsync(fd)
-                info = os.fstat(fd)
-                if not _file_ok(info) or info.st_size != len(photo.data):
-                    raise DomainError('media_storage_unsafe')
-                os.close(fd)
-                fd = None
-                os.fsync(self._fd)
-                # Only now may a later layer commit a re-authorized SQLite manifest.
-                return StoredDerivative(key, photo.sha256, len(photo.data), photo.width, photo.height)
-            except BaseException:
-                if fd is not None:
-                    os.close(fd)
-                if created:
-                    # Roll back only this newly generated key. A process crash can still
-                    # leave an orphan; reconciliation, not an ACID claim, handles that.
-                    try:
-                        os.unlink(key, dir_fd=self._fd)
-                        os.fsync(self._fd)
-                    except OSError:
-                        pass
-                raise
+            return self._put_locked(photo)
 
-    def read(self, receipt):
-        """Internal integrity read. Caller MUST authorize persisted owner/manifest first."""
+    def _put_locked(self, photo):
+        """Internal only: caller holds this root's _guard through manifest commit."""
+        self._validate_photo(photo)
+        count, total = self._inventory()
+        if count >= MAX_FILES or total + len(photo.data) > MAX_TOTAL_BYTES:
+            raise DomainError('media_storage_quota')
+        key = uuid.uuid4().hex + '.jpg'
+        fd = None
+        created = False
+        try:
+            fd = os.open(key, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW
+                         | os.O_CLOEXEC | os.O_NONBLOCK, 0o600, dir_fd=self._fd)
+            created = True
+            # Restrictive umask may remove owner permissions: set on our new fd only.
+            os.fchmod(fd, 0o600)
+            offset = 0
+            while offset < len(photo.data):
+                written = os.write(fd, photo.data[offset:])
+                if written <= 0:
+                    raise OSError('short write')
+                offset += written
+            os.fsync(fd)
+            info = os.fstat(fd)
+            if not _file_ok(info) or info.st_size != len(photo.data):
+                raise DomainError('media_storage_unsafe')
+            os.close(fd)
+            fd = None
+            os.fsync(self._fd)
+            # Only now may a later layer commit a re-authorized SQLite manifest.
+            return StoredDerivative(key, photo.sha256, len(photo.data), photo.width, photo.height)
+        except BaseException:
+            if fd is not None:
+                os.close(fd)
+            if created:
+                # Roll back only this newly generated key. A process crash can still
+                # leave an orphan; reconciliation, not an ACID claim, handles that.
+                try:
+                    os.unlink(key, dir_fd=self._fd)
+                    os.fsync(self._fd)
+                except OSError:
+                    pass
+            raise
+
+    @staticmethod
+    def _validate_receipt(receipt):
         if (type(receipt) is not StoredDerivative or type(receipt.blob_key) is not str
                 or not _KEY.fullmatch(receipt.blob_key)
                 or type(receipt.byte_size) is not int or not 0 < receipt.byte_size <= MAX_OUTPUT_BYTES
                 or type(receipt.sha256) is not str or not re.fullmatch('[0-9a-f]{64}', receipt.sha256)):
             raise DomainError('media_derivative_invalid')
+    def read(self, receipt):
+        """Internal integrity read. Caller MUST authorize persisted owner/manifest first."""
+        self._validate_receipt(receipt)
         with self._guard():
-            fd = os.open(receipt.blob_key, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK
-                         | os.O_CLOEXEC, dir_fd=self._fd)
-            try:
-                before = os.fstat(fd)
-                if not _file_ok(before) or before.st_size != receipt.byte_size:
+            return self._read_locked(receipt)
+
+    def _read_locked(self, receipt):
+        """Internal only: this root's guard already held."""
+        self._validate_receipt(receipt)
+        fd = os.open(receipt.blob_key, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK
+                     | os.O_CLOEXEC, dir_fd=self._fd)
+        try:
+            before = os.fstat(fd)
+            if not _file_ok(before) or before.st_size != receipt.byte_size:
+                raise DomainError('media_storage_integrity')
+            data = bytearray()
+            while True:
+                block = os.read(fd, min(65536, receipt.byte_size + 1 - len(data)))
+                if not block:
+                    break
+                data.extend(block)
+                if len(data) > receipt.byte_size:
                     raise DomainError('media_storage_integrity')
-                data = bytearray()
-                while True:
-                    block = os.read(fd, min(65536, receipt.byte_size + 1 - len(data)))
-                    if not block:
-                        break
-                    data.extend(block)
-                    if len(data) > receipt.byte_size:
-                        raise DomainError('media_storage_integrity')
-                after = os.fstat(fd)
-                if (not _file_ok(after) or after.st_size != len(data)
-                        or after.st_mtime_ns != before.st_mtime_ns
-                        or after.st_ctime_ns != before.st_ctime_ns
-                        or len(data) != receipt.byte_size or sha256(data).hexdigest() != receipt.sha256):
-                    raise DomainError('media_storage_integrity')
-                return bytes(data)
-            finally:
-                os.close(fd)
+            after = os.fstat(fd)
+            if (not _file_ok(after) or after.st_size != len(data)
+                    or after.st_mtime_ns != before.st_mtime_ns
+                    or after.st_ctime_ns != before.st_ctime_ns
+                    or len(data) != receipt.byte_size or sha256(data).hexdigest() != receipt.sha256):
+                raise DomainError('media_storage_integrity')
+            return bytes(data)
+        finally:
+            os.close(fd)

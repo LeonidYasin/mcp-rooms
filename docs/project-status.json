@@ -111,6 +111,19 @@
       ]
     },
     {
+      "id": "media_cleanup",
+      "title": "Проверяемая очистка и возврат квот",
+      "stage": "SOURCE",
+      "summary": "Подготовлены read-only plan, snapshot recheck, PURGING/PURGED, durable absence и tombstones. Не автоматический orphan sweep и не admin API.",
+      "doc": "docs/media-cleanup.md",
+      "source": "src/mcp_rooms/media_cleanup.py",
+      "evidence": null,
+      "depends_on": [
+        "media_stage",
+        "media_files"
+      ]
+    },
+    {
       "id": "media",
       "title": "Хранение и права на фото",
       "stage": "SPEC",
@@ -122,7 +135,8 @@
         "identity",
         "worker",
         "media_files",
-        "media_stage"
+        "media_stage",
+        "media_cleanup"
       ]
     },
     {

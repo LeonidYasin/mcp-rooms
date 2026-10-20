@@ -121,3 +121,12 @@ reconciliation remain SPEC. Never expose filesystem read by blob key to clients.
 and private STAGED manifests with before/after credential/draft checks. Attachment,
 rolling retention/budget reclamation, reconciliation/recovery and public APIs remain
 SPEC. Expired/failed rows do not silently release their reserved file budget.
+
+
+## M2b.4 implementation boundary
+
+[Reviewed retention](media-cleanup.md) prepares snapshot-bound dry run/application,
+phase2 cleanup, durable absence before byte/active-row budget release and retained
+idempotency tombstones. Unknown/orphan files block destructive apply; no silent
+orphan deletion. Full restore, receipt compaction, admin/scheduling and public
+upload/attachment remain separate gates.

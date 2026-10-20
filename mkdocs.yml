@@ -80,6 +80,7 @@ nav:
     - Decode worker: docs/media-worker.md
     - Private photo files: docs/media-private-files.md
     - Private media staging: docs/media-staging.md
+    - Reviewed media cleanup: docs/media-cleanup.md
     - Web: docs/web-marketplace-plan.md
     - Отдельный admin MCP: docs/admin-mcp-design.md
   - Комнаты и клиенты:

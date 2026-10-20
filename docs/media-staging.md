@@ -16,10 +16,11 @@ credential audience/resource and fixed normalization policy. Category ancestry m
 remain active. A private opaque UUID media_id is distinct from the private blob key;
 responses never return a filesystem path or blob key. Guessed IDs do not authorize reads.
 
-Initialization explicitly adds independent version1 `media_stage_schema` and
+Initialization explicitly adds independent version2 `media_stage_schema` and
 `media_stages` tables to the existing snapshot database. It requires market schema2;
 partial/future namespaces fail closed. Room schema/application_id/user_version are
-unchanged. Neither current server startup nor an HTTP request creates these tables.
+unchanged. An explicit additive1→2 migration adds cleanup phases; there is no automatic
+request-triggered migration. [Retention contract](media-cleanup.md). Neither current server startup nor an HTTP request creates these tables.
 
 ## State machine / transaction boundaries
 
@@ -69,11 +70,11 @@ made about a revocation occurring after that check and before network delivery.
 - Each operation reserves the maximum2MiB derivative budget before decoding.
 - TTL10 minutes, capped by draft expiry, never extended on retry.
 
-All rows, including failed and expired ones, keep admission budget in this slice.
-This conservative lifetime budget prevents failed/orphan bytes bypassing quotas;
-it is **not** a complete rolling upload service. New attempts can exhaust it and
-remain blocked until reviewed lifecycle maintenance exists. Under these byte caps,
-actual concurrent/lifetime operations may hit the byte budget before the row cap.
+Expired/failed rows retain budget until explicit reviewed cleanup reaches PURGED
+with durable file absence. Ordinary requests never auto-clean. Purged rows remain
+idempotency tombstones, separately capped at512 globally /128 per owner lifetime.
+This is not an unlimited rolling service: receipt compaction/scheduling remains a
+separate gate. See [reviewed retention](media-cleanup.md).
 
 Physical file count/bytes are separately checked by the file layer; per-owner DB
 budgets do not replace root/disk/WAL budgets. HTTP streaming/admission/time limits,
@@ -88,7 +89,7 @@ compatible. A draft revision change conservatively makes this staged result
 unavailable: future attachment needs a new versioned transaction, not a bypass.
 
 Still required: attach/idempotency/revision and ordered media preview hashes;
-reviewable reconciliation/retention and DB+files recovery; safe budget reclamation;
+explicit orphan recovery, receipt compaction/scheduling and DB+files recovery;
 authenticated upload/read adapters and actual user scope issuance; explicit consent
 and public projection; separate admin controls; operator-approved OS sandbox TEST.
 No VPS, main, Caddy, real key or production service changed in this implementation.

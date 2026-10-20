@@ -59,17 +59,18 @@ is not yet accepted.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [M3b.2](docs/ci-m3b2.md), application source
-`e91d5b195d3399911dd331034f1941d488a23220`: Python3.12 623 passed.
-Explicit same-origin session HTTP bridge for an existing key; Secure HttpOnly
-browser cookie/bootstrap/CSRF logout. No browser form or automatic marketplace
-onboarding yet. Cookie authority is NOT forwarded to listing/media writes until
-M3b.3 transaction-time session binding passes; see [work-state](docs/work-state.json).
-Built on [session core](docs/ci-m3b1.md), [private photo HTTP](docs/ci-m3a2.md) and
-12 scoped listing MCP tools on top of8 rooms. Default CLI stays rooms-only; signup
-does not grant listing scopes. No public marketplace or VPS rollout.
+**Latest accepted checkpoint:** [F1](docs/ci-f1.md), application source
+`c086805e79a788e63c8df9093c9a0bf50c95b479`: Python3.12 **645 passed**.
+Explicit opt-in anonymous read-only published card/photo transport, escaped HTML,
+version-bound photo URLs and withdrawal checks. No external deployment, feed,
+browser editing, in-app replies or automatic marketplace onboarding yet.
+
+Built on [M3b.2 session bridge](docs/ci-m3b2.md), [private photo HTTP](docs/ci-m3a2.md)
+and12 scoped listing MCP tools on top of8 rooms. Cookie authority is NOT forwarded
+to listing/media writes until M3b.3 transaction-time session binding passes;
+that track is paused, not dropped. Default CLI stays rooms-only; signup does not
+grant listing scopes. [Machine-readable continuation state](docs/work-state.json).
 [Shorter owner-first TEST: three major gates, not the full six-stage pilot](docs/owner-first-test.md).
-F1 read-only card/photo transport is being added as explicit opt-in; no default CLI enablement or deployment.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).

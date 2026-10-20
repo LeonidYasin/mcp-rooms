@@ -52,6 +52,7 @@ Admin MCP не заменён общим shell: typed операторский b
 ## F1: контракт read-only карточки
 
 Исходник: `src/mcp_rooms/public_web.py`; CI: `tests/test_public_web.py`.
+[Exact-SHA F1 acceptance](ci-f1.md):645 tests на Python3.12. Это не deployment.
 Explicit trusted composition `create_app(..., market=adapter, public_market=True)`.
 Default CLI остаётся rooms-only; никаких DDL/migration/key issuance на request.
 

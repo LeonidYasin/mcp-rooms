@@ -297,7 +297,7 @@ No main, VPS, public upload/publication or new real scope issuance changed.
 
 - [x] Подготовить explicit opt-in read-only карточку/фото с повторной public availability проверкой.
 - [x] Подготовить synthetic integration/negative tests и обновлённое consent notice v2.
-- [ ] Принять exact-SHA CI; SOURCE не считать опубликованным сайтом.
+- [x] Exact-SHA CI `c086805e`: Python3.12 645 passed/2 warnings; Python3.10 595 passed/31 skipped/2 warnings; matrix/package/docs green. [Evidence](docs/ci-f1.md). CI не считать опубликованным сайтом.
 - [ ] F2 strict fresh composition/bootstrap/package, один worker, без startup DDL.
 - [ ] OS/resource isolation, DB+files security-state restore и reviewed rollback.
 - [ ] Отдельно одобренный preflight/изолированный loopback, затем HTTPS TEST.

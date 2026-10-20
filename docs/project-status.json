@@ -291,13 +291,14 @@
     {
       "id": "public_card",
       "title": "Read-only карточка по ссылке",
-      "stage": "SOURCE",
+      "stage": "CI",
       "summary": "Explicit opt-in anonymous GET опубликованной карточки/фото, escaped HTML и withdrawal checks. Не feed, форма или VPS deploy.",
       "doc": "docs/owner-first-test.md",
       "source": "src/mcp_rooms/public_web.py",
-      "evidence": null,
+      "evidence": "docs/ci-f1.md",
       "depends_on": [
-        "user_market_mcp"
+        "user_market_mcp",
+        "publish"
       ]
     }
   ]

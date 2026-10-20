@@ -6,6 +6,15 @@
 TEST — реальный изолированный rollout, PROD — отдельное разрешение/выпуск. Статусы не
 подменяют друг друга; ни документ, ни зелёный pytest сами не означают PROD.
 
+## Уточнение первого выпуска: owner-first TEST
+
+До полного сценария ниже выделен [сокращённый трек F1–F2](owner-first-test.md):
+MCP/Bearer HTTP управление и read-only карточка с фото по ссылке. Это ограниченный
+изолированный TEST, не открытый marketplace с регистрацией/откликами/модерацией.
+Три крупных ворот: кандидат/артефакт; OS/ресурсы/restore/rollback; разрешённый deploy.
+M3b.3 browser session transaction binding сохранён, но не blocker пока cookies вообще
+не управляют объявлениями. Отложенные направления не считать завершёнными.
+
 ## Где лежит истина
 
 | Вопрос | Канонический документ/источник |
@@ -32,6 +41,10 @@ flowchart TD
   B --> C[M1b lifecycle / category API / durable command contracts]
   C --> D[M2 media validation + preview + version-bound publish]
   D --> E[M3 browser session + user MCP over same services]
+  D --> L[F1 owner MCP and read-only card]
+  L --> M[F2 fresh isolated candidate and artifact]
+  M --> N[OS budgets and security-state restore]
+  N --> O[Separately approved small owner-first TEST]
   C --> F[M4a separate private responses]
   C --> G[M4b separate admin app / moderation / audit]
   E --> H[M5 CI / failure / backup / capacity gates]
@@ -44,7 +57,8 @@ flowchart TD
 
 Параллельные ветви на схеме — логические зависимости, не запуск subagents или обещание
 выполнять всё одновременно. До публичной экспозиции обязательные security gates
-сходятся в M5. Публичная карточка без private response/admin/abuse не выпуск продукта.
+сходятся в M5 для полного выпуска. Ветка F1–F2 — меньший разрешаемый технический TEST;
+публичная карточка без private response/admin/abuse не объявляется полным выпуском продукта.
 
 ## Пакеты и критерии выхода
 

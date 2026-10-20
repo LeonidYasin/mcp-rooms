@@ -110,6 +110,7 @@ nav:
     - CI photo HTTP: docs/ci-m3a2.md
     - CI browser sessions: docs/ci-m3b1.md
     - CI browser HTTP: docs/ci-m3b2.md
+    - CI public card F1: docs/ci-f1.md
     - CI сайта и публикация: docs/ci-pages.md
     - Итоги исследования: docs/marketplace-research-final.md
     - Проверка кандидатов: docs/candidate-source-checks.md

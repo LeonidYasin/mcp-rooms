@@ -173,7 +173,7 @@ erasure, publication or proof of sale. No VPS change or listing scopes issued by
 - [x] Prepare deterministic preview of exact record/category path/resource/policy notice; untrusted text is not HTML.
 - [x] Prepare separate listings:publish permission checks, short-lived private intent, replay without deadline extension and fresh validity read.
 - [x] Prepare negative/revoke/expiry/revision/category/resource/rollback/concurrency fixtures; no publication or scope issuance.
-- [ ] Exact-SHA CI of this source slice.
+- [x] Exact-code-SHA CI of M1b.2 at `2108b93e`: 8/8 checks, Python3.12 247 passed/2 warnings. [Evidence](docs/ci-m1b2.md).
 - [ ] Actual publisher: new live-publication notice/media manifest, transactional recheck+one-time consume+state transition/audit, approved public API.
 
 [Intent contract](docs/publication-intent.md). [Positioning](docs/project-positioning.md):

@@ -1,6 +1,7 @@
 # M1b.2: точный предпросмотр и приватное намерение публикации
 
-Статус: SOURCE, waiting exact-code-SHA CI. **Не публикация и не полный M1b.**
+Статус: SOURCE + [CI на code SHA 2108b93e](ci-m1b2.md): 8/8 checks,
+Python3.12 247 passed/2 warnings. **Не публикация и не полный M1b.**
 Код: `preview_contract.py`, внутренние методы `DraftStore.preview`,
 `confirm_publication_intent`, `get_publication_intent`. Эти методы не зарегистрированы
 в user MCP/HTTP; listing scope issuance в текущей IdentityStore не включена.

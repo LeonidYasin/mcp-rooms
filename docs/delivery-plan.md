@@ -150,7 +150,7 @@ policy остаются следующими. Не перескакивать к
 
 [Private publication intent](publication-intent.md) is prepared as source: full version
 binding with category/resource/policy digest and separate publish scope. It never
-changes public state. CI acceptance and remaining M1b retention/delete/retry policy
-are separate gates; actual M2 publish needs new media-ready notice/manifest and atomic
+changes public state. [CI confirmed at code SHA 2108b93e](ci-m1b2.md), 8/8 checks,
+Python3.12 247 passed/2 warnings. Remaining M1b retention/delete/retry policy is separate; actual M2 publish needs new media-ready notice/manifest and atomic
 intent consumption. [Positioning](project-positioning.md) separates technical first item
 from public launch messaging.

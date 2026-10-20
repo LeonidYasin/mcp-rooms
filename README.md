@@ -49,6 +49,8 @@ is specified, not yet an executed integration suite.
   Not registered in MCP/HTTP; current enrollment still cannot issue listing scopes.
 - [M1b.2 private preview/intent](docs/publication-intent.md): exact content/revision/
   category/resource binding; separate publish scope, short TTL; still published=false.
+  [M1b.2 CI evidence](docs/ci-m1b2.md): code SHA `2108b93e`, 8/8 checks,
+  Python3.12 247 tests passed, 2 warnings.
 - Shared domain primitives keep legacy RoomError/Principal aliases. No room schema
   version or default startup migration change. CI evidence is separate from source.
 

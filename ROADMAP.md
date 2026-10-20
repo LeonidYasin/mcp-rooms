@@ -1,10 +1,9 @@
 # MCP Rooms roadmap
 
-Current checkpoint: [M3b.1 CI](docs/ci-m3b1.md), separate bounded browser session core
-and repository-native [AI handoff](docs/ai-handoff.md) / [work-state](docs/work-state.json).
-Built on [private photo HTTP](docs/ci-m3a2.md) and [listing MCP](docs/ci-m3a1.md).
-In review: [M3b.2 HTTP session bridge](docs/browser-http.md).
-Next: M3b.3 transaction-time session authority, then onboarding/typed browser commands/form;
+Current checkpoint: [M3b.2 CI](docs/ci-m3b2.md), explicit same-origin session HTTP bridge.
+Next: M3b.3 transaction-time session authority BEFORE cookie-authenticated market/media writes;
+then automatic onboarding/recovery/retention, typed browser commands and the draft/photo form.
+[AI handoff](docs/ai-handoff.md) / [work-state](docs/work-state.json) are the continuation entry.
 [6 remaining milestones to useful external TEST](docs/deployment-readiness.md).
 Older sections retain historical acceptance boundaries; they are not promises of a live service.
 

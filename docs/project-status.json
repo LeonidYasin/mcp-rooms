@@ -194,7 +194,8 @@
         "publish",
         "user_market_mcp",
         "media_http",
-        "browser_sessions"
+        "browser_sessions",
+        "browser_http"
       ]
     },
     {
@@ -277,11 +278,11 @@
     {
       "id": "browser_http",
       "title": "HTTP bridge браузерной сессии",
-      "stage": "SOURCE",
+      "stage": "CI",
       "summary": "Explicit opt-in HTTPS/same-origin login по существующему ключу, Secure HttpOnly cookie, CSRF logout, bounded body/budgets. Не onboarding и не cookie-auth market commands.",
       "doc": "docs/browser-http.md",
       "source": "src/mcp_rooms/browser_http.py",
-      "evidence": null,
+      "evidence": "docs/ci-m3b2.md",
       "depends_on": [
         "browser_sessions",
         "user_market_mcp"

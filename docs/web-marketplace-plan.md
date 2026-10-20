@@ -47,7 +47,8 @@ WordPress/Osclass и не заводим вторую identity сейчас. Р�
 
 Ветка alpha; TEST закрыт. Восемь rooms_* существуют. Private drafts/media/publication
 core, opt-in user MCP и private binary HTTP upload/read приняты в CI — это не live web.
-Ядро browser session — следующий ограниченный срез; статус в work-state.
+Ядро browser session и HTTP bridge приняты в CI; cookies ещё не дают authority
+над market/media — сначала transaction-time session binding. Статус в work-state.
 Формы, public feed/card/photo routes, admin MCP, private response и заказы ещё не включены.
 Подробности и матрица состояния в mindmap. Никакого merge/release/production/VPS изменения
 самим коммитом; прежние сервисы и БД остаются без изменений.

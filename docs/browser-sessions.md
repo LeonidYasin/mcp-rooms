@@ -40,7 +40,11 @@ Logout требует session possession+CSRF, идемпотентно отзы
 можно было завершить старый browser login. Отзыв parent сразу отключает все зависимые
 sessions при следующей проверке; ядро не заменяет независимый account recovery.
 
-## Предстоящий HTTP контракт, ещё не реализация
+## HTTP-интеграция и оставшаяся граница
+
+[M3b.2](browser-http.md) реализует opt-in HTTP login/bootstrap/logout по существующему
+ключу. Он не подключает cookie к market/media: сначала M3b.3 session authority
+в core transaction. Автоматический onboarding, recovery и форма ещё не готовы.
 
 - Cookie `__Host-…`, Secure, HttpOnly, SameSite=Strict, Path=/, без Domain; HTTPS only.
   Не расширять trust на insecure loopback или произвольные прокси-заголовки.

@@ -59,15 +59,15 @@ is not yet accepted.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [M3b.1](docs/ci-m3b1.md), application source
-`ce8f1ea1d90628e98c9b0421ebaad243039db977`: Python3.12 580 passed.
-Separate bounded browser session core (no HTTP wiring yet), plus
-[M3a.2 private photo HTTP](docs/ci-m3a2.md) and12 scoped listing MCP tools on top of8 rooms.
-Default CLI stays rooms-only; signup does not grant listing scopes.
-In review: [M3b.2 session HTTP bridge](docs/browser-http.md). Cookie authority is not yet
-forwarded to marketplace writes: transaction-time session binding is the next security gate.
-Automatic onboarding/recovery and the draft/photo form remain unimplemented.
-No browser login/form, public marketplace or VPS rollout yet.
+**Latest accepted checkpoint:** [M3b.2](docs/ci-m3b2.md), application source
+`e91d5b195d3399911dd331034f1941d488a23220`: Python3.12 623 passed.
+Explicit same-origin session HTTP bridge for an existing key; Secure HttpOnly
+browser cookie/bootstrap/CSRF logout. No browser form or automatic marketplace
+onboarding yet. Cookie authority is NOT forwarded to listing/media writes until
+M3b.3 transaction-time session binding passes; see [work-state](docs/work-state.json).
+Built on [session core](docs/ci-m3b1.md), [private photo HTTP](docs/ci-m3a2.md) and
+12 scoped listing MCP tools on top of8 rooms. Default CLI stays rooms-only; signup
+does not grant listing scopes. No public marketplace or VPS rollout.
 [Six remaining stages to useful external TEST](docs/deployment-readiness.md).
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).

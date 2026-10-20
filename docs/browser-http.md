@@ -1,6 +1,6 @@
 # M3b.2 — same-origin HTTP bridge браузерной сессии
 
-**SOURCE до exact-SHA CI. Не форма, не автоматическая регистрация и не live endpoint.**
+**CI: [точный принятый SHA и доказательства](ci-m3b2.md). Не форма, не автоматическая регистрация и не live endpoint.**
 Дополняет [ядро browser sessions](browser-sessions.md). Явная trusted composition:
 `create_app(..., market=adapter, browser_sessions=BrowserSessions(adapter.drafts))`.
 Browser schema1 должна быть отдельно initialized; startup только проверяет binding/schema.

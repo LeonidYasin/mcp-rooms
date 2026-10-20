@@ -2,8 +2,8 @@
 
 Первый срез adapters/auth; не завершение всего этапа1 из плана деплоя.
 Следующий [M3a.2 добавил opt-in приватную HTTP-загрузку](media-http.md) в CI.
-Browser sessions, форма, публичная витрина/search и готовый auto-onboarding
-marketplace ещё не реализованы. Не подключает и не обновляет VPS.
+[M3b.2](browser-http.md) добавил отдельный HTTP session bridge, пока без cookie authority
+над market/media. Форма, публичная витрина/search и auto-onboarding ещё не реализованы. Не подключает и не обновляет VPS.
 
 ## Явное включение вместо скрытой миграции
 

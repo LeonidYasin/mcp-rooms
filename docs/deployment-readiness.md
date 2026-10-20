@@ -40,9 +40,10 @@ projection. Это internal CI, а не публичный web или завер
 | 6 | Одобренный изолированный TEST-деплой | Свежий preflight; отдельный пользователь/unit/БД/root/порт; loopback smoke; HTTPS только после проверки; реальное чтение/публикация/отклик с явным согласием владельца. |
 
 В этапе1 приняты [opt-in user MCP/auth](ci-m3a1.md), [private binary HTTP фото](ci-m3a2.md)
-и [отдельное ядро browser sessions](ci-m3b1.md). Последнее не подключено к HTTP:
-Secure cookie delivery, same-origin/CSRF adapter, login/renewal/recovery, автоматический
-marketplace onboarding и anti-abuse/retention остаются. Целиком этап1 не закрыт.
+и [ядро browser sessions](ci-m3b1.md) с [HTTP bridge](ci-m3b2.md). Cookie пока не
+подключена к market/media: M3b.3 должен проверять session внутри core transaction.
+Автоматический onboarding, renewal/recovery, typed browser actions, реальный browser QA
+и anti-abuse/retention остаются. Целиком этап1 не закрыт.
 
 Этапы 1–4 — ещё не реализованные полностью пакеты, а не галочки по наличию SPEC.
 Шаг 5 включает интеграцию; не выдаём успешные unit-тесты publisher за рабочий сайт.

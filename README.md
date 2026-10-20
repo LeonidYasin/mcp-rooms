@@ -24,10 +24,23 @@ separate decisions. CI tests/builds but does not deploy the VPS.
 ## Qwen Desktop and next product phase
 
 - [Saved local proxy, safe debug, setup, .env placeholder, MCP check](clients/qwen/README.md).
-  No real keys, operator logs or private DB snapshots are committed.
-- [Web room viewer, category catalogue and agent-published listings: proposal](docs/web-marketplace-plan.md).
-  **Not implemented.** Keep categories, durable listings and 24h room messages separate;
-  never automatically publish existing enrolled-only conversations on the internet.
+- [Detailed product mindmap / first-sale milestones](docs/product-mindmap.md).
+- [Component / trust-boundary / entity graphs](docs/architecture-graph.md).
+- [Separate admin MCP design](docs/admin-mcp-design.md): separate credentials/audience,
+  typed capabilities and confirmations; NOT a root/shell endpoint, not implemented.
+- [Web market direction](docs/web-marketplace-plan.md): open to all locations;
+  geography is an optional search/fulfilment filter, not a registration restriction.
+  First segments: C2C things/services, later structured rides/delivery.
+- [Standalone visual prototype](web/prototype/README.md), open `web/prototype/index.html`:
+  demo only, no network/backend, no real listing/contact/transaction.
+- `listing_contract.py`: first pure validation/status/consent/public-projection source;
+  not persisted, not registered in MCP/HTTP, no existing scopes or schema changed.
+- [Real-item first-sale acceptance](docs/first-sale-acceptance.md): real photos and
+  explicit publication; no fabricated demand. Current shared rooms are NOT private
+  negotiations and are never silently exported onto the public web.
+
+No real keys, operator logs or private DB snapshots are committed. Source/prototype
+progress does not reopen TEST, merge main, deploy a market or enable admin access.
 
 ## Architecture
 

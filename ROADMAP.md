@@ -79,19 +79,33 @@ No automatic deployment, autonomous agents, endless history, E2EE, A2A, matching
 - [x] Add Linux mocked-upstream CI contracts for header injection, secret-free tracing, bounds, redirects/errors/SSE cleanup.
 - [ ] Future Qwen native-header/final raw-tool exact-read regression acceptance if another TEST is approved.
 
-## Web market proposal — next alpha, NOT IMPLEMENTED
+## Web market / separate admin — owner-directed next phase
 
-Detailed draft: docs/web-marketplace-plan.md. Categories, listings and rooms are
-separate entities. Existing enrolled-only room history is never silently published.
+Detailed [mindmap](docs/product-mindmap.md), [relationships](docs/architecture-graph.md),
+[admin boundary](docs/admin-mcp-design.md), [first-sale gates](docs/first-sale-acceptance.md).
+Open to all locations; no one-town registration restriction. C2C goods/services first,
+structured rides/delivery later. Supersedes the previous B2B-only niche suggestion.
 
-- [ ] W1: authorized read-only web room list/feed/replies with same membership, safe rendering, bounded updates and revocable web session design.
-- [ ] W2: hierarchical category catalogue; request/offer listing model and additive SQLite migration, independent listing retention and stable web URLs.
-- [ ] W2: explicit agent draft/publish/update/search/close tools with owner/scopes/idempotency/audit and publication permissions; retain rooms_* compatibility.
-- [ ] W2: public opt-in listing pages, enrolled-only discussions by default; room close must not cascade-delete listings.
-- [ ] W2: search/filter, expiry/status/renewal; optional contacts only; moderation/report/spam policy before public onboarding.
-- [ ] W3: saved searches, useful want/offer matching and consented notifications; optional provider-independent embeddings/LLM, not mandatory cost.
-- [ ] Validate one commercial niche (proposed: small-business automation tasks); measure useful introductions/repeat use before pricing assumptions.
-- [ ] Paid hosted/team/alert/analytics tiers only after value validation; no escrow/payment guarantees or mandatory biography/contact in the first MVP.
+- [x] Save detailed mindmap, component/trust/data graphs and operator/admin boundaries.
+- [x] Start pure listing field/status/publication-consent/public-projection contracts,
+  with CI test sources. Not a persistent API or completed atomic CAS implementation.
+- [x] Prepare responsive standalone demo listing, catalogue, empty/modal states;
+  honest missing-photo state, no fake seller/rating/click success. Not a live web app.
+- [ ] Exact-HEAD CI/review for this new slice (previous baseline 152 tests passed).
+- [ ] Additive categories/listings/media SQLite migration + backup/restore on copy.
+- [ ] Transactional listing service: owner/scopes/CAS/idempotency/caps and expiry.
+- [ ] Real photo upload/re-encoding/EXIF stripping/ownership/publication/media budgets.
+- [ ] Web form/preview/public URL + server-rendered safe output and revocable sessions.
+- [ ] User listings MCP draft/publish/search/update/close, shared records with web.
+- [ ] Separate admin MCP app/auth/read-only tools; negative audience/scope tests.
+- [ ] Admin moderation/categories/audit/confirmation and manual operator boundary.
+- [ ] Private response/negotiation ACL: current shared rooms are not private.
+- [ ] Approved isolated TEST and first real-item publication/find/respond trial.
+- [ ] Authorized web room viewer with same membership and bounded active-window reads.
+- [ ] Communities/categories/subscriptions; useful filters without bot-vote ranking.
+- [ ] Quote/order/atomic single assignment for rides/delivery, privacy/legal review.
+- [ ] Optional provider-independent matching/embeddings; no mandatory paid LLM.
+- [ ] Commercial tiers only after actual useful replies and repeated use, not fabricated demand.
 
-Merging the baseline alpha to main requires separate review/approval; it need not wait
-for the entire web market, and never automatically authorizes production deployment.
+Merge, release and production deployment remain separate approvals. Existing VPS
+services/data/main are unchanged; the closed TEST is not reopened by code publication.

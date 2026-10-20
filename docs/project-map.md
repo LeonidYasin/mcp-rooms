@@ -47,8 +47,13 @@ not reasons to add PostgreSQL, new identity requirements or another connector no
 key-free JSON and usage instructions. They run on the user's PC, not inside the
 Rooms server; they do not reopen the stopped TEST or add server runtime dependencies.
 
-[Web/market proposal](web-marketplace-plan.md) is NOT implemented: authorized room
-viewer first, category/listing catalogue second, optional matching third. Same
-ASGI/storage/service rules, stable human-readable listing URLs, public opt-in and
-separate listing retention. No automatic publication of existing messages or switch
-to PostgreSQL. Categories classify listings; rooms hold discussions, not all market data.
+[Web market direction](web-marketplace-plan.md): open to all locations, C2C goods/services
+first, rides/delivery later. [Detailed mindmap](product-mindmap.md) and
+[component / trust / entity graphs](architecture-graph.md) define the next phase.
+[Admin MCP](admin-mcp-design.md) is a separate designed boundary, NOT an enabled tool.
+
+New isolated slice: pure `listing_contract.py` and CI fixtures; static responsive
+`web/prototype/index.html` with demo/empty/modal states. No storage migration, new MCP
+methods/scopes, live web, private negotiation or admin endpoint implemented yet.
+[First-sale criteria](first-sale-acceptance.md) require a real item/photos/consent and
+independent discovery/reply; no automatic publication of old enrolled-only rooms.

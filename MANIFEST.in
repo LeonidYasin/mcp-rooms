@@ -10,3 +10,7 @@ include clients/qwen/requirements.txt
 include clients/qwen/qwen-local.json
 include clients/qwen/.env.example
 include clients/qwen/SHA256SUMS.txt
+
+# Explicit self-contained design prototype; no populated env or private media.
+include web/prototype/index.html
+include web/prototype/README.md

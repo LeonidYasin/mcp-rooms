@@ -145,8 +145,7 @@ class BearerGate:
             if body not in (b'', b'{}'):
                 raise RequestFailure('no_arguments_supported', 400)
             try:
-                metadata, raw = await anyio.to_thread.run_sync(partial(self.auth.issue_token,
-                    principal.user_id, scopes=sorted(principal.scopes)))
+                metadata, raw = await anyio.to_thread.run_sync(partial(self.auth.delegate_current, principal))
             except RoomError as exc:
                 return await self.reply(scope, receive, send, {'error': exc.code}, 409)
             except Exception:
@@ -176,10 +175,15 @@ class BearerGate:
             CURRENT.reset(token)
 
 
-def create_app(database, resource, registration_enabled=False):
+def create_app(database, resource, registration_enabled=False, *, market=None):
     resource = resource_url(resource)
-    store = RoomStore(database)
-    auth = IdentityStore(store, resource)
+    if market is not None:
+        from .market_adapter import MarketAdapter
+        if not isinstance(market,MarketAdapter):
+            raise RoomError('market_binding_mismatch')
+        market.check_binding(database,resource)
+    store = market.store if market is not None else RoomStore(database)
+    auth = IdentityStore(store, resource, allow_listing_scopes=market is not None)
     parsed = urlsplit(resource)
     transport = TransportSecuritySettings(enable_dns_rebinding_protection=True,
         allowed_hosts=[parsed.netloc, '127.0.0.1:*', 'localhost:*'],
@@ -231,6 +235,14 @@ def create_app(database, resource, registration_enabled=False):
     async def rooms_close(room_id: StrictStr) -> list[TextContent]:
         """Only the room owner may close it, deleting its history and membership."""
         return await call('close', room_id=room_id)
+
+    if market is not None:
+        from .market_tools import register_market_tools
+        async def call_market(action, **args):
+            principal = CURRENT.get()
+            result = await anyio.to_thread.run_sync(partial(market.execute,principal,action,**args))
+            return [TextContent(type='text',text=json.dumps(result,ensure_ascii=False))]
+        register_market_tools(mcp,call_market)
 
     return BearerGate(mcp.streamable_http_app(), auth, registration_enabled)
 

@@ -34,13 +34,14 @@ def render_card(card, prefix):
         '/photos/'+str(card['publication_revision'])+'/'+e(p['media_id'])+'.jpg" alt="Фото '+str(i)+' объявления">'
         for i,p in enumerate(card['photos'],1))
     categories=' → '.join(e(p['title']) for p in card['category_path'])
+    modes=' · '.join({'pickup':'Самовывоз','shipping':'Доставка','online':'Онлайн'}[m] for m in card['modes'])
     kind='Предлагаю' if card['kind']=='offer' else 'Ищу'
     return ('<!doctype html><html lang="ru"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+
         ' — Хочу · Предлагаю</title><style>'+CSS+'</style></head><body>'
         '<header>Хочу <span>·</span> Предлагаю <span> / TEST</span></header><main><article>'
         '<div class="category">'+categories+'</div><p class="badge">'+kind+'</p><h1>'+title+
-        '</h1><p class="location">'+location+'</p><p class="price">'+price+'</p><div class="gallery">'+
+        '</h1><p class="location">'+location+'</p><p class="price">'+price+'</p><p>'+modes+'</p><div class="gallery">'+
         (gallery or '<p>Фотографии не добавлены.</p>')+'</div><h2>Описание и условия</h2>'
         '<div class="description">'+e(card['description'])+'</div><aside class="notice">'
         'Тестовая площадка. Встроенная переписка, оплата и гарантии сделки пока недоступны. '

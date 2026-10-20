@@ -1,13 +1,9 @@
 """In-process synthetic CI; never deploy or issue real credentials."""
-import json
-from dataclasses import replace
-from urllib.parse import urlsplit
 import pytest
 from starlette.testclient import TestClient
 from mcp_rooms.server import create_app
 from mcp_rooms.store import RoomError
-from mcp_rooms.public_web import render_card, CSS, STYLE_HASH
-from mcp_rooms.domain import DomainError
+from mcp_rooms.public_web import render_card, STYLE_HASH
 from test_market_server import market, create, confirm
 from test_server import RESOURCE, tool
 from test_draft_store import key
@@ -146,3 +142,20 @@ def test_prefix_links_are_derived_only_from_trusted_resource(web):
     html=render_card(card,'/rooms-test')
     assert 'src="/rooms-test/market/' in html
     assert 'src="/market/' not in html
+
+
+def test_fulfilment_modes_are_visible(web):
+    x,c=web
+    lid,_,_=publish(x,modes=['pickup','shipping','online'],locality='Synthetic town')
+    response=c.get('/market/'+lid)
+    assert response.status_code==200 and 'Самовывоз · Доставка · Онлайн' in response.text
+
+
+def test_v1_consent_cannot_authorize_v2_publication(web):
+    x,c=web;lid=create(x)['listing']['id']
+    intent=confirm(x,lid)
+    with x.store._db(write=True) as db:
+        db.execute("UPDATE publication_consents SET schema='mcp-rooms/live-publication-consent/v1' WHERE intent_id=?",(intent['intent_id'],))
+    result=tool(x.client,x.ta,'listings_publish',listing_id=lid,intent_id=intent['intent_id'],client_id=key())
+    assert result['error']=='publication_consent_unavailable'
+    assert c.get('/market/'+lid).status_code==404

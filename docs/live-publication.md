@@ -2,13 +2,19 @@
 
 Внутренний opt-in `PublicationStore`, не запущенный публичный web/API. Отдельный
 [user MCP adapter](user-market-mcp.md) проверен в CI как явная composition API;
-HTTP upload, browser sessions, auto market onboarding, каталог/search и приватные
-отклики ещё не включены.
+Это исходный контракт ядра M2c.2. Позже приняты opt-in user MCP, private photo HTTP,
+browser session bridge и [F1 read-only карточка](ci-f1.md); default CLI и VPS
+этим не включаются. Auto market onboarding, каталог/search и приватные отклики
+по-прежнему отсутствуют.
 Никакая настоящая вещь не опубликована этим кодовым срезом.
 
 ## Новое согласие, не повышение старого intent
 
-Схема `mcp-rooms/live-publication-consent/v1` отличается от обоих private intents.
+Текущий notice-контракт `mcp-rooms/live-publication-consent/v2` (с F1) отличается
+от обоих private intents и прежнего live-consent/v1. Старое v1 согласие не разрешает
+новую публикацию v2. SQLite publication namespace остаётся версии1, не мигрируется
+на request. Поле preview `public_transport_enabled: null` означает, что core не знает
+настройки opt-in transport.
 Preview включает точный private record, отдельный allowlisted card_preview (время
 будущей публикации ещё не назначено), публичные поля/порядок и проверенные
 фото, путь категории, resource, notice и текущую publication epoch. Notice объясняет:
@@ -67,9 +73,10 @@ expiry, точное соответствие draft/links/manifest и digest byt
 повторный DB check. Старая версия URL после снятия/перепубликации не обслуживается.
 Private/missing/withdrawn/disabled/expired/corrupt результаты не различаются для reader.
 
-Будущие HTTP adapters должны выдавать `Cache-Control: no-store`, фиксированный JPEG
-content type, nosniff, bounded ответы и rate limits. Это ещё не реализованный transport,
-не CDN invalidation и не возможность отозвать уже скачанные данные. Audience/allowlist
+[F1 read-only adapter](owner-first-test.md) выдаёт `Cache-Control: no-store`, фиксированный JPEG
+content type, nosniff, bounded ответы и per-process admission/budget. Это opt-in код,
+не работающий внешний endpoint, не CDN invalidation и не возможность отозвать уже
+скачанные данные. Audience/allowlist
 полей не заменяют abuse controls или правила запрещённых товаров.
 
 Public expiry не позже fixed draft expiry. Attached photos уже удерживаются до него;
@@ -107,7 +114,7 @@ sequenceDiagram
   O->>P: publish consent ID + command UUID
   P->>F: Verify bytes outside DB write tx
   P->>D: Atomic recheck + consume + snapshot + receipt + audit
-  Note over P,D: Internal public state only - no HTTP or MCP route enabled
+  Note over P,D: Core public state - transports require explicit separate composition
   O->>P: withdraw expected publication revision
   P->>D: Epoch increment + withdrawn + receipt + audit
   Note over O,D: Old public version no longer served - downloaded copies cannot be erased

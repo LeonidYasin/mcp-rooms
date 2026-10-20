@@ -195,7 +195,8 @@
         "user_market_mcp",
         "media_http",
         "browser_sessions",
-        "browser_http"
+        "browser_http",
+        "public_card"
       ]
     },
     {

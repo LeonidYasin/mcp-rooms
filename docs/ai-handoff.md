@@ -26,6 +26,7 @@ MCP Rooms / «Хочу — Предлагаю»: рынок возможност
 ворот до разрешённого VPS TEST вместо ожидания всего полного6-этапного сценария.
 Нет browser editing/onboarding/search/replies/admin MCP; это меньший результат.
 M3b.3 session binding **не отменён**: paused до возвращения browser writes.
+[F1 принят в exact-SHA CI](ci-f1.md):645 tests на Python3.12.
 Ближайшая задача теперь F2 composition/bootstrap/package, не самовольный deploy.
 
 ## Архитектура уже выбрана

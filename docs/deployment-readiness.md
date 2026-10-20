@@ -84,7 +84,7 @@ GitHub Pages — версионируемая документация, а не 
 [single-publisher Pages gate](ci-pages.md#remaining-single-publisher-configuration-gate):
 дублирующий branch/Jekyll publisher не считается выключенным от зелёного Actions job.
 
-## M3a.2 — следующий ограниченный срез
+## M3a.2 — завершённый исторический срез
 
 [Приватный бинарный HTTP upload/read](media-http.md) общий для человека и агента.
 Explicit opt-in, без web-формы, public photo route и автоматической marketplace

@@ -42,9 +42,27 @@ with sync_playwright() as pw:
     browser=pw.chromium.launch()
     page=browser.new_page(viewport={'width':1440,'height':1050},device_scale_factor=1)
     page.emulate_media(reduced_motion='reduce')
-    external=[]; errors=[]
+    external=[]; errors=[]; console=[]; failed_requests=[]
     page.on('request',lambda req:external.append(req.url) if not req.url.startswith(base) and not req.url.startswith('data:') else None)
     page.on('pageerror',lambda err:errors.append(str(err)))
+    page.on('console', lambda message: console.append(message.type + ': ' + message.text)
+            if message.type in ('warning', 'error') else None)
+    page.on('requestfailed', lambda request: failed_requests.append([request.url, request.failure]))
+    page.add_init_script('''
+      window.__searchDebug = [];
+      const OriginalWorker = window.Worker;
+      window.Worker = class extends OriginalWorker {
+        constructor(...args) {
+          super(...args);
+          this.addEventListener('error', e => window.__searchDebug.push(['error', e.message]));
+          this.addEventListener('message', e => window.__searchDebug.push(['receive', e.data?.type]));
+        }
+        postMessage(...args) {
+          window.__searchDebug.push(['send', args[0]?.type]);
+          return super.postMessage(...args);
+        }
+      };
+    ''')
     # Exercise every generated page containing authored Mermaid source.
     diagrams=0
     for f in SITE.rglob('*.html'):
@@ -90,7 +108,11 @@ with sync_playwright() as pw:
         page.wait_for_function('document.querySelectorAll(".md-search-result__link").length > 0',timeout=30000)
     except Exception:
         page.screenshot(path=str(SHOTS/'search-failure.png'),full_page=False)
-        (SHOTS/'search-failure.txt').write_text(page.locator('.md-search').inner_text())
+        (SHOTS/'search-failure.txt').write_text(json.dumps({
+            'ui': page.locator('.md-search').inner_text(),
+            'console': console, 'page_errors': errors, 'failed_requests': failed_requests,
+            'worker': page.evaluate('window.__searchDebug'),
+        },ensure_ascii=False,indent=2))
         raise
     page.screenshot(path=str(SHOTS/'search.png'),full_page=False)
     browser.close()

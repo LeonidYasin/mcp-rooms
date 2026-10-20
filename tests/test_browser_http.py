@@ -108,7 +108,8 @@ def test_fetch_metadata_denials(web,extra):
 
 def test_clear_insecure_transport_even_forwarded_https(web):
     x=web
-    with TestClient(x.gate,base_url='http://rooms.example') as client:
+    insecure_gate=create_app(x.store.path,RESOURCE,market=x.adapter,browser_sessions=x.sessions)
+    with TestClient(insecure_gate,base_url='http://rooms.example') as client:
         r=client.post(bh.PATH,headers=headers(x,**{'X-Forwarded-Proto':'https'}),json={})
         assert r.status_code==400 and r.json()['error']=='browser_https_required'
     h=list(headers(x).items())

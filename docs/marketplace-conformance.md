@@ -64,3 +64,10 @@ persisted credential rechecks из ID-02/ID-03, rollback и quotas из O-02, un
 namespace и media refusal. Это не полное исполнение этих IDs через web/MCP и не
 PASS всех требований. ID-01 listing enrollment, P/M/W/S/R/A/E cases и full O gates
 остаются NOT IMPLEMENTED / NOT RUN для нового marketplace.
+
+## M1b.1 mapping — SOURCE, separate exact-SHA CI required
+
+Own-list isolation/cursor bounds extend L-01/L-02; private archive CAS/retry/rollback
+extend L-03/L-04/L-05, not P-04 public unpublish. Category read is not public S-01
+search. Synthetic schema migration/rollback extends O cases but not real operator
+restore/rollout. No HTTP/MCP acceptance is inferred from these storage fixtures.

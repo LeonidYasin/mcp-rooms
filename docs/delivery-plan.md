@@ -59,7 +59,7 @@ rollback/ACL tests в CI Python3.10–3.13; пакет импортируетс�
 [Evidence: 8/8 checks, Python3.12 197 passed/2 warnings](ci-m1a.md).
 Это не приёмка M1b/новых transports или публичной площадки.
 
-**M1b, следующий срез:** прикладной API для owner drafts/categories, lifecycle с
+**M1b, следующий срез (выполняется частями):** прикладной API для owner drafts/categories, lifecycle с
 content-bound publication consent (не bool без привязки к версии), формализованные
 errors и retry rules. До HTTP/MCP рассмотреть clock/expiry, command capacity, category
 changes, retention/cleanup. Read/list — bounded pagination; не выдавать private IDs
@@ -139,3 +139,9 @@ reconciliation; проверенный rollback; sanitised logs/metrics. Рев�
 Оценка календарных сроков пока не дана: неизвестна цена media/session/public acceptance.
 CI M1a подтверждён; следующая контрольная точка — M1b lifecycle/read-list/category и
 retention contracts, а не открытие доступа на VPS.
+
+## M1b.1 — подготовлен следующий внутренний шаг
+
+[Личный список/категории/архив](private-draft-lifecycle.md): SOURCE, waiting exact-SHA
+CI. Full M1b не завершён: content-bound publication consent и retention/deletion/retry
+policy остаются следующими. Не перескакивать к public integration из-за наличия archive.

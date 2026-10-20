@@ -71,3 +71,9 @@ independent discovery/reply; no automatic publication of old enrolled-only rooms
 The earlier "no persistence" description refers to the prototype/initial contract.
 Private draft persistence now exists in source; no public listing API or migration at
 server startup exists. Generic IdentityStore issuance still rejects listing scopes.
+
+### M1b.1 source increment
+
+`draft_store.py`: own list/category read/private archive; `tests/test_draft_lifecycle.py`
+adds pagination/migration/archive/concurrency negatives. [Lifecycle design](private-draft-lifecycle.md).
+Market namespace v2 is explicit opt-in; no RoomStore startup/version changes or public API.

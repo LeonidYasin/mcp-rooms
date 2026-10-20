@@ -1,4 +1,4 @@
-"""Pure next-alpha listing contract. NOT registered in MCP/HTTP or persisted yet.
+"""Pure listing value contract. No MCP/HTTP registration or persistence in this module.
 
 Callers must authenticate/recheck revocation before every command. This module
 cannot verify credentials, media ownership or category availability; a future

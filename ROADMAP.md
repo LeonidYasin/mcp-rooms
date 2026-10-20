@@ -155,3 +155,15 @@ evaluation only for a documented blocker or a concrete better maintenance trade-
 
 No signup scope expansion, registered listing tools/routes, media, publish, private response,
 admin MCP or live migration is implied. [Storage design](docs/draft-storage-design.md).
+
+## M1b.1 — private navigation/lifecycle, no public integration
+
+- [x] Prepare bounded owner-scoped list with actor/status-bound keyset cursor and no foreign totals.
+- [x] Prepare category immediate-child reads with active ancestry and explicit capacity bound.
+- [x] Prepare terminal private archive, version CAS/receipt atomicity, rollback and archive/update race tests.
+- [x] Prepare explicit market namespace v1→v2 migration preserving old rows/receipts; room version/startup unchanged.
+- [ ] Exact-SHA CI of M1b.1, including full M1a/room/identity regression.
+- [ ] Remaining M1b: content-bound consent + publication policy and retention/delete/retry horizon; quota reserve for protective actions before public access.
+
+[Lifecycle/migration contract](docs/private-draft-lifecycle.md). Archiving is not physical
+erasure, publication or proof of sale. No VPS change or listing scopes issued by signup.

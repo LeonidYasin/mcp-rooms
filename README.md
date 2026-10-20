@@ -37,6 +37,8 @@ is specified, not yet an executed integration suite.
   197 tests passed, 2 warnings. Not public marketplace or production acceptance.
 - `draft_store.py`: explicit opt-in private create/get/update with persisted access
   rechecks, atomic revision/command receipts, quotas and a small category tree.
+  [M1b.1 source extension](docs/private-draft-lifecycle.md): own keyset list, category
+  children and terminal private archive; explicit opt-in market schema v1→v2.
   Not registered in MCP/HTTP; current enrollment still cannot issue listing scopes.
 - Shared domain primitives keep legacy RoomError/Principal aliases. No room schema
   version or default startup migration change. CI evidence is separate from source.

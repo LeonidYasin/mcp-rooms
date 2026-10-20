@@ -1,7 +1,8 @@
-# Private draft storage — M1a, не публичный marketplace
+# Private draft storage — M1a + M1b.1, не публичный marketplace
 
 Код: `domain.py`, `listing_contract.py`, `draft_store.py`.
-Статус: SOURCE + [CI подтверждён на code SHA 784b4c6b](ci-m1a.md);
+Статус базового M1a: [CI подтверждён на code SHA 784b4c6b](ci-m1a.md).
+Расширение M1b.1: [lifecycle/schema v2](private-draft-lifecycle.md), SOURCE до exact-SHA CI;
 HTTP/MCP/enrollment integration отсутствует.
 [План](delivery-plan.md) / [conformance](marketplace-conformance.md).
 
@@ -9,7 +10,7 @@ HTTP/MCP/enrollment integration отсутствует.
 
 - Существующий standalone application_id и PRAGMA user_version=2 не меняются.
 - `DraftStore.initialize()` вызывается явно только на уже открытом RoomStore, не из
-  create_app. Additive namespace `market_schema(version=1)`; partial/future namespace
+  create_app. Additive namespace `market_schema(version=2), explicit v1→v2 migration`; partial/future namespace
   не перезаписывается. Данные существующих комнат не мигрируются в объявления.
 - Ошибка миграции откатывает DDL транзакцию. Повтор initialize не сбрасывает taxonomy.
 - Обычная IdentityStore/enrollment по-прежнему выдаёт только rooms scopes. Listing
@@ -18,7 +19,7 @@ HTTP/MCP/enrollment integration отсутствует.
   Сам raw secret не проверяет; знание credential ID не аутентификация. На каждой
   транзакции дополнительно сверяет user/credential, resource, persisted scopes,
   expiry/revoked/disabled. Все публичные адаптеры обязаны сначала проверить секрет.
-- Пока только private drafts, без publish/delete/list/публичного search. Media IDs
+- Пока private draft/archived и own list, без publish/delete/публичного search. Media IDs
   отклоняются до реализации media ownership/validation. Нет file/image/network ops.
 
 ## Сущности
@@ -39,6 +40,7 @@ erDiagram
     int created_at
     int updated_at
     int expires_at
+    string status
   }
   MARKET_COMMAND {
     string user_id PK
@@ -117,3 +119,6 @@ owner privacy, scope mismatch, revoked/disabled/expired/resource check, same-use
 CAS concurrency, duplicate concurrency, changed payload conflict, receipt rollback,
 quotas, media refusal, category parent disable, expiry/clock rollback, room compatibility.
 Это storage/application tests, не доказательство public media/session/admin/production.
+
+Дополнение: [private list/category/archive и migration sequence](private-draft-lifecycle.md).
+Результаты базового M1a не заменяют отдельные CI evidence новой версии.

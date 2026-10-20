@@ -11,12 +11,13 @@ from dataclasses import asdict, dataclass
 import hashlib
 import json
 import re
+import sqlite3
 import uuid
 from .domain import DomainError, Principal, identifier
 from .identity import resource_url
 from .listing_contract import Listing, ListingContent, create_draft
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 TABLES = ('market_schema', 'market_categories', 'market_drafts', 'market_commands')
 CATEGORIES = (
     ('things', None, 'things', 'Вещи'),
@@ -64,29 +65,42 @@ class DraftStore:
             if existing:
                 if existing != set(TABLES):
                     raise DomainError('unsupported_market_schema')
-                self._schema(db)
+                version = self._schema(db, allow_v1=True)
+                if version == 1:
+                    columns = {row['name'] for row in db.execute('PRAGMA table_info(market_drafts)')}
+                    if columns != {'id', 'user_id', 'category_id', 'content', 'revision',
+                                   'created_at', 'updated_at', 'expires_at'}:
+                        raise DomainError('unsupported_market_schema')
+                    db.execute("ALTER TABLE market_drafts ADD COLUMN status TEXT NOT NULL DEFAULT 'draft' CHECK(status IN ('draft','archived'))")
+                    db.execute('CREATE INDEX market_drafts_page ON market_drafts(user_id,status,created_at,id)')
+                    db.execute('UPDATE market_schema SET version=? WHERE singleton=1', (SCHEMA_VERSION,))
                 return
             # New sidecar tables in the SAME DB/snapshot; no drop/rewrite of room data.
             db.execute('CREATE TABLE market_schema (singleton INTEGER PRIMARY KEY CHECK(singleton=1), version INTEGER NOT NULL)')
             db.execute('CREATE TABLE market_categories (id TEXT PRIMARY KEY, parent_id TEXT REFERENCES market_categories(id), root TEXT NOT NULL, title TEXT NOT NULL, active INTEGER NOT NULL CHECK(active IN (0,1)))')
-            db.execute('CREATE TABLE market_drafts (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id), category_id TEXT NOT NULL REFERENCES market_categories(id), content TEXT NOT NULL, revision INTEGER NOT NULL CHECK(revision>0), created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, expires_at INTEGER NOT NULL, CHECK(created_at<=updated_at AND updated_at<expires_at))')
+            db.execute('CREATE TABLE market_drafts (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id), category_id TEXT NOT NULL REFERENCES market_categories(id), content TEXT NOT NULL, revision INTEGER NOT NULL CHECK(revision>0), created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, expires_at INTEGER NOT NULL, status TEXT NOT NULL DEFAULT \'draft\' CHECK(status IN (\'draft\',\'archived\')), CHECK(created_at<=updated_at AND updated_at<expires_at))')
             db.execute('CREATE INDEX market_drafts_owner ON market_drafts(user_id)')
+            db.execute('CREATE INDEX market_drafts_page ON market_drafts(user_id,status,created_at,id)')
             db.execute('CREATE TABLE market_commands (user_id TEXT NOT NULL REFERENCES users(id), client_id TEXT NOT NULL, operation TEXT NOT NULL, digest TEXT NOT NULL, result TEXT NOT NULL, created_at INTEGER NOT NULL, PRIMARY KEY(user_id,client_id))')
             db.executemany('INSERT INTO market_categories VALUES (?,?,?,?,1)', CATEGORIES)
             db.execute('INSERT INTO market_schema VALUES (1,?)', (SCHEMA_VERSION,))
 
     @staticmethod
-    def _schema(db):
+    def _schema(db, *, allow_v1=False):
         try:
             rows = db.execute('SELECT singleton,version FROM market_schema').fetchall()
-        except Exception as exc:
-            # Translate only absent/incompatible namespace, not arbitrary auth errors.
-            import sqlite3
-            if isinstance(exc, sqlite3.OperationalError):
+        except sqlite3.OperationalError as exc:
+            if str(exc) == 'no such table: market_schema':
                 raise DomainError('market_migration_required') from None
             raise
-        if len(rows) != 1 or rows[0]['singleton'] != 1 or rows[0]['version'] != SCHEMA_VERSION:
+        if len(rows) != 1 or rows[0]['singleton'] != 1:
             raise DomainError('unsupported_market_schema')
+        version = rows[0]['version']
+        if version == 1 and not allow_v1:
+            raise DomainError('market_migration_required')
+        if version not in ((1, SCHEMA_VERSION) if allow_v1 else (SCHEMA_VERSION,)):
+            raise DomainError('unsupported_market_schema')
+        return version
 
     def _authorize(self, db, principal, scope, now):
         if (not isinstance(principal, Principal) or type(principal.scopes) is not frozenset
@@ -141,7 +155,7 @@ class DraftStore:
         c = json.loads(row['content'])
         c['modes'], c['media_ids'] = tuple(c['modes']), tuple(c['media_ids'])
         listing = Listing(row['id'], 'user:' + row['user_id'], ListingContent(**c),
-                          'draft', 'private', row['revision'], row['created_at'],
+                          row['status'], 'private', row['revision'], row['created_at'],
                           row['updated_at'], row['expires_at'])
         return {'listing': asdict(listing), 'category_id': row['category_id']}
 
@@ -187,7 +201,7 @@ class DraftStore:
             if db.execute('SELECT COUNT(*) FROM market_drafts WHERE user_id=?', (principal.user_id,)).fetchone()[0] >= self.limits.per_owner:
                 raise DomainError('owner_draft_capacity')
             listing = create_draft(principal, str(uuid.uuid4()), content, now)
-            db.execute('INSERT INTO market_drafts VALUES (?,?,?,?,?,?,?,?)',
+            db.execute('INSERT INTO market_drafts(id,user_id,category_id,content,revision,created_at,updated_at,expires_at) VALUES (?,?,?,?,?,?,?,?)',
                        (listing.id, principal.user_id, category_id, _json(payload['content']),
                         listing.revision, now, now, listing.expires_at))
             result = self._record(self._owned(db, principal.user_id, listing.id, now))
@@ -209,12 +223,14 @@ class DraftStore:
             if replay is not None:
                 return {**replay, 'replayed': True}
             row = self._owned(db, principal.user_id, listing_id, now)
+            if row['status'] != 'draft':
+                raise DomainError('draft_not_editable')
             if row['revision'] != expected_revision:
                 raise DomainError('revision_conflict')
             if now < row['updated_at']:
                 raise DomainError('invalid_timestamp')
             self._category(db, category_id, content.category)
-            result = db.execute('UPDATE market_drafts SET content=?,category_id=?,revision=revision+1,updated_at=? WHERE id=? AND user_id=? AND revision=?',
+            result = db.execute('UPDATE market_drafts SET content=?,category_id=?,revision=revision+1,updated_at=? WHERE id=? AND user_id=? AND revision=? AND status=\'draft\'',
                                 (_json(payload['content']), category_id, now, listing_id, principal.user_id, expected_revision))
             if result.rowcount != 1:
                 raise DomainError('revision_conflict')
@@ -228,3 +244,90 @@ class DraftStore:
             now = self.store.clock()
             self._authorize(db, principal, 'listings:read', now)
             return json.loads(_json(self._record(self._owned(db, principal.user_id, listing_id, now))))
+
+
+    @staticmethod
+    def _page(cursor, principal, status):
+        if cursor is None:
+            return None
+        if not isinstance(cursor, str) or len(cursor) > 180:
+            raise DomainError('invalid_cursor')
+        match = re.fullmatch(
+            r'market:([0-9a-f-]{36}):(draft|archived):(0|[1-9][0-9]{0,18}):([0-9a-f-]{36})', cursor)
+        if (not match or match.group(1) != principal.user_id or match.group(2) != status
+                or int(match.group(3)) > 2**63-1):
+            raise DomainError('invalid_cursor')
+        try:
+            identifier(match.group(1))
+            identifier(match.group(4))
+        except DomainError:
+            raise DomainError('invalid_cursor') from None
+        return int(match.group(3)), match.group(4)
+
+    def list_own(self, principal, *, status='draft', cursor=None, limit=20):
+        """Keyset read, not a frozen snapshot. Only the current actor's live rows."""
+        if type(status) is not str or status not in {'draft', 'archived'}:
+            raise DomainError('invalid_draft_status')
+        _bounded_integer(limit, 1, 50, 'invalid_limit')
+        with self.store._db() as db:
+            self._schema(db)
+            now = self.store.clock()
+            self._authorize(db, principal, 'listings:read', now)
+            after = self._page(cursor, principal, status)
+            query = 'SELECT * FROM market_drafts WHERE user_id=? AND status=? AND expires_at>?'
+            args = [principal.user_id, status, now]
+            if after is not None:
+                query += ' AND (created_at>? OR (created_at=? AND id>?))'
+                args.extend((after[0], after[0], after[1]))
+            rows = db.execute(query + ' ORDER BY created_at,id LIMIT ?', (*args, limit+1)).fetchall()
+            page = rows[:limit]
+            has_more = len(rows) > limit
+            next_cursor = None
+            if has_more:
+                last = page[-1]
+                next_cursor = f"market:{principal.user_id}:{status}:{last['created_at']}:{last['id']}"
+            return {'items': [json.loads(_json(self._record(row))) for row in page],
+                    'has_more': has_more, 'next_cursor': next_cursor}
+
+    def categories(self, principal, *, parent_id=None):
+        """Bounded immediate children, no public API or runtime category editing."""
+        with self.store._db() as db:
+            self._schema(db)
+            self._authorize(db, principal, 'listings:read', self.store.clock())
+            if parent_id is not None:
+                self._category(db, parent_id)
+            rows = db.execute('SELECT * FROM market_categories WHERE parent_id IS ? AND active=1 ORDER BY id LIMIT 101', (parent_id,)).fetchall()
+            if len(rows) > 100:
+                raise DomainError('category_capacity')
+            result = []
+            for row in rows:
+                self._category(db, row['id'])
+                result.append({field: row[field] for field in ('id', 'parent_id', 'root', 'title')})
+            return {'categories': result}
+
+    def archive(self, principal, listing_id, *, expected_revision, client_id):
+        """Terminal private state, NOT physical erasure or a public sold claim."""
+        identifier(listing_id)
+        _bounded_integer(expected_revision, 1, 2**63-2, 'invalid_revision')
+        payload = {'id': listing_id, 'expected_revision': expected_revision}
+        with self.store._db(write=True) as db:
+            self._schema(db)
+            now = self.store.clock()
+            self._authorize(db, principal, 'listings:write', now)
+            digest, replay = self._retry(db, principal, client_id, 'archive', payload)
+            if replay is not None:
+                return {**replay, 'replayed': True}
+            row = self._owned(db, principal.user_id, listing_id, now)
+            if row['status'] != 'draft':
+                raise DomainError('draft_not_editable')
+            if row['revision'] != expected_revision:
+                raise DomainError('revision_conflict')
+            if now < row['updated_at']:
+                raise DomainError('invalid_timestamp')
+            result = db.execute("UPDATE market_drafts SET status='archived',revision=revision+1,updated_at=? WHERE id=? AND user_id=? AND revision=? AND status='draft'",
+                                (now, listing_id, principal.user_id, expected_revision))
+            if result.rowcount != 1:
+                raise DomainError('revision_conflict')
+            result = json.loads(_json(self._record(self._owned(db, principal.user_id, listing_id, now))))
+            self._receipt(db, principal, client_id, 'archive', digest, result, now)
+            return {**result, 'replayed': False}

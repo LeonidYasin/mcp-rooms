@@ -1,7 +1,8 @@
 # Private draft storage — M1a, не публичный marketplace
 
 Код: `domain.py`, `listing_contract.py`, `draft_store.py`.
-Статус: SOURCE до подтверждения CI; HTTP/MCP/enrollment integration отсутствует.
+Статус: SOURCE + [CI подтверждён на code SHA 784b4c6b](ci-m1a.md);
+HTTP/MCP/enrollment integration отсутствует.
 [План](delivery-plan.md) / [conformance](marketplace-conformance.md).
 
 ## Инварианты

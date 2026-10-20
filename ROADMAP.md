@@ -150,7 +150,7 @@ evaluation only for a documented blocker or a concrete better maintenance trade-
 - [x] Prepare explicit additive market namespace and small category hierarchy without room user_version/default startup changes.
 - [x] Prepare private draft persistence/reopen/owner access, persisted credential+resource+scope rechecks, atomic revision and command receipts.
 - [x] Prepare bounded lifetime caps and negative/concurrency/rollback/regression CI fixtures.
-- [ ] Exact-HEAD CI acceptance of this slice (source is not PASS evidence).
+- [x] Exact-code-SHA CI acceptance of M1a at `784b4c6b`: 8/8 checks, Python3.10–3.13; Python3.12 log 197 passed/2 warnings. [Evidence](docs/ci-m1a.md). This is not full marketplace conformance.
 - [ ] Full M1b lifecycle/read-list/category API/retention and command contracts.
 
 No signup scope expansion, registered listing tools/routes, media, publish, private response,

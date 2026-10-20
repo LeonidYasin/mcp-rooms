@@ -50,12 +50,14 @@ flowchart TD
 
 ### M1 — сохранение и предметный контракт
 
-**M1a, текущий срез SOURCE:** shared domain primitives с compatibility aliases;
+**M1a, SOURCE + CI на code SHA 784b4c6b:** shared domain primitives с compatibility aliases;
 explicit opt-in additive market namespace; фиксированное дерево категорий; private
 create/get/update drafts; persisted credential/resource/scopes/user recheck; атомарные
 revision + retry receipt; lifetime caps; изолированные tests. Нет внешнего API.
-Выход: полная регрессия Rooms/identity и новые concurrency/rollback/ACL tests в CI
-Python3.10–3.13; пакет импортируется вне source tree. До CI статус только SOURCE.
+Выход подтверждён на этом code SHA: регрессия Rooms/identity и новые concurrency/
+rollback/ACL tests в CI Python3.10–3.13; пакет импортируется вне source tree.
+[Evidence: 8/8 checks, Python3.12 197 passed/2 warnings](ci-m1a.md).
+Это не приёмка M1b/новых transports или публичной площадки.
 
 **M1b, следующий срез:** прикладной API для owner drafts/categories, lifecycle с
 content-bound publication consent (не bool без привязки к версии), формализованные
@@ -135,4 +137,5 @@ reconciliation; проверенный rollback; sanitised logs/metrics. Рев�
 6. Операторские файлы/ключи/DB не публиковать; ветка public, не «приватный черновик».
 
 Оценка календарных сроков пока не дана: неизвестна цена media/session/public acceptance.
-Следующая контрольная точка — подтверждённый CI M1a, а не открытие доступа на VPS.
+CI M1a подтверждён; следующая контрольная точка — M1b lifecycle/read-list/category и
+retention contracts, а не открытие доступа на VPS.

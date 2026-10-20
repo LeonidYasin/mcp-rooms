@@ -33,6 +33,8 @@ is specified, not yet an executed integration suite.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).
+- [M1a CI evidence](docs/ci-m1a.md): code SHA `784b4c6b`, 8/8 checks; Python3.12
+  197 tests passed, 2 warnings. Not public marketplace or production acceptance.
 - `draft_store.py`: explicit opt-in private create/get/update with persisted access
   rechecks, atomic revision/command receipts, quotas and a small category tree.
   Not registered in MCP/HTTP; current enrollment still cannot issue listing scopes.

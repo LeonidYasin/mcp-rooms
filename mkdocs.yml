@@ -53,6 +53,7 @@ extra_javascript:
     type: module
 validation:
   nav:
+  - Продолжить разработку: docs/ai-handoff.md
     omitted_files: info
   links:
     anchors: info
@@ -86,6 +87,7 @@ nav:
     - Publication core: docs/live-publication.md
     - User marketplace MCP: docs/user-market-mcp.md
     - Photo HTTP upload: docs/media-http.md
+    - Browser session core: docs/browser-sessions.md
     - Web: docs/web-marketplace-plan.md
     - Отдельный admin MCP: docs/admin-mcp-design.md
   - Комнаты и клиенты:

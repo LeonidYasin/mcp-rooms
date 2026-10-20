@@ -19,6 +19,14 @@ local-identity adapter. Existing embedded VPS data/connections are NOT moved.
 GitHub credentials, shell/process tools, external web tools, Telegram and LLM APIs
 are not part of this server. GitHub is only the source hosting / CI platform.
 
+## Continue development — for a new AI chat
+
+Start with [AGENTS.md](AGENTS.md), [AI handoff](docs/ai-handoff.md) and
+[machine-readable work state](docs/work-state.json). They identify the accepted code
+SHA, evidence, current slice, next task and owner permission gates. No past chat required.
+Component truth lives in [project-status.json](docs/project-status.json); verify remote
+HEAD/CI before changing anything.
+
 ## Repository / main / deployment status
 
 As checked on 2026-10-19, `main` still points to the initial scaffold commit
@@ -45,14 +53,17 @@ Each page links to its exact Git SHA; the component map uses `docs/project-statu
 Python/SQLite modular marketplace domain**, reusing supported infrastructure. Reuse
 engines remain references/fallbacks, not mandatory foundations. This is an MVP direction,
 not proof of runtime superiority or production approval. [Acceptance contract](docs/marketplace-conformance.md)
-is specified, not yet an executed integration suite.
+is specified; individual core/ASGI slices are tested, but the full external user journey
+is not yet accepted.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [M3a.1](docs/ci-m3a1.md), source `405d2a34`: Python3.12
-501 tests passed. A separately composed user MCP adds12 scoped listing tools to8
-rooms, over actual Bearer/official SDK, with safe self-delegation. Default CLI stays
-rooms-only; signup does not grant listing scopes. No public web/upload or VPS rollout.
+**Latest accepted checkpoint:** [M3a.2](docs/ci-m3a2.md), application source
+`bca0c8a0ea0336125f928edf196c927a5d6678ed`: Python3.12 539 passed.
+Opt-in private binary photo HTTP for people/agents, plus12 scoped listing MCP tools
+on top of8 rooms. Default CLI stays rooms-only; signup does not grant listing scopes.
+Browser session core is the next bounded slice — see work-state for SOURCE vs CI.
+No browser login/form, public marketplace or VPS rollout yet.
 [Six remaining stages to useful external TEST](docs/deployment-readiness.md).
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
@@ -65,7 +76,8 @@ rooms-only; signup does not grant listing scopes. No public web/upload or VPS ro
   children and terminal private archive; explicit opt-in market schema v1→v2.
   [M1b.1 CI evidence](docs/ci-m1b1.md): code SHA `104d5a5c`, 8/8 checks;
   Python3.12 226 tests passed, 2 warnings. Still no public listing API.
-  Not registered in MCP/HTTP; current enrollment still cannot issue listing scopes.
+  Historical M1 boundary: later M3a adds opt-in MCP/HTTP adapters; default enrollment
+  still does not issue listing scopes.
 - [M1b.2 private preview/intent](docs/publication-intent.md): exact content/revision/
   category/resource binding; separate publish scope, short TTL; still published=false.
   [M1b.2 CI evidence](docs/ci-m1b2.md): code SHA `2108b93e`, 8/8 checks,

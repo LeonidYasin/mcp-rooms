@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "repository": "LeonidYasin/mcp-rooms",
+  "branch": "feat/standalone-identity",
+  "pull_request": 1,
+  "accepted": {
+    "source_sha": "bca0c8a0ea0336125f928edf196c927a5d6678ed",
+    "evidence": "docs/ci-m3a2.md",
+    "python312_passed": 539,
+    "kind": "CI_NOT_DEPLOYMENT"
+  },
+  "current_slice": {
+    "id": "M3b.1",
+    "stage": "SOURCE",
+    "contract": "docs/browser-sessions.md",
+    "source": "src/mcp_rooms/browser_sessions.py",
+    "tests": "tests/test_browser_sessions.py",
+    "evidence": null
+  },
+  "next_task": {
+    "id": "M3b.2",
+    "title": "Same-origin browser HTTP session adapter before the listing form",
+    "contract": "docs/browser-sessions.md",
+    "acceptance": [
+      "Review automatic identity/onboarding and loss/recovery flow without requiring GitHub/email/phone or issuing an implicit publish grant.",
+      "Implement explicit opt-in, no startup/request migration, Secure HttpOnly SameSite host-only session delivery and strict Origin/CSRF.",
+      "Reject session cookies on MCP/admin; typed browser actions must use the same core and bounded binary upload.",
+      "Review session fixation/rotation, quota cleanup and login abuse budgets; negative ASGI tests then browser QA in CI.",
+      "Only after auth acceptance implement draft/photo/preview form; no automatic publication."
+    ]
+  },
+  "runtime_last_known": {
+    "not_a_current_probe": true,
+    "rooms_test": "stopped; temporary HTTPS route removed by owner report",
+    "rooms_production": "not accepted or deployed by this project",
+    "main_last_recorded_sha": "96247414c03469ade2f9fdc96047e5f3d2d39f71",
+    "main_note": "Last recorded scaffold; verify remote before decisions. Do not merge without approval.",
+    "pages": "documentation only; single-publisher owner configuration gate remains"
+  },
+  "permission_gates": [
+    "Each remote execution requires separate owner approval AND special password.",
+    "No main merge/release/VPS or live database changes/real credential issuance without separate approval."
+  ],
+  "verification": {
+    "local": "static preparation and AST only; no project execution",
+    "runtime": "GitHub Actions only",
+    "commit_policy": "read remote HEAD and expected_head_sha CAS, never force push"
+  },
+  "read_next": [
+    "AGENTS.md",
+    "docs/ai-handoff.md",
+    "docs/project-status.json",
+    "docs/deployment-readiness.md",
+    "docs/browser-sessions.md"
+  ]
+}

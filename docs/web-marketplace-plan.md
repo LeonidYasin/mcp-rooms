@@ -10,7 +10,8 @@
 слой Python/SQLite поверх Rooms, готовые инфраструктурные библиотеки. Не устанавливаем
 WordPress/Osclass и не заводим вторую identity сейчас. Решение не означает доказанной
 стоимости/производительности или разрешения на production.
-[Контракт приёмки](marketplace-conformance.md) задан; интеграционные тесты ещё не написаны.
+[Контракт приёмки](marketplace-conformance.md) задан; отдельные core/ASGI сценарии уже
+проверяются в CI, полный внешний end-to-end сценарий ещё не принят.
 Готовые движки остаются резервом при конкретном blocker, широкий поиск завершён.
 
 ## Порядок реализации
@@ -44,8 +45,10 @@ WordPress/Osclass и не заводим вторую identity сейчас. Р�
 
 ## Состояние
 
-Ветка alpha; TEST закрыт. Восемь rooms_* существуют. Listing contract/статический макет
-начаты отдельно. Каталог/формы/загрузка фото/public API/admin MCP/заказы ещё не включены.
+Ветка alpha; TEST закрыт. Восемь rooms_* существуют. Private drafts/media/publication
+core, opt-in user MCP и private binary HTTP upload/read приняты в CI — это не live web.
+Ядро browser session — следующий ограниченный срез; статус в work-state.
+Формы, public feed/card/photo routes, admin MCP, private response и заказы ещё не включены.
 Подробности и матрица состояния в mindmap. Никакого merge/release/production/VPS изменения
 самим коммитом; прежние сервисы и БД остаются без изменений.
 

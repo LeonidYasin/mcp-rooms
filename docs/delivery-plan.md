@@ -154,3 +154,10 @@ changes public state. [CI confirmed at code SHA 2108b93e](ci-m1b2.md), 8/8 check
 Python3.12 247 passed/2 warnings. Remaining M1b retention/delete/retry policy is separate; actual M2 publish needs new media-ready notice/manifest and atomic
 intent consumption. [Positioning](project-positioning.md) separates technical first item
 from public launch messaging.
+
+## Уточнение границ следующего этапа
+
+[Рынок возможностей](opportunity-model.md): вещи/услуги первыми; работа, команды,
+проекты, стартапы и инвесторы — будущие отдельные домены, не готовые API.
+[M2a photo normalizer](media-image-safety.md) готовится отдельно от публичной загрузки,
+media storage и worker isolation. Наличие конвертера не означает готовность M2/публикации.

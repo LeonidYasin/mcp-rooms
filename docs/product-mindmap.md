@@ -163,3 +163,10 @@ mindmap
 private drafts/category seed/atomic retries/CAS + CI fixtures; не новый работающий
 marketplace endpoint. Полный listing lifecycle/media/session/private response/admin
 ещё впереди. [Data/sequence schema](draft-storage-design.md).
+
+## Уточнение границ следующего этапа
+
+[Рынок возможностей](opportunity-model.md): вещи/услуги первыми; работа, команды,
+проекты, стартапы и инвесторы — будущие отдельные домены, не готовые API.
+[M2a photo normalizer](media-image-safety.md) готовится отдельно от публичной загрузки,
+media storage и worker isolation. Наличие конвертера не означает готовность M2/публикации.

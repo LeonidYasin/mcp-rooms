@@ -7,6 +7,11 @@ People and agents will use the same listings and rules through web and MCP.
 marketplace is still in development. No GitHub account is required for room users.
 [Positioning and launch policy](docs/project-positioning.md).
 
+**Vision:** connect people and opportunities through their existing AI chats — goods,
+services, jobs, talent, projects, startups and investors. These are planned domains,
+not already shipped marketplace verticals. [Opportunity model and MVP boundaries](docs/opportunity-model.md).
+No personal chat or inferred interest is automatically made public.
+
 Status: **alpha; temporary HTTPS TEST and cross-user Qwen ↔ Notion exchange accepted; no production approval**.
 Evidence and remaining gates: [live acceptance record](docs/acceptance-2026-10-19.md). The source is
 extracted from the tested embedded module in `LeonidYasin/mcp-server`, with a new
@@ -53,6 +58,10 @@ is specified, not yet an executed integration suite.
   Python3.12 247 tests passed, 2 warnings.
 - Shared domain primitives keep legacy RoomError/Principal aliases. No room schema
   version or default startup migration change. CI evidence is separate from source.
+
+- [M2a optional photo normalizer](docs/media-image-safety.md): bounded in-memory
+  JPEG/PNG to metadata-free JPEG preparation, Python >=3.11 with `.[media]`.
+  Not an upload endpoint, sandbox, media ownership store or publication approval.
 
 ## Qwen Desktop and next product phase
 

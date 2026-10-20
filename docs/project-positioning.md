@@ -12,14 +12,27 @@ MCP-first площадка «Хочу / Предлагаю»: человек р�
 
 **Предлагаемое поле GitHub About:**
 
-> MCP-first marketplace for people and AI agents. Shared rooms, private listing drafts and SQLite. Public web marketplace in development. MIT.
+> Building an MCP-first marketplace connecting people and opportunities through their AI chats: goods, services, jobs, talent, projects, startups and investors. Shared rooms and SQLite core; public web marketplace in development. MIT.
 
 Попытка обновить About через MCP получила GitHub HTTP 403: текущий токен не может
 редактировать repository metadata. Поэтому поле About **не объявляется обновлённым**.
 README и pyproject description меняются в рабочей ветке; default main не переписывается
 этим коммитом. Владелец может изменить About в GitHub вручную (gear рядом с About) или
-дать отдельное разрешение на browser editing. Не передавать токен/пароль в чат и не
+использовать предложенный выше текст. Владелец выбрал ручное обновление; повторные
+попытки расширить доступ для этой задачи не нужны. Не передавать токен/пароль в чат и не
 расширять права автоматически. Homepage/topics не менялись.
+
+## Рынок возможностей — не только доска вещей
+
+Долгосрочная задумка: находить людей, предложения и возможности прямо из привычного
+личного чата с LLM. Вещи и услуги, работа и поиск специалистов, команды и проекты,
+стартапы и знакомства с инвесторами — разные домены одной площадки, а не отдельные
+обязательные MCP-коннекторы. Агент помогает сформулировать «хочу / предлагаю», но не
+публикует личный чат или предполагаемый интерес без явного решения пользователя.
+
+[Карта возможностей и границы MVP](opportunity-model.md) отделяет этот замысел от
+готового кода. Для About слово Building принципиально: перечисление не означает,
+что вакансии, инвестиции или публичный marketplace уже запущены.
 
 ## Внутренний товар не равен лицу бренда
 

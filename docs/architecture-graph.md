@@ -130,3 +130,10 @@ ASSIGNMENT: уникальный order_id и CAS версии заказа в о
 
 [Mindmap и этапы](product-mindmap.md) · [Admin boundary](admin-mcp-design.md)
 · [Первый тест продажи](first-sale-acceptance.md).
+
+## Уточнение границ следующего этапа
+
+[Рынок возможностей](opportunity-model.md): вещи/услуги первыми; работа, команды,
+проекты, стартапы и инвесторы — будущие отдельные домены, не готовые API.
+[M2a photo normalizer](media-image-safety.md) готовится отдельно от публичной загрузки,
+media storage и worker isolation. Наличие конвертера не означает готовность M2/публикации.

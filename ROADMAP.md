@@ -179,3 +179,15 @@ erasure, publication or proof of sale. No VPS change or listing scopes issued by
 [Intent contract](docs/publication-intent.md). [Positioning](docs/project-positioning.md):
 technical test item is not the public brand hero. GitHub About update attempted but
 blocked by token HTTP403; README/package description updated in the working branch.
+
+
+## Vision / M2a — bounded photo preparation
+
+- [x] Broaden documented vision to opportunities from personal AI chats, without claiming shipped jobs/investment verticals.
+- [x] Prepare optional bounded JPEG/PNG normalizer and synthetic negative fixtures; no upload/paths/network/publication.
+- [ ] Exact-SHA CI acceptance of M2a (core3.10, media3.11–3.13).
+- [ ] OS-limited decode worker; authenticated media ownership, storage/quotas/retention and served derivative contract.
+- [ ] Actual listing publish/consent transaction, public web/user MCP, private response and separate admin gate.
+
+[Opportunity boundaries](docs/opportunity-model.md), [photo safety contract](docs/media-image-safety.md).
+About is proposed text for the owner's manual update, not an API metadata mutation.

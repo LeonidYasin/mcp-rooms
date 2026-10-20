@@ -13,6 +13,8 @@ readme = "README.md"
 dependencies = ["mcp==1.26.0", "uvicorn>=0.35,<1"]
 
 [project.optional-dependencies]
+# Optional media workers require Python >=3.11; room/core support stays >=3.10.
+media = ["Pillow==13.0.0"]
 test = ["pytest>=8,<9", "httpx>=0.28,<0.29", "build>=1.2,<2"]
 
 [project.scripts]

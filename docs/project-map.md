@@ -85,3 +85,10 @@ DraftStore records/checks short-lived publication intent without publishing.
 `tests/test_publication_intent.py` covers scope/version/hash/expiry/resource/isolation.
 [Intent design](publication-intent.md), [public positioning](project-positioning.md).
 No listing scopes issued by signup and no new routes/tools.
+
+## Уточнение границ следующего этапа
+
+[Рынок возможностей](opportunity-model.md): вещи/услуги первыми; работа, команды,
+проекты, стартапы и инвесторы — будущие отдельные домены, не готовые API.
+[M2a photo normalizer](media-image-safety.md) готовится отдельно от публичной загрузки,
+media storage и worker isolation. Наличие конвертера не означает готовность M2/публикации.

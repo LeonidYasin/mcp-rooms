@@ -154,6 +154,7 @@ class MediaHTTP:
         listing_id, media_id = matched.groups()
         reading = media_id is not None
         response = None
+        sending = False
         try:
             if scope['method'] != ('GET' if reading else 'POST'):
                 response = JSONResponse({'error': 'method_not_allowed'}, status_code=405,
@@ -173,16 +174,27 @@ class MediaHTTP:
                         response = JSONResponse({'ok': True, **result}, status_code=200 if result['replayed'] else 201,
                                                 headers=PRIVATE_HEADERS)
                     # Keep admission until response is sent, not merely constructed.
+                    sending = True
                     return await response(scope, receive, send)
         except HTTPFailure as exc:
+            if sending:
+                raise
             code, status = exc.code, exc.status
         except DomainError as exc:
+            if sending:
+                raise
             code, status = self.domain_error(exc, reading)
         except TimeoutError:
+            if sending:
+                raise
             code, status = 'request_timeout', 408
         except (OSError, sqlite3.Error):
+            if sending:
+                raise
             code, status = 'media_unavailable', 503
         except Exception:
+            if sending:
+                raise
             code, status = 'media_unavailable', 500
         if response is not None:
             return await response(scope, receive, send)

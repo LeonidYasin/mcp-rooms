@@ -74,7 +74,7 @@ def test_upload_replay_private_read_and_mcp_attachment(http):
     assert len(list(x.root.iterdir())) >= 1
     assert x.client.post(path(lid),headers=h,content=b'changed').status_code==409
     record=tool(x.client,x.ta,'listings_get',listing_id=lid)
-    assert record['listing']['media_ids']==[]
+    assert record['listing']['content']['media_ids']==[]
     assert tool(x.client,x.ta,'listings_publication_status',listing_id=lid)['publication']['state']=='never_published'
     read=x.client.get(path(lid,mid),headers={'Authorization':'Bearer '+x.ta})
     assert read.status_code==200 and read.content.startswith(b'\xff\xd8')
@@ -216,3 +216,61 @@ def test_actual_native_worker_http_ci_only(http):
     with Image.open(BytesIO(result.content)) as image:
         assert image.format=='JPEG' and not image.getexif() and image.size==(25,12)
     assert upload(x,lid,b'not an image').status_code==400
+
+
+def test_read_only_credential_cannot_upload_and_origin_gate(http):
+    x=http;lid=create(x)['listing']['id']
+    _,raw=x.auth.issue_token(x.a,scopes=['listings:read'])
+    h=headers(x,Authorization='Bearer '+raw)
+    assert direct(x,path(lid),[],list(h.items()))[0]==403
+    h=headers(x,Origin='https://foreign.example')
+    assert direct(x,path(lid),[],list(h.items()))[0]==403
+
+
+def test_active_publication_blocks_upload_before_body(http):
+    from test_market_server import confirm
+    x=http;lid=create(x)['listing']['id']
+    c=confirm(x,lid)
+    assert tool(x.client,x.ta,'listings_publish',listing_id=lid,intent_id=c['intent_id'],client_id=key())['ok']
+    assert direct(x,path(lid),[],list(headers(x).items()))[0]==409
+
+
+def test_incremental_limit_checks_accumulated_bytes(http,monkeypatch):
+    x=http;lid=create(x)['listing']['id'];monkeypatch.setattr(mh,'MAX_INPUT_BYTES',16)
+    events=[{'type':'http.request','body':b'x'*10,'more_body':True},
+            {'type':'http.request','body':b'x'*7,'more_body':False}]
+    assert direct(x,path(lid),events,list(headers(x).items()))[0]==413
+    assert x.stages.worker.calls==0
+
+
+def test_private_read_corruption_and_unknown_uniform(http,monkeypatch):
+    x=http;lid=create(x)['listing']['id'];mid=upload(x,lid).json()['media_id']
+    def broken(receipt):raise DomainError('media_storage_integrity',path='/private/root')
+    monkeypatch.setattr(x.files,'read',broken)
+    auth={'Authorization':'Bearer '+x.ta}
+    a=x.client.get(path(lid,mid),headers=auth)
+    b=x.client.get(path(lid,key()),headers=auth)
+    assert a.status_code==b.status_code==404 and a.json()==b.json()
+    assert '/private/root' not in a.text
+
+
+def test_method_and_path_allowlist(http):
+    x=http;lid=create(x)['listing']['id']
+    assert x.client.get(path(lid),headers=headers(x)).status_code==405
+    assert x.client.post(path(lid,key()),headers=headers(x),content=b'x').status_code==405
+    assert x.client.get(path(lid,key())+'?key=never',headers=headers(x)).status_code==400
+    assert x.client.post(path(lid)+'/../elsewhere',headers=headers(x),content=b'x').status_code==404
+
+
+def test_send_error_does_not_attempt_second_response_and_releases_slot(http):
+    x=http;lid=create(x)['listing']['id'];mid=upload(x,lid).json()['media_id'];starts=[]
+    async def run():
+        async def receive():raise AssertionError('GET must not read body')
+        async def send(event):
+            if event['type']=='http.response.start':starts.append(event)
+            else:raise OSError('synthetic disconnected transport')
+        scope={'type':'http','method':'GET','path':path(lid,mid),'query_string':b'',
+               'headers':[(b'host',b'rooms.example'),(b'authorization',('Bearer '+x.ta).encode())]}
+        await x.gate(scope,receive,send)
+    with pytest.raises(OSError):anyio.run(run)
+    assert len(starts)==1 and x.gate.media_http.reads.active==0

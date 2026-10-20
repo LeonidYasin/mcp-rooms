@@ -43,8 +43,9 @@ async def read_body(receive, maximum):
 
 class BearerGate:
     """Per-request identity; self signup is explicit and opt-in, never implicit login."""
-    def __init__(self, app, auth, registration_enabled=False, media_http=None, browser_sessions=None):
+    def __init__(self, app, auth, registration_enabled=False, media_http=None, browser_sessions=None, public_market=None):
         self.app, self.auth = app, auth
+        self.public_market = public_market
         self.media_http = media_http
         self.registration_enabled = registration_enabled
         self.enrollment = Enrollment(auth)
@@ -88,6 +89,10 @@ class BearerGate:
                 re.fullmatch(r'(?:127\.0\.0\.1|localhost)(?::[0-9]{1,5})?', hosts[0])):
             raise RequestFailure('invalid_host', 421)
         path, method = scope['path'], scope['method']
+        # Public reads have no session authority; their own strict host/method gate
+        # runs before credential-origin policy. All other routes remain unchanged.
+        if self.public_market is not None and self.public_market.match(path):
+            return await self.public_market.handle(scope, receive, send)
         # A link from another site is a normal top-level navigation to PUBLIC,
         # read-only signup HTML, not a cross-origin API request. Do not extend
         # this exception to JS subresources, iframes, registration or credentials.
@@ -193,8 +198,10 @@ class BearerGate:
             CURRENT.reset(token)
 
 
-def create_app(database, resource, registration_enabled=False, *, market=None, media_http=False, browser_sessions=None):
+def create_app(database, resource, registration_enabled=False, *, market=None, media_http=False, browser_sessions=None, public_market=False):
     if type(media_http) is not bool or (media_http and market is None):
+        raise RoomError('market_binding_mismatch')
+    if type(public_market) is not bool or (public_market and market is None):
         raise RoomError('market_binding_mismatch')
     resource = resource_url(resource)
     if browser_sessions is not None:
@@ -275,8 +282,10 @@ def create_app(database, resource, registration_enabled=False, *, market=None, m
         register_market_tools(mcp,call_market)
 
     from .media_http import MediaHTTP
+    from .public_web import PublicMarket
     return BearerGate(mcp.streamable_http_app(), auth, registration_enabled,
-                      MediaHTTP(market) if media_http else None, browser_sessions)
+                      MediaHTTP(market) if media_http else None, browser_sessions,
+                      PublicMarket(market.publisher, resource) if public_market else None)
 
 
 def main():

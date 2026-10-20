@@ -19,6 +19,15 @@ MCP Rooms / «Хочу — Предлагаю»: рынок возможност
 допустимый технический тест, не обязательный PR-образ проекта. Фото, цену,
 местоположение, комплект и дефекты должен подтвердить сам владелец.
 
+## Текущий приоритет: короткий owner-first TEST
+
+[Сокращённый маршрут F1–F2](owner-first-test.md): MCP/Bearer HTTP управляет объявлением;
+публичный web только читает явно опубликованную карточку/фото по ссылке. ≈3 крупных
+ворот до разрешённого VPS TEST вместо ожидания всего полного6-этапного сценария.
+Нет browser editing/onboarding/search/replies/admin MCP; это меньший результат.
+M3b.3 session binding **не отменён**: paused до возвращения browser writes.
+Ближайшая задача теперь F2 composition/bootstrap/package, не самовольный deploy.
+
 ## Архитектура уже выбрана
 
 [ADR-001](decisions/001-marketplace-foundation.md): минимальный собственный Python/SQLite
@@ -38,6 +47,7 @@ framework без измеренного blocker. Исследование кан
 - `market_adapter.py`, `market_tools.py`, `server.py`: explicit market composition,
   8 rooms +12 scoped listing tools. Default CLI по-прежнему8 rooms.
 - `media_http.py`: explicit opt-in bounded binary upload/private JPEG read; не public photo route.
+- `public_web.py`: explicit opt-in anonymous read-only card/photo; нет feed, формы или cookie writes.
 - `browser_sessions.py`: отдельный bounded session core, browser schema1.
 - `browser_http.py`: opt-in session login/bootstrap/logout bridge; статус в work-state.
   Cookie ещё не является authority для listing/media writes: сначала transaction-time
@@ -59,12 +69,11 @@ MCP сам не открывает диск пользователя. Будущ
 
 ## Что ещё НЕ сделано
 
-Cookie-authorized market commands, автоматический onboarding/recovery и форма, публичная витрина/search/
-photo serving, приватный отклик, отдельный admin MCP; полная OS isolation/load/RAM
+Cookie-authorized market commands, автоматический onboarding/recovery и форма, публичный каталог/search, web-редактирование, приватный отклик, отдельный admin MCP; полная OS isolation/load/RAM
 приёмка, DB+files disaster restore/security-state reconciliation, безопасная очистка
 долгоживущих auth receipts/сессий. Не считать стадией production наличие public_get
 внутри Python, green unit tests или GitHub Pages. [План до TEST](deployment-readiness.md)
-содержит6 крупных этапов; этап пользовательских adapters закрывается частями.
+содержит полный6-этапный и сокращённый3-воротный маршрут; ни один не означает готовый deploy.
 
 ## Состояние инфраструктуры — только последнее известное
 

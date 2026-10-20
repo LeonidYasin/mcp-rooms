@@ -68,7 +68,8 @@ M3b.3 transaction-time session binding passes; see [work-state](docs/work-state.
 Built on [session core](docs/ci-m3b1.md), [private photo HTTP](docs/ci-m3a2.md) and
 12 scoped listing MCP tools on top of8 rooms. Default CLI stays rooms-only; signup
 does not grant listing scopes. No public marketplace or VPS rollout.
-[Six remaining stages to useful external TEST](docs/deployment-readiness.md).
+[Shorter owner-first TEST: three major gates, not the full six-stage pilot](docs/owner-first-test.md).
+F1 read-only card/photo transport is being added as explicit opt-in; no default CLI enablement or deployment.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).

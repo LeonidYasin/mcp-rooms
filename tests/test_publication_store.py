@@ -54,7 +54,7 @@ def test_new_consent_contract_and_atomic_allowlisted_publication(market):
     private = x.editor.preview(x.a,x.draft_id)
     preview = x.market.preview(x.a,x.draft_id)
     assert preview['schema'] == PUBLICATION_SCHEMA != private['schema']
-    assert preview['public_transport_enabled'] is False and preview['publication_epoch'] == 0
+    assert preview['public_transport_enabled'] is None and preview['publication_epoch'] == 0
     assert preview['digest'] != private['digest']
     assert preview['card_preview']['published_at'] is None
     assert 'owner' not in preview['card_preview'] and 'user_id' not in preview['card_preview']

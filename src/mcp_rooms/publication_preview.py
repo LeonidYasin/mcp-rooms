@@ -2,13 +2,13 @@
 from hashlib import sha256
 from .preview_contract import canonical_json
 
-PUBLICATION_SCHEMA = 'mcp-rooms/live-publication-consent/v1'
+PUBLICATION_SCHEMA = 'mcp-rooms/live-publication-consent/v2'
 NOTICE = ('A separate publish command will expose this exact card and photos to anyone '
-          'through the future public web/MCP adapters. Review all text, price, location '
+          'through explicitly enabled public adapters. Review all text, price, location '
           'and photos: personal details written there will be public. Private rooms, '
           'credentials and account details are not included. Withdrawal stops future '
           'service reads, but cannot erase copies already obtained by others. '
-          'Agent delegation is not proof of human review. No public transport is enabled yet.')
+          'Agent delegation is not proof of human review. Public transport availability depends on the server composition; this preview does not enable it.')
 
 
 def public_card(record, category_path, photos, epoch, now):
@@ -27,6 +27,6 @@ def publication_preview(record, category_path, resource, photos, epoch):
                     record=record, category_path=category_path, photos=photos,
                     publication_epoch=epoch, audience='public_web_and_agents',
                     card_preview=public_card(record,category_path,photos,epoch+1,None),
-                    publication_transaction_available=True, public_transport_enabled=False)
+                    publication_transaction_available=True, public_transport_enabled=None)
     digest = sha256((PUBLICATION_SCHEMA+'\0'+canonical_json(document)).encode()).hexdigest()
     return {**document, 'digest': digest}

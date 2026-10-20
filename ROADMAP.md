@@ -292,3 +292,16 @@ No main, VPS, public upload/publication or new real scope issuance changed.
 - [ ] Bounded streaming upload, HTTP/browser/session/onboarding, web/search and approved TEST.
 
 [User MCP boundary](docs/user-market-mcp.md). No default CLI enablement, live keys, main or VPS changed.
+
+## F1 — owner-first сокращённый TEST
+
+- [x] Подготовить explicit opt-in read-only карточку/фото с повторной public availability проверкой.
+- [x] Подготовить synthetic integration/negative tests и обновлённое consent notice v2.
+- [ ] Принять exact-SHA CI; SOURCE не считать опубликованным сайтом.
+- [ ] F2 strict fresh composition/bootstrap/package, один worker, без startup DDL.
+- [ ] OS/resource isolation, DB+files security-state restore и reviewed rollback.
+- [ ] Отдельно одобренный preflight/изолированный loopback, затем HTTPS TEST.
+
+[Три крупных ворот](docs/owner-first-test.md), не три команды. Browser M3b.3
+сохранён как paused обязательный track до cookie-auth writes; полный web/search/
+private replies/admin MVP не объявлен выполненным или отменённым.

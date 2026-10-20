@@ -53,12 +53,12 @@ extra_javascript:
     type: module
 validation:
   nav:
-  - Продолжить разработку: docs/ai-handoff.md
     omitted_files: info
   links:
     anchors: info
 nav:
   - Обзор: index.md
+  - Продолжить разработку: docs/ai-handoff.md
   - Карта и архитектура:
     - Карта компонентов: map.md
     - Подробная mindmap: docs/product-mindmap.md

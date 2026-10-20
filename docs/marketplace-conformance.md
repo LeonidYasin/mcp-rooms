@@ -65,7 +65,7 @@ namespace и media refusal. Это не полное исполнение эти
 PASS всех требований. ID-01 listing enrollment, P/M/W/S/R/A/E cases и full O gates
 остаются NOT IMPLEMENTED / NOT RUN для нового marketplace.
 
-## M1b.1 mapping — SOURCE, separate exact-SHA CI required
+## M1b.1 mapping — SOURCE + [exact-code-SHA CI](ci-m1b1.md)
 
 Own-list isolation/cursor bounds extend L-01/L-02; private archive CAS/retry/rollback
 extend L-03/L-04/L-05, not P-04 public unpublish. Category read is not public S-01

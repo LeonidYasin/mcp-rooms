@@ -2,7 +2,8 @@
 
 Код: `domain.py`, `listing_contract.py`, `draft_store.py`.
 Статус базового M1a: [CI подтверждён на code SHA 784b4c6b](ci-m1a.md).
-Расширение M1b.1: [lifecycle/schema v2](private-draft-lifecycle.md), SOURCE до exact-SHA CI;
+Расширение M1b.1: [lifecycle/schema v2](private-draft-lifecycle.md),
+[CI подтверждён на code SHA 104d5a5c](ci-m1b1.md);
 HTTP/MCP/enrollment integration отсутствует.
 [План](delivery-plan.md) / [conformance](marketplace-conformance.md).
 

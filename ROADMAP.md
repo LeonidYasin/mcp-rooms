@@ -162,7 +162,7 @@ admin MCP or live migration is implied. [Storage design](docs/draft-storage-desi
 - [x] Prepare category immediate-child reads with active ancestry and explicit capacity bound.
 - [x] Prepare terminal private archive, version CAS/receipt atomicity, rollback and archive/update race tests.
 - [x] Prepare explicit market namespace v1→v2 migration preserving old rows/receipts; room version/startup unchanged.
-- [ ] Exact-SHA CI of M1b.1, including full M1a/room/identity regression.
+- [x] Exact-code-SHA CI of M1b.1 at `104d5a5c`: 8/8 checks, Python3.12 226 passed/2 warnings, full existing regression. [Evidence](docs/ci-m1b1.md).
 - [ ] Remaining M1b: content-bound consent + publication policy and retention/delete/retry horizon; quota reserve for protective actions before public access.
 
 [Lifecycle/migration contract](docs/private-draft-lifecycle.md). Archiving is not physical

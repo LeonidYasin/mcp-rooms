@@ -142,6 +142,6 @@ retention contracts, а не открытие доступа на VPS.
 
 ## M1b.1 — подготовлен следующий внутренний шаг
 
-[Личный список/категории/архив](private-draft-lifecycle.md): SOURCE, waiting exact-SHA
-CI. Full M1b не завершён: content-bound publication consent и retention/deletion/retry
+[Личный список/категории/архив](private-draft-lifecycle.md): SOURCE +
+[CI на code SHA 104d5a5c](ci-m1b1.md), 8/8 checks, Python3.12 226 passed/2 warnings. Full M1b не завершён: content-bound publication consent и retention/deletion/retry
 policy остаются следующими. Не перескакивать к public integration из-за наличия archive.

@@ -1,6 +1,7 @@
 # M1b.1: личный список, категории и архив
 
-Статус: SOURCE до exact-SHA CI, **не полный M1b и не публичный API**.
+Статус: SOURCE + [exact-code-SHA CI подтверждён](ci-m1b1.md),
+**не полный M1b и не публичный API**.
 Это расширение [M1a](ci-m1a.md), реализованное внутри DraftStore. Секреты/ключи/
 реальные объявления не создаются этим изменением. [Общий план](delivery-plan.md).
 
@@ -70,14 +71,15 @@ taxonomy маленькая. Если более 100 детей — явная c
   версия, не ручное понижение marker. Это ещё не операторская миграция на VPS.
 - Startup create_app всё ещё не вызывает market initialize. Никакие live DB не менялись.
 
-## Prepared CI cases
+## CI cases (exact code SHA 104d5a5c)
 
 Terminal archive/replay; чужой archive и missing indistinguishable; stale revision;
 receipt rollback; исторический replay не меняет stored status; cursor actor/status/
 format/limits; равные created_at; update/archive между страницами; expiry; category
 parent hide/bounds; revoked reads/mutation; archive-vs-update race; synthetic v1
 migration/integrity/receipt preservation и DDL-failure rollback. Вся existing regression
-матрица также обязательна. До результата exact SHA не объявлять эти кейсы PASS.
+матрица прошла на этом SHA: 8/8 checks, Python3.12 226 passed/2 warnings.
+[Evidence](ci-m1b1.md); это не full marketplace conformance.
 
 ## Что остаётся после этого среза
 

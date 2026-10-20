@@ -25,12 +25,12 @@ def register_market_tools(mcp, call):
         """Read available category children. No category administration."""
         return await call('categories',parent_id=parent_id)
 
-    @mcp.tool(structured_output=False, annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False))
+    @mcp.tool(structured_output=False, annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=True, idempotentHint=True, openWorldHint=False))
     async def listings_update(listing_id: StrictStr, content: ListingInput, category_id: StrictStr, expected_revision: StrictInt, client_id: StrictStr) -> list[TextContent]:
         """Versioned private text edit preserving photos. Withdraw an active listing first."""
         return await call('update',listing_id=listing_id,content=content,category_id=category_id,expected_revision=expected_revision,client_id=client_id)
 
-    @mcp.tool(structured_output=False, annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False))
+    @mcp.tool(structured_output=False, annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=True, idempotentHint=True, openWorldHint=False))
     async def listings_set_photos(listing_id: StrictStr, media_ids: list[StrictStr], expected_revision: StrictInt, client_id: StrictStr) -> list[TextContent]:
         """Set 0-8 ordered owned staged photo IDs. No path, URL, base64 or arbitrary upload."""
         return await call('set_photos',listing_id=listing_id,media_ids=media_ids,expected_revision=expected_revision,client_id=client_id)
@@ -50,7 +50,7 @@ def register_market_tools(mcp, call):
         """Record short-lived explicit consent after owner approves this exact preview. Not proof of human review, not publication."""
         return await call('confirm',listing_id=listing_id,expected_revision=expected_revision,preview_digest=preview_digest,consent=consent,client_id=client_id)
 
-    @mcp.tool(structured_output=False, annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False))
+    @mcp.tool(structured_output=False, annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=True, idempotentHint=True, openWorldHint=False))
     async def listings_publish(listing_id: StrictStr, intent_id: StrictStr, client_id: StrictStr) -> list[TextContent]:
         """Publish exact approved version. Owner approval required. Replay is historical; re-read publication status."""
         return await call('publish',listing_id=listing_id,intent_id=intent_id,client_id=client_id)

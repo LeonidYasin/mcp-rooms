@@ -63,6 +63,7 @@ def test_opt_in_twenty_tools_no_admin_or_upload_methods(market):
     assert {t['name'] for t in listed}==NAMES|MARKET_NAMES
     for t in listed:
         if t['name'] in MARKET_NAMES:
+            assert t['annotations']['destructiveHint'] == (t['name'] in {'listings_update','listings_set_photos','listings_archive','listings_publish','listings_withdraw'})
             assert t['annotations']['openWorldHint'] is False
             assert t['annotations']['readOnlyHint'] == (t['name'] in {'listings_get','listings_list_own','listings_categories','listings_preview','listings_publication_status'})
             schema=t['inputSchema']['properties']

@@ -25,7 +25,9 @@ separate decisions. CI tests/builds but does not deploy the VPS.
 
 [Completed reuse research / candidate decision gates](docs/marketplace-research-final.md):
 HivePress + ListingHive + official WordPress MCP Adapter is the first evaluation candidate;
-Apache OsclassPoint is the fallback. No stack switch, implementation or deployment approved.
+Apache OsclassPoint and a minimal own Python/SQLite domain are also candidates.
+[Source-level checks / equal build-vs-reuse comparison](docs/candidate-source-checks.md).
+No stack switch, implementation or deployment approved.
 
 
 - [Saved local proxy, safe debug, setup, .env placeholder, MCP check](clients/qwen/README.md).

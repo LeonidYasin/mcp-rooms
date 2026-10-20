@@ -120,3 +120,11 @@ services/data/main are unchanged; the closed TEST is not reopened by code public
 
 Desk research is complete enough for selection, not runtime/security acceptance. No new
 market features, main merge or VPS change is implied. Existing Rooms pilot remains separate.
+
+## Equal build-vs-reuse architecture gate
+
+- [x] Static review of HivePress user/listing paths, Osclass registration and WordPress MCP permissions documentation; [results and own-code debts](docs/candidate-source-checks.md).
+- [x] Include minimal Python/SQLite domain as an equal candidate, not an automatically inferior fallback.
+- [ ] Define shared backend-independent conformance contract and negative cases.
+- [ ] Verify bounded finalist slices in approved CI/test environment; no vendor-core edits, shared-admin shortcut or duplicate writable catalog.
+- [ ] Select architecture by verified integration + maintenance cost; no invented timing/scores or automatic preference for reuse/custom.

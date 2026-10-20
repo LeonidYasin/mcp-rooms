@@ -1,7 +1,7 @@
 # M2b.2 — private derivative file primitives
 
 Internal opt-in implementation; not a public upload API, media manifest or owner
-permission system. Exact-SHA CI acceptance is recorded separately after checks.
+permission system. [Exact-SHA CI acceptance](ci-m2b2.md) covers only these primitives.
 Existing servers do not import/start/migrate this layer automatically.
 
 ## Trust boundary

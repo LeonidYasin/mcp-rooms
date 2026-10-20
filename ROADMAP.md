@@ -221,7 +221,7 @@ Documentation publication is not application rollout or approval to merge main.
 
 - [x] Prepare fixed-root dirfd layer, exclusive files, durable writes and digest reads.
 - [x] Prepare bounded inventory quotas, symlink/hardlink/FIFO, corruption, I/O and concurrency fixtures.
-- [ ] Accept exact-SHA CI and record evidence.
+- [x] Exact-SHA CI at `4eebfce4`: Python3.12 330 passed/2 warnings; application matrix and docs QA green. [Evidence](docs/ci-m2b2.md).
 - [ ] Add persisted owner-authorized media reservations/manifests; no raw-key read API.
 - [ ] Add reconciliation/retention and consistent DB+files recovery.
 

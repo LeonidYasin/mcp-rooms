@@ -244,3 +244,12 @@ reviewed contract parity and a pinned compatibility-adapter migration are ready.
 Never overwrite an embedded DB, auto-map GitHub IDs to UUID users, or maintain two
 indefinitely hand-edited copies. Source/schema/data migration requires a separate
 plan and operator approval. No PyPI release or production readiness is claimed.
+
+
+### Internal photo pipeline checkpoint
+
+The optional resource-limited decoder worker and private durable derivative file
+primitives are checked in [M2b.1](docs/ci-m2b1.md) and [M2b.2 CI](docs/ci-m2b2.md).
+This is not an upload/publish API: OS sandbox, persisted owner-authorized media
+manifests, attachment/consent and lifecycle remain separate gates. No Rooms
+production deployment is claimed.

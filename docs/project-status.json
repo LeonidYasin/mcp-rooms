@@ -86,11 +86,11 @@
     {
       "id": "media_files",
       "title": "Приватные файлы производных фото",
-      "stage": "SOURCE",
-      "summary": "Подготовлен внутренний dirfd/O_EXCL/fsync слой, bounded inventory/quota и digest read. Без owner ACL/manifest/API.",
+      "stage": "CI",
+      "summary": "В CI проверены private dirfd/O_EXCL/fsync слой, bounded inventory/quota, digest read и pipeline worker → file. Owner ACL/manifest/API ещё не реализованы.",
       "doc": "docs/media-private-files.md",
       "source": "src/mcp_rooms/media_files.py",
-      "evidence": null,
+      "evidence": "docs/ci-m2b2.md",
       "depends_on": [
         "worker"
       ]

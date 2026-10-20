@@ -21,6 +21,14 @@ Only isolated Rooms TEST was deployed, then stopped; retained DB is not a runnin
 service. A reviewed merge of the baseline alpha and a production deployment are
 separate decisions. CI tests/builds but does not deploy the VPS.
 
+## Marketplace architecture decision
+
+[ADR-001](docs/decisions/001-marketplace-foundation.md): continue a **minimal own
+Python/SQLite modular marketplace domain**, reusing supported infrastructure. Reuse
+engines remain references/fallbacks, not mandatory foundations. This is an MVP direction,
+not proof of runtime superiority or production approval. [Acceptance contract](docs/marketplace-conformance.md)
+is specified, not yet an executed integration suite.
+
 ## Qwen Desktop and next product phase
 
 [Completed reuse research / candidate decision gates](docs/marketplace-research-final.md):

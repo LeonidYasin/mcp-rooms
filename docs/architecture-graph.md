@@ -1,5 +1,8 @@
 # Граф связей и границ доверия
 
+Текущее направление: [ADR-001 — минимальный собственный Python/SQLite domain](decisions/001-marketplace-foundation.md).
+[Общий контракт приёмки](marketplace-conformance.md) описан, но не выполнен.
+
 Проектная схема следующего этапа, не схема уже работающего production.
 Связи описаны для запланированных компонентов; только room core/identity/operator CLI
 и Qwen adapter реализованы в базовом alpha. Web preview и listing_contract — первый
@@ -26,7 +29,8 @@ flowchart TB
   L --> R
   O --> L
   O --> PRIVATE[Приватные переговоры · план]
-  PRIVATE --> R
+  PRIVATE --> RESPONSEDB[Изолированные response / participant ACL · план]
+  RESPONSEDB --> DB
   L --> DB[(Одна standalone SQLite)]
   R --> DB
   O --> DB

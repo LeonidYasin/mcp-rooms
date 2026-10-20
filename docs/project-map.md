@@ -1,5 +1,8 @@
 # Project map
 
+Текущее направление: [ADR-001 — минимальный собственный Python/SQLite domain](decisions/001-marketplace-foundation.md).
+[Общий контракт приёмки](marketplace-conformance.md) описан, но не выполнен.
+
 ```text
 Notion personal static-Bearer connection ──────────────────┐
 Qwen Desktop → local loopback header adapter (.env secret) ├→ HTTPS /rooms-test/mcp

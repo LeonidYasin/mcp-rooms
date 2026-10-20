@@ -128,3 +128,17 @@ market features, main merge or VPS change is implied. Existing Rooms pilot remai
 - [ ] Define shared backend-independent conformance contract and negative cases.
 - [ ] Verify bounded finalist slices in approved CI/test environment; no vendor-core edits, shared-admin shortcut or duplicate writable catalog.
 - [ ] Select architecture by verified integration + maintenance cost; no invented timing/scores or automatic preference for reuse/custom.
+
+## Concrete outcome after candidate review
+
+- [x] Select bounded own Python/SQLite modular domain as the next MVP direction; [ADR-001](docs/decisions/001-marketplace-foundation.md). No WordPress/Osclass install or second identity store.
+- [x] Specify common backend-independent [conformance cases](docs/marketplace-conformance.md); NOT an implemented or passed integration suite.
+- [ ] Slice 1: persistent category/draft + atomic CAS/idempotency + unchanged room compatibility.
+- [ ] Slice 2: validated photos, preview/content-bound consent, public card/search/unpublish.
+- [ ] Slice 3: same application commands via safe browser sessions and scoped listing MCP.
+- [ ] Slice 4: private response and isolated minimal admin MCP/moderation/audit.
+- [ ] Slice 5: CI acceptance/recovery/capacity, separately approved operator TEST, real-item/independent-response evidence.
+
+The historical candidate-evaluation checklist above is superseded by ADR-001 for work
+ordering; runtime comparison/deployment claims remain unproven. Reopen alternative
+evaluation only for a documented blocker or a concrete better maintenance trade-off.

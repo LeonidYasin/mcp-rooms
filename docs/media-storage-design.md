@@ -113,3 +113,11 @@ implementation. This overall storage document remains SPEC.
 [Private filesystem primitives](media-private-files.md) prepare durable derivative
 bytes and integrity reads only. Ownership, reservations/manifests, attach and
 reconciliation remain SPEC. Never expose filesystem read by blob key to clients.
+
+
+## M2b.3 implementation boundary
+
+[Owner-authorized private staging](media-staging.md) adds opt-in SQLite reservations
+and private STAGED manifests with before/after credential/draft checks. Attachment,
+rolling retention/budget reclamation, reconciliation/recovery and public APIs remain
+SPEC. Expired/failed rows do not silently release their reserved file budget.

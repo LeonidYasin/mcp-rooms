@@ -79,6 +79,7 @@ nav:
     - Media worker и storage: docs/media-storage-design.md
     - Decode worker: docs/media-worker.md
     - Private photo files: docs/media-private-files.md
+    - Private media staging: docs/media-staging.md
     - Web: docs/web-marketplace-plan.md
     - Отдельный admin MCP: docs/admin-mcp-design.md
   - Комнаты и клиенты:

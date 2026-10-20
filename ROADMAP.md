@@ -226,3 +226,14 @@ Documentation publication is not application rollout or approval to merge main.
 - [ ] Add reconciliation/retention and consistent DB+files recovery.
 
 [Boundary](docs/media-private-files.md). No public upload, attachment or publication yet.
+
+
+## M2b.3 — owner-authorized private staging
+
+- [x] Prepare opt-in SQLite staging, fixed-budget reservations, resource/draft/owner checks and safe replay.
+- [x] Prepare revoke/change-during-decode, read recheck, quota/retry/concurrency and pipeline fixtures.
+- [ ] Accept exact-SHA CI; record evidence.
+- [ ] Versioned photo attachment and ordered manifest/preview consent.
+- [ ] Reviewable reconciliation/retention and safe budget reclamation/recovery.
+
+[Staging boundary](docs/media-staging.md): no public API, attach, scope issuance or VPS migration.

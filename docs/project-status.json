@@ -96,6 +96,21 @@
       ]
     },
     {
+      "id": "media_stage",
+      "title": "Приватный staging и владелец фото",
+      "stage": "SOURCE",
+      "summary": "Подготовлены SQLite reservation/manifest, persisted owner/scope/resource rechecks, bounded admission и безопасный replay. Не attachment/publish; lifecycle ещё SPEC.",
+      "doc": "docs/media-staging.md",
+      "source": "src/mcp_rooms/media_stage.py",
+      "evidence": null,
+      "depends_on": [
+        "identity",
+        "drafts",
+        "worker",
+        "media_files"
+      ]
+    },
+    {
       "id": "media",
       "title": "Хранение и права на фото",
       "stage": "SPEC",
@@ -106,7 +121,8 @@
       "depends_on": [
         "identity",
         "worker",
-        "media_files"
+        "media_files",
+        "media_stage"
       ]
     },
     {

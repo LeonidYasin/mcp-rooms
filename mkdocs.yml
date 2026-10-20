@@ -10,6 +10,10 @@ theme:
   language: ru
   font: false
   palette:
+    - media: '(prefers-color-scheme)'
+      toggle:
+        icon: material/brightness-auto
+        name: Светлая тема
     - media: '(prefers-color-scheme: light)'
       scheme: default
       primary: white
@@ -23,7 +27,7 @@ theme:
       accent: light blue
       toggle:
         icon: material/weather-sunny
-        name: Светлая тема
+        name: Как в системе
   features:
     - navigation.sections
     - navigation.top

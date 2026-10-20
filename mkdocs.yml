@@ -80,7 +80,7 @@ nav:
     - Identity: docs/identity.md
     - API комнат: docs/api.md
     - Регистрация: docs/registration.md
-    - Qwen Desktop: clients/qwen/README.md
+    - Qwen Desktop: clients/qwen/overview.md
     - Эксплуатация: docs/operations.md
   - Проверки и исследования:
     - Исторический пилот: docs/acceptance-2026-10-19.md

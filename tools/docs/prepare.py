@@ -6,6 +6,7 @@ from urllib.parse import quote, urlsplit
 from html import escape
 import json
 import os
+import posixpath
 import re
 import shutil
 
@@ -49,6 +50,7 @@ assert not DEST.is_symlink()
 if DEST.exists(): shutil.rmtree(DEST)
 DEST.mkdir()
 allowed = {str(f) for f in paths}
+site_paths = {str(f): (f.parent / 'overview.md').as_posix() if f.name == 'README.md' else f.as_posix() for f in paths}
 manifest = []
 
 def provenance(path):
@@ -70,13 +72,16 @@ for f in paths:
         assert raw.is_relative_to(ROOT), ('Escaping link', f, target)
         rel = raw.relative_to(ROOT).as_posix()
         assert raw.exists(), ('Broken local doc link', f, target)
-        if rel in allowed: return match.group(0)
+        if rel in allowed:
+            dest = posixpath.relpath(site_paths[rel], posixpath.dirname(site_paths[str(f)]) or '.')
+            if u.fragment: dest += '#' + u.fragment
+            return '[' + label + '](' + dest + ')'
         assert not raw.is_symlink()
         dest = REPO + ('/tree/' if raw.is_dir() else '/blob/') + SHA + '/' + quote(rel, safe='/')
         if u.fragment: dest += '#' + u.fragment
         return '[' + label + '](' + dest + ')'
     text = re.sub(r'\[([^]\n]+)\]\(([^)\s]+)\)', link, text)
-    out = DEST / f
+    out = DEST / site_paths[str(f)]
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(text + provenance(str(f)))
     manifest.append({'path':str(f), 'sha256':sha256(data).hexdigest()})
@@ -110,7 +115,7 @@ home = """# Рынок возможностей из вашего чата с И
 | Приватные черновики и intent | SOURCE + CI, не публичный API | [Контракт](docs/publication-intent.md) |
 | Нормализация фото | SOURCE + CI, не публичная загрузка | [Лимиты и границы](docs/media-image-safety.md) |
 | Web, публикация, приватный отклик, admin MCP | SPEC / следующий этап | [Карта](map.md) |
-| Main / production | Не выпуск этой alpha-ветки | [Состояние репозитория](README.md) |
+| Main / production | Не выпуск этой alpha-ветки | [Состояние репозитория](overview.md) |
 
 ## Версия, которую вы читаете
 
@@ -131,7 +136,7 @@ text += '**TEST** — историческая изолированная про
 text += '[Продуктовая mindmap](docs/product-mindmap.md) · [Архитектура и ER](docs/architecture-graph.md) · [Roadmap](ROADMAP.md)\n\n'
 text += '## Компоненты и доказательства\n\n<div class="component-grid">\n'
 for n in NODES:
-    docurl = n['doc'][:-3] + '/'
+    docurl = site_paths[n['doc']][:-3] + '/'
     text += '<section class="component-card" id="' + n['id'] + '"><span class="stage stage-' + n['stage'].lower() + '">' + n['stage'] + '</span><h3>' + escape(n['title']) + '</h3><p>' + escape(n['summary']) + '</p>'
     text += '<a href="../' + docurl + '">Контракт и документация</a>'
     if n['source']: text += ' · <a href="' + REPO + '/blob/' + SHA + '/' + quote(n['source']) + '">Код версии</a>'

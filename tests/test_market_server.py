@@ -87,7 +87,7 @@ def test_actual_bearer_draft_workflow_and_cross_user_acl(market):
     assert tool(x.client,x.tb,'listings_get',listing_id=lid)['error']=='draft_unavailable'
     assert tool(x.client,x.tb,'listings_publication_status',listing_id=lid)['error']=='draft_unavailable'
     own=tool(x.client,x.ta,'listings_list_own')
-    assert len(own['listings'])==1
+    assert len(own['items'])==1
     categories=tool(x.client,x.ta,'listings_categories',parent_id='plumbing')
     assert categories['ok']
     updated=tool(x.client,x.ta,'listings_update',listing_id=lid,content={**CONTENT,'title':'Updated synthetic'},category_id='toilets',expected_revision=1,client_id=key())
@@ -203,3 +203,31 @@ def test_missing_namespace_refused_without_startup_migration(market):
     with pytest.raises(RoomError,match='unsupported_publication_schema'):create_app(x.store.path,RESOURCE,market=x.adapter)
     with x.store._db() as db:
         assert not db.execute("SELECT 1 FROM sqlite_master WHERE name='publication_audit'").fetchone()
+
+
+def test_http_delegation_preserves_listing_scopes_and_expiry(market):
+    x=market;headers={'Authorization':'Bearer '+x.ta}
+    assert x.client.post('/credentials',headers=headers,json={'scopes':['admin:all']}).status_code==400
+    response=x.client.post('/credentials',headers=headers,json={})
+    assert response.status_code==201 and response.headers['cache-control']=='no-store'
+    data=response.json();actor=x.auth.authenticate(data['key'])
+    assert actor.user_id==x.a and actor.scopes==LISTING_SCOPES
+    assert data['expires_at']==x.ma['expires_at'] and data['expiry_bounded_by_source'] is True
+    assert actor.credential_id!=x.ma['credential_id'] and x.auth.authenticate(x.ta)
+    assert create(x,data['key'])['ok']
+    assert x.client.delete('/credentials/current',headers=headers).status_code==200
+    assert rpc(x.client,x.ta,'tools/list').status_code==401
+    assert rpc(x.client,data['key'],'tools/list').status_code==200
+
+
+def test_revoke_between_gate_and_delegation_cannot_issue(market,monkeypatch):
+    x=market;gate=x.client.app;original=gate.auth.delegate_current
+    with x.store._db() as db:count=db.execute('SELECT COUNT(*) FROM credentials').fetchone()[0]
+    def revoke_first(principal):
+        x.auth.revoke(principal.credential_id)
+        return original(principal)
+    monkeypatch.setattr(gate.auth,'delegate_current',revoke_first)
+    response=x.client.post('/credentials',headers={'Authorization':'Bearer '+x.ta},json={})
+    assert response.status_code==409 and response.json()['error']=='authentication_required'
+    assert 'key' not in response.json()
+    with x.store._db() as db:assert db.execute('SELECT COUNT(*) FROM credentials').fetchone()[0]==count

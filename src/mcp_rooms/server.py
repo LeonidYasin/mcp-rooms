@@ -151,7 +151,7 @@ class BearerGate:
             except Exception:
                 return await self.reply(scope, receive, send, {'error': 'credential_unavailable'}, 503)
             return await self.reply(scope, receive, send, {'ok': True, 'key': raw, **metadata,
-                'previous_key_remains_active': True}, 201)
+                'previous_key_remains_active': True, 'expiry_bounded_by_source': True}, 201)
         if path == '/credentials/current':
             if method != 'DELETE':
                 raise RequestFailure('method_not_allowed', 405)

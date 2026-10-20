@@ -133,6 +133,8 @@ class IdentityStore:
             if (type(actual) is not list or not actual
                     or any(type(s) is not str or s not in self.allowed_scopes for s in actual)):
                 raise RoomError('authentication_required')
+            if any(type(s) is not str or s not in self.allowed_scopes for s in principal.scopes):
+                raise RoomError('insufficient_scope')
             scopes = sorted(principal.scopes)
             if not scopes or not set(scopes) <= set(actual):
                 raise RoomError('insufficient_scope')

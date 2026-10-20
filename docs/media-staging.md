@@ -1,7 +1,7 @@
 # M2b.3 — owner-authorized private media staging
 
 Internal opt-in service; not HTTP/MCP registration, attachment or publication.
-CI acceptance is recorded separately for the exact tested source SHA. No live
+[Exact-SHA CI acceptance](ci-m2b3.md) covers this internal staging slice. No live
 schema migration or new scope issuance is implied.
 
 ## Contract and boundaries

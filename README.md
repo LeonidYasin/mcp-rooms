@@ -250,6 +250,8 @@ plan and operator approval. No PyPI release or production readiness is claimed.
 
 The optional resource-limited decoder worker and private durable derivative file
 primitives are checked in [M2b.1](docs/ci-m2b1.md) and [M2b.2 CI](docs/ci-m2b2.md).
-This is not an upload/publish API: OS sandbox, persisted owner-authorized media
-manifests, attachment/consent and lifecycle remain separate gates. No Rooms
+[Owner-authorized private staging](docs/ci-m2b3.md) adds opt-in SQLite reservations
+and private manifests with fresh credential/draft checks. This is not an
+upload/publish API: OS sandbox, attachment/consent, safe quota reclamation and
+lifecycle/recovery remain separate gates. No Rooms
 production deployment is claimed.

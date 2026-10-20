@@ -222,7 +222,7 @@ Documentation publication is not application rollout or approval to merge main.
 - [x] Prepare fixed-root dirfd layer, exclusive files, durable writes and digest reads.
 - [x] Prepare bounded inventory quotas, symlink/hardlink/FIFO, corruption, I/O and concurrency fixtures.
 - [x] Exact-SHA CI at `4eebfce4`: Python3.12 330 passed/2 warnings; application matrix and docs QA green. [Evidence](docs/ci-m2b2.md).
-- [ ] Add persisted owner-authorized media reservations/manifests; no raw-key read API.
+- [x] Add persisted owner-authorized media reservations/manifests in M2b.3; no raw-key read API. [Evidence](docs/ci-m2b3.md).
 - [ ] Add reconciliation/retention and consistent DB+files recovery.
 
 [Boundary](docs/media-private-files.md). No public upload, attachment or publication yet.
@@ -232,7 +232,7 @@ Documentation publication is not application rollout or approval to merge main.
 
 - [x] Prepare opt-in SQLite staging, fixed-budget reservations, resource/draft/owner checks and safe replay.
 - [x] Prepare revoke/change-during-decode, read recheck, quota/retry/concurrency and pipeline fixtures.
-- [ ] Accept exact-SHA CI; record evidence.
+- [x] Exact-SHA CI at `d2a405a8`: Python3.12 368 passed/2 warnings; Python3.10 319 passed/30 skipped/2 warnings; application matrix + docs QA green. [Evidence](docs/ci-m2b3.md).
 - [ ] Versioned photo attachment and ordered manifest/preview consent.
 - [ ] Reviewable reconciliation/retention and safe budget reclamation/recovery.
 

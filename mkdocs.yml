@@ -1,8 +1,6 @@
 site_name: MCP Rooms · Карта проекта
 site_description: Версионируемая документация открытого MCP-first рынка возможностей
 site_url: https://leonidyasin.github.io/mcp-rooms/
-repo_url: https://github.com/LeonidYasin/mcp-rooms
-repo_name: LeonidYasin/mcp-rooms
 docs_dir: .pages-src
 site_dir: .pages-site
 use_directory_urls: true

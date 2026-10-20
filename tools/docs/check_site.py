@@ -62,6 +62,11 @@ with sync_playwright() as pw:
             page.wait_for_function('window.docsDiagrams && window.docsDiagrams.ready',timeout=60000)
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'),(route,width,'page overflow')
             page.screenshot(path=str(SHOTS/f'{name}-{label}.png'),full_page=False)
+            if name=='mindmap':
+                page.locator('button[data-diagram-scale="actual"]').first.click()
+                page.locator('.diagram-tools').first.scroll_into_view_if_needed()
+                page.screenshot(path=str(SHOTS/f'mindmap-zoom-{label}.png'),full_page=False)
+                assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
         if label=='mobile':
             page.goto(base+'/')
             page.locator('.md-header label[for="__drawer"]').click()

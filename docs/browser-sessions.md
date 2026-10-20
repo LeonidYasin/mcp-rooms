@@ -1,6 +1,6 @@
 # M3b.1 — отдельное ядро браузерных сессий
 
-**SOURCE до exact-SHA CI; не web login, не форма и не production.**
+**CI: [точный принятый SHA и доказательства](ci-m3b1.md); не web login, не форма и не production.**
 [Следующий слой после private HTTP upload](media-http.md). Отдельный credential
 namespace `bs1_…`, не MCP `rm1_…`; digest-only SQLite storage в той же private DB.
 `BrowserSessions(drafts).initialize()` — явная additive browser schema1, без

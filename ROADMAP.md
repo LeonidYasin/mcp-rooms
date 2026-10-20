@@ -1,10 +1,10 @@
 # MCP Rooms roadmap
 
-Current checkpoint: [M3a.2 CI](docs/ci-m3a2.md), opt-in private photo HTTP for browser and agent,
-plus [M3a.1 listing MCP](docs/ci-m3a1.md).
-In review: [M3b.1 browser session core](docs/browser-sessions.md).
-Continuation state: [AI handoff](docs/ai-handoff.md) / [work-state](docs/work-state.json).
-Next: same-origin browser HTTP auth/onboarding, then form; [6 remaining milestones to useful external TEST](docs/deployment-readiness.md).
+Current checkpoint: [M3b.1 CI](docs/ci-m3b1.md), separate bounded browser session core
+and repository-native [AI handoff](docs/ai-handoff.md) / [work-state](docs/work-state.json).
+Built on [private photo HTTP](docs/ci-m3a2.md) and [listing MCP](docs/ci-m3a1.md).
+Next: M3b.2 same-origin browser HTTP auth/onboarding, then draft/photo form;
+[6 remaining milestones to useful external TEST](docs/deployment-readiness.md).
 Older sections retain historical acceptance boundaries; they are not promises of a live service.
 
 ## Source extraction / private-pilot alpha

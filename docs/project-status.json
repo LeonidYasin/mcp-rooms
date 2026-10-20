@@ -193,7 +193,8 @@
       "depends_on": [
         "publish",
         "user_market_mcp",
-        "media_http"
+        "media_http",
+        "browser_sessions"
       ]
     },
     {
@@ -263,11 +264,11 @@
     {
       "id": "browser_sessions",
       "title": "Ядро браузерных сессий",
-      "stage": "SOURCE",
+      "stage": "CI",
       "summary": "Отдельный digest-only namespace, least-privilege scopes, parent revoke/expiry, idle/absolute TTL и CSRF primitive. Не HTTP login, не форма.",
       "doc": "docs/browser-sessions.md",
       "source": "src/mcp_rooms/browser_sessions.py",
-      "evidence": null,
+      "evidence": "docs/ci-m3b1.md",
       "depends_on": [
         "identity",
         "drafts"

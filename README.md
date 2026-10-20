@@ -21,6 +21,7 @@ are not part of this server. GitHub is only the source hosting / CI platform.
 
 ## Continue development — for a new AI chat
 
+**Use branch `feat/standalone-identity`, not the old default main scaffold.**
 Start with [AGENTS.md](AGENTS.md), [AI handoff](docs/ai-handoff.md) and
 [machine-readable work state](docs/work-state.json). They identify the accepted code
 SHA, evidence, current slice, next task and owner permission gates. No past chat required.
@@ -58,11 +59,12 @@ is not yet accepted.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [M3a.2](docs/ci-m3a2.md), application source
-`bca0c8a0ea0336125f928edf196c927a5d6678ed`: Python3.12 539 passed.
-Opt-in private binary photo HTTP for people/agents, plus12 scoped listing MCP tools
-on top of8 rooms. Default CLI stays rooms-only; signup does not grant listing scopes.
-Browser session core is the next bounded slice — see work-state for SOURCE vs CI.
+**Latest accepted checkpoint:** [M3b.1](docs/ci-m3b1.md), application source
+`ce8f1ea1d90628e98c9b0421ebaad243039db977`: Python3.12 580 passed.
+Separate bounded browser session core (no HTTP wiring yet), plus
+[M3a.2 private photo HTTP](docs/ci-m3a2.md) and12 scoped listing MCP tools on top of8 rooms.
+Default CLI stays rooms-only; signup does not grant listing scopes.
+Next: same-origin browser HTTP/session/onboarding, then draft/photo/preview form.
 No browser login/form, public marketplace or VPS rollout yet.
 [Six remaining stages to useful external TEST](docs/deployment-readiness.md).
 

@@ -4,18 +4,18 @@
   "branch": "feat/standalone-identity",
   "pull_request": 1,
   "accepted": {
-    "source_sha": "bca0c8a0ea0336125f928edf196c927a5d6678ed",
-    "evidence": "docs/ci-m3a2.md",
-    "python312_passed": 539,
+    "source_sha": "ce8f1ea1d90628e98c9b0421ebaad243039db977",
+    "evidence": "docs/ci-m3b1.md",
+    "python312_passed": 580,
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
     "id": "M3b.1",
-    "stage": "SOURCE",
+    "stage": "CI",
     "contract": "docs/browser-sessions.md",
     "source": "src/mcp_rooms/browser_sessions.py",
     "tests": "tests/test_browser_sessions.py",
-    "evidence": null
+    "evidence": "docs/ci-m3b1.md"
   },
   "next_task": {
     "id": "M3b.2",

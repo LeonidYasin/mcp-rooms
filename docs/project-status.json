@@ -192,7 +192,8 @@
       "evidence": null,
       "depends_on": [
         "publish",
-        "user_market_mcp"
+        "user_market_mcp",
+        "media_http"
       ]
     },
     {
@@ -249,11 +250,11 @@
     {
       "id": "media_http",
       "title": "Приватная HTTP-загрузка фото",
-      "stage": "SOURCE",
+      "stage": "CI",
       "summary": "Общий бинарный transport для будущей web-формы и агента: owner/revision/scopes, bounded body, private JPEG read. Explicit opt-in; не публичная публикация и не VPS.",
       "doc": "docs/media-http.md",
       "source": "src/mcp_rooms/media_http.py",
-      "evidence": null,
+      "evidence": "docs/ci-m3a2.md",
       "depends_on": [
         "user_market_mcp",
         "photo_drafts"

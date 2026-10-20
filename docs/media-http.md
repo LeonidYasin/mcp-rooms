@@ -1,6 +1,6 @@
 # M3a.2 — приватная бинарная загрузка для человека и агента
 
-**SOURCE, до приёмки точного SHA в CI. Не внешний endpoint и не production.**
+**CI: [точный принятый SHA и проверки](ci-m3a2.md). Не внешний endpoint и не production.**
 Над [staging](media-staging.md) добавлен отдельный opt-in HTTP transport.
 Обычный CLI остаётся rooms-only. Даже `market=adapter` не включает загрузку:
 нужен явный `create_app(..., market=adapter, media_http=True)` с подготовленными

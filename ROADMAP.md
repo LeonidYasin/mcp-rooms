@@ -1,7 +1,7 @@
 # MCP Rooms roadmap
 
-Current checkpoint: [M3a.1 CI](docs/ci-m3a1.md), opt-in authenticated listing MCP.
-In review: [M3a.2 private HTTP photo upload](docs/media-http.md), for browser and agent.
+Current checkpoint: [M3a.2 CI](docs/ci-m3a2.md), opt-in private photo HTTP for browser and agent,
+plus [M3a.1 listing MCP](docs/ci-m3a1.md).
 Next: browser user auth/session/onboarding and form; [6 remaining milestones to useful external TEST](docs/deployment-readiness.md).
 Older sections retain historical acceptance boundaries; they are not promises of a live service.
 

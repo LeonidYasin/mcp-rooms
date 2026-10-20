@@ -73,4 +73,4 @@ GitHub Pages — версионируемая документация, а не 
 
 [Приватный бинарный HTTP upload/read](media-http.md) общий для человека и агента.
 Explicit opt-in, без web-формы, public photo route и автоматической marketplace
-регистрации. До exact-SHA CI это SOURCE. Первый из 6 этапов ещё не завершён.
+регистрации. [Приёмка M3a.2 в CI](ci-m3a2.md) завершена; первый из 6 этапов ещё не завершён.

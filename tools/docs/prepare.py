@@ -115,7 +115,8 @@ home = """# Рынок возможностей из вашего чата с И
 | Приватные черновики и intent | SOURCE + CI, не публичный API | [Контракт](docs/publication-intent.md) |
 | Нормализация фото | SOURCE + CI, не публичная загрузка | [Лимиты и границы](docs/media-image-safety.md) |
 | Публикация и user MCP | CI, явный opt-in; default CLI rooms-only | [Проверки](docs/ci-m3a1.md) |
-| Web/upload/onboarding, приватный отклик, admin MCP | SPEC / следующий этап | [Карта](map.md) |
+| Private photo HTTP | CI, opt-in; общий transport для человека и агента, пока без формы | [Проверки](docs/ci-m3a2.md) |
+| Web/onboarding, приватный отклик, admin MCP | SPEC / следующий этап | [Карта](map.md) |
 | Main / production | Не выпуск этой alpha-ветки | [Состояние репозитория](overview.md) |
 
 ## Версия, которую вы читаете

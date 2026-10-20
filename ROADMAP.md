@@ -244,7 +244,7 @@ Documentation publication is not application rollout or approval to merge main.
 - [x] Prepare bounded read-only plan and exact snapshot/store binding.
 - [x] Prepare PURGING/PURGED, durable absence before quota release, retained bounded receipts.
 - [x] Coordinate stage writes with cleanup, including late worker and interrupted cleanup fixtures.
-- [ ] Accept exact-SHA GitHub CI; record evidence.
+- [x] Exact-SHA CI at `f5a7aada`: Python3.12 395 passed/2 warnings; Python3.10 346 passed/30 skipped/2 warnings; application matrix +13-diagram docs QA green. [Evidence](docs/ci-m2b4.md).
 - [ ] Explicit orphan recovery, complete DB+files restore and receipt compaction policy.
 - [ ] Operator/admin authorization, scheduling and approved OS TEST; no automatic cleanup enabled.
 

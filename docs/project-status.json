@@ -87,10 +87,10 @@
       "id": "media_files",
       "title": "Приватные файлы производных фото",
       "stage": "CI",
-      "summary": "В CI проверены private dirfd/O_EXCL/fsync слой, bounded inventory/quota, digest read и pipeline worker → file. Owner ACL/manifest/API ещё не реализованы.",
+      "summary": "Приватные dirfd/O_EXCL/fsync, quota/digest read и общий guard writer/cleanup проверены CI. Права/manifest — отдельный staging; не direct API.",
       "doc": "docs/media-private-files.md",
       "source": "src/mcp_rooms/media_files.py",
-      "evidence": "docs/ci-m2b2.md",
+      "evidence": "docs/ci-m2b4.md",
       "depends_on": [
         "worker"
       ]
@@ -99,10 +99,10 @@
       "id": "media_stage",
       "title": "Приватный staging и владелец фото",
       "stage": "CI",
-      "summary": "В CI проверены SQLite reservations/приватный STAGED manifest, owner/scope/resource rechecks, replay и гонки revoke/revision. Без attach/publish; lifecycle ещё SPEC.",
+      "summary": "Private STAGED manifest и schema2: persisted owner/scope/resource rechecks, replay и coordinated write/cleanup проверены CI. Без attachment/publish.",
       "doc": "docs/media-staging.md",
       "source": "src/mcp_rooms/media_stage.py",
-      "evidence": "docs/ci-m2b3.md",
+      "evidence": "docs/ci-m2b4.md",
       "depends_on": [
         "identity",
         "drafts",
@@ -113,11 +113,11 @@
     {
       "id": "media_cleanup",
       "title": "Проверяемая очистка и возврат квот",
-      "stage": "SOURCE",
-      "summary": "Подготовлены read-only plan, snapshot recheck, PURGING/PURGED, durable absence и tombstones. Не автоматический orphan sweep и не admin API.",
+      "stage": "CI",
+      "summary": "В CI проверены dry-run/recheck, PURGING/PURGED, durable absence, возврат квот, tombstones и гонки writer/cleanup. Orphans блокируют удаление; не admin API.",
       "doc": "docs/media-cleanup.md",
       "source": "src/mcp_rooms/media_cleanup.py",
-      "evidence": null,
+      "evidence": "docs/ci-m2b4.md",
       "depends_on": [
         "media_stage",
         "media_files"
@@ -127,7 +127,7 @@
       "id": "media",
       "title": "Хранение и права на фото",
       "stage": "SPEC",
-      "summary": "Интеграция фото: attachment, ordered preview, retention/reconciliation и recovery ещё SPEC. Worker, файлы и private staging проверены отдельно в CI.",
+      "summary": "Остались attachment, ordered preview, явный orphan recovery и полный DB+files restore. Worker/files/staging и reviewed retention проверены отдельно в CI.",
       "doc": "docs/media-storage-design.md",
       "source": null,
       "evidence": null,

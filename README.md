@@ -252,6 +252,8 @@ The optional resource-limited decoder worker and private durable derivative file
 primitives are checked in [M2b.1](docs/ci-m2b1.md) and [M2b.2 CI](docs/ci-m2b2.md).
 [Owner-authorized private staging](docs/ci-m2b3.md) adds opt-in SQLite reservations
 and private manifests with fresh credential/draft checks. This is not an
-upload/publish API: OS sandbox, attachment/consent, safe quota reclamation and
-lifecycle/recovery remain separate gates. No Rooms
+upload/publish API. [Reviewed retention](docs/ci-m2b4.md) adds dry-run, durable
+quota reclamation and retained receipts, not automatic orphan deletion or a public
+admin capability. OS sandbox, attachment/consent, orphan recovery, receipt compaction
+and full DB+files restore remain separate gates. No Rooms
 production deployment is claimed.

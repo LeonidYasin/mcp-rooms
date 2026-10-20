@@ -2,7 +2,7 @@
 
 Internal **operator-only** code, not a user capability, admin MCP, HTTP endpoint,
 CLI command or scheduled task. No operator has applied it on the VPS. Exact-SHA
-CI acceptance is recorded separately after checks. A plan digest is not authentication.
+[Exact-SHA CI acceptance](ci-m2b4.md) covers this internal retention slice. A plan digest is not authentication.
 
 ## Dry run before destructive work
 

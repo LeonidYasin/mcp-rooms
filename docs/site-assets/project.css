@@ -7,3 +7,8 @@
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
 .diagram-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:24px}.diagram-tools button{min-height:44px;padding:8px 12px;border:1px solid var(--md-default-fg-color--lightest);border-radius:6px;font:inherit;cursor:pointer;background:var(--md-default-bg-color);color:var(--md-default-fg-color)}.diagram-tools output{font-size:14px;margin-left:8px}.diagram-tools+.diagram-frame{margin-top:8px}.diagram-tools button:focus-visible{outline:3px solid #2783de;outline-offset:3px}
+
+/* Search results must wrap authored prose, not overflow the result drawer. */
+.md-search-result__teaser{white-space:normal!important;overflow-wrap:anywhere;word-break:normal;max-width:100%;font-size:14px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;max-height:6em;overflow:hidden!important}
+.md-search-result__teaser *{white-space:normal!important;max-width:100%;overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:0s!important}}

@@ -41,6 +41,7 @@ base=f'http://127.0.0.1:{server.server_port}'
 with sync_playwright() as pw:
     browser=pw.chromium.launch()
     page=browser.new_page(viewport={'width':1440,'height':1050},device_scale_factor=1)
+    page.emulate_media(reduced_motion='reduce')
     external=[]; errors=[]
     page.on('request',lambda req:external.append(req.url) if not req.url.startswith(base) and not req.url.startswith('data:') else None)
     page.on('pageerror',lambda err:errors.append(str(err)))
@@ -64,15 +65,16 @@ with sync_playwright() as pw:
             page.screenshot(path=str(SHOTS/f'{name}-{label}.png'),full_page=False)
             if name=='mindmap':
                 page.locator('button[data-diagram-scale="actual"]').first.click()
-                page.locator('.diagram-tools').first.scroll_into_view_if_needed()
-                page.screenshot(path=str(SHOTS/f'mindmap-zoom-{label}.png'),full_page=False)
+                page.locator('.diagram-frame').first.screenshot(path=str(SHOTS/f'mindmap-zoom-{label}.png'))
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
         if label=='mobile':
             page.goto(base+'/')
             page.locator('.md-header label[for="__drawer"]').click()
+            page.wait_for_function('document.querySelector(".md-sidebar--primary").getBoundingClientRect().left >= -1')
             page.screenshot(path=str(SHOTS/'menu-mobile.png'),full_page=False)
     page.emulate_media(color_scheme='dark')
     page.goto(base+'/')
+    page.wait_for_function('document.body.dataset.mdColorScheme === "slate"')
     page.screenshot(path=str(SHOTS/'home-dark.png'),full_page=False)
     # Built-in local search must return a known document.
     page.set_viewport_size({'width':1440,'height':1050})

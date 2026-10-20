@@ -29,6 +29,16 @@ engines remain references/fallbacks, not mandatory foundations. This is an MVP d
 not proof of runtime superiority or production approval. [Acceptance contract](docs/marketplace-conformance.md)
 is specified, not yet an executed integration suite.
 
+## Execution plan and current source slice
+
+- [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
+- [Private draft storage schema and transaction flow](docs/draft-storage-design.md).
+- `draft_store.py`: explicit opt-in private create/get/update with persisted access
+  rechecks, atomic revision/command receipts, quotas and a small category tree.
+  Not registered in MCP/HTTP; current enrollment still cannot issue listing scopes.
+- Shared domain primitives keep legacy RoomError/Principal aliases. No room schema
+  version or default startup migration change. CI evidence is separate from source.
+
 ## Qwen Desktop and next product phase
 
 [Completed reuse research / candidate decision gates](docs/marketplace-research-final.md):
@@ -48,8 +58,8 @@ No stack switch, implementation or deployment approved.
   First segments: C2C things/services, later structured rides/delivery.
 - [Standalone visual prototype](web/prototype/README.md), open `web/prototype/index.html`:
   demo only, no network/backend, no real listing/contact/transaction.
-- `listing_contract.py`: first pure validation/status/consent/public-projection source;
-  not persisted, not registered in MCP/HTTP, no existing scopes or schema changed.
+- `listing_contract.py`: pure validation/status/consent/public projection. Private
+  drafts now have an opt-in persistence slice; publication/media/public APIs remain absent.
 - [Real-item first-sale acceptance](docs/first-sale-acceptance.md): real photos and
   explicit publication; no fabricated demand. Current shared rooms are NOT private
   negotiations and are never silently exported onto the public web.

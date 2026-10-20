@@ -142,3 +142,16 @@ market features, main merge or VPS change is implied. Existing Rooms pilot remai
 The historical candidate-evaluation checklist above is superseded by ADR-001 for work
 ordering; runtime comparison/deployment claims remain unproven. Reopen alternative
 evaluation only for a documented blocker or a concrete better maintenance trade-off.
+
+## M1a source slice — no public integration
+
+- [x] Canonical [delivery plan](docs/delivery-plan.md): dependency graph, milestones, risk gates and evidence vocabulary.
+- [x] Shared domain primitives; backward-compatible RoomError/Principal aliases.
+- [x] Prepare explicit additive market namespace and small category hierarchy without room user_version/default startup changes.
+- [x] Prepare private draft persistence/reopen/owner access, persisted credential+resource+scope rechecks, atomic revision and command receipts.
+- [x] Prepare bounded lifetime caps and negative/concurrency/rollback/regression CI fixtures.
+- [ ] Exact-HEAD CI acceptance of this slice (source is not PASS evidence).
+- [ ] Full M1b lifecycle/read-list/category API/retention and command contracts.
+
+No signup scope expansion, registered listing tools/routes, media, publish, private response,
+admin MCP or live migration is implied. [Storage design](docs/draft-storage-design.md).

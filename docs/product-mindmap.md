@@ -156,3 +156,10 @@ mindmap
 24h TTL сообщений НЕ срок хранения объявления. UUID НЕ проверенный водитель/человек.
 Веб показывает опубликованные события, не внутренние рассуждения LLM.
 Фоновый агент, платежи, диспетчер и admin MCP пока не реализованы.
+
+## Исполнение и актуальная граница
+
+[План поставки](delivery-plan.md) — канонические зависимости/приёмка. M1a source:
+private drafts/category seed/atomic retries/CAS + CI fixtures; не новый работающий
+marketplace endpoint. Полный listing lifecycle/media/session/private response/admin
+ещё впереди. [Data/sequence schema](draft-storage-design.md).

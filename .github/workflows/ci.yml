@@ -28,4 +28,4 @@ jobs:
         run: |
           python -m pip install --force-reinstall --no-deps dist/*.whl
           cd /tmp
-          python -c 'from mcp_rooms.server import create_app; from mcp_rooms.identity import IdentityStore; from mcp_rooms.listing_contract import ListingContent'
+          python -c 'from mcp_rooms.server import create_app; from mcp_rooms.identity import IdentityStore; from mcp_rooms.listing_contract import ListingContent; from mcp_rooms.draft_store import DraftStore; from mcp_rooms.domain import Principal'

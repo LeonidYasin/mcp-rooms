@@ -56,3 +56,11 @@ Browser write требует session+CSRF; MCP write — scoped Bearer. Форм
 consent/media/session/admin isolation gates; наличие пилотных room PASS не переносится
 на новые ресурсы. Имена будущих методов и публичных URL определяются реализацией;
 этот документ не выдаёт несуществующие API за рабочие команды.
+
+## M1a mapping (SOURCE, до подтверждения exact-SHA CI)
+
+`tests/test_draft_store.py` покрывает private storage части L-01/L-02/L-03/L-04/L-05,
+persisted credential rechecks из ID-02/ID-03, rollback и quotas из O-02, unchanged room
+namespace и media refusal. Это не полное исполнение этих IDs через web/MCP и не
+PASS всех требований. ID-01 listing enrollment, P/M/W/S/R/A/E cases и full O gates
+остаются NOT IMPLEMENTED / NOT RUN для нового marketplace.

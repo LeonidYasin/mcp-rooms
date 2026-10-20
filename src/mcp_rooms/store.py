@@ -9,14 +9,11 @@ import re
 import sqlite3
 import stat
 import time
-import unicodedata
 import uuid
 
 
-class RoomError(Exception):
-    def __init__(self, code, **details):
-        super().__init__(code)
-        self.code, self.details = code, details
+# Compatibility aliases: existing clients/tests keep the same exception identity.
+from .domain import DomainError as RoomError, identifier as _id, text as _text
 
 
 @dataclass(frozen=True)
@@ -31,21 +28,6 @@ class Limits:
     text: int = 500
     cadence_ms: int = 10000
     ttl_ms: int = 86400000
-
-
-def _text(value, maximum):
-    if not isinstance(value, str):
-        raise RoomError('invalid_text')
-    value = unicodedata.normalize('NFC', value).strip()
-    if not value or len(value) > maximum or any(unicodedata.category(c) == 'Cc' and c not in '\n\t' for c in value):
-        raise RoomError('invalid_text')
-    return value
-
-
-def _id(value):
-    if not isinstance(value, str) or not re.fullmatch(r'[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}', value):
-        raise RoomError('invalid_id')
-    return value
 
 
 def _limit(value):

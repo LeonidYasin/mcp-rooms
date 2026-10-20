@@ -6,8 +6,7 @@ transactional service must do those checks. Existing room scopes are unchanged.
 """
 from dataclasses import dataclass, replace
 import re
-from .identity import Principal
-from .store import RoomError, _id, _text
+from .domain import Principal, DomainError as RoomError, identifier as _id, text as _text
 
 MODES = frozenset({'pickup', 'shipping', 'online'})
 CATEGORIES = frozenset({'things', 'services', 'rides', 'delivery', 'other'})

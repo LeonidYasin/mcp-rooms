@@ -1,5 +1,4 @@
 """Local UUID and server-key identity. No network calls, passwords, or MCP admin methods."""
-from dataclasses import dataclass
 import hashlib
 import hmac
 import json
@@ -16,15 +15,8 @@ TOKEN = re.compile(r'rm1_([0-9a-f]{32})\.([A-Za-z0-9_-]{43})')
 UUID_BEARER = re.compile(r'[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}')
 
 
-@dataclass(frozen=True)
-class Principal:
-    user_id: str
-    credential_id: str
-    scopes: frozenset[str]
-
-    @property
-    def owner(self):
-        return 'user:' + self.user_id
+# Re-export preserves the existing identity.Principal import contract.
+from .domain import Principal
 
 
 def resource_url(value):

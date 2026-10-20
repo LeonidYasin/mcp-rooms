@@ -60,3 +60,14 @@ New isolated slice: pure `listing_contract.py` and CI fixtures; static responsiv
 methods/scopes, live web, private negotiation or admin endpoint implemented yet.
 [First-sale criteria](first-sale-acceptance.md) require a real item/photos/consent and
 independent discovery/reply; no automatic publication of old enrolled-only rooms.
+
+## Current source layout extension (not deployed)
+
+- `domain.py`: errors, principal, ID/text primitives; old imports re-export aliases.
+- `draft_store.py`: opt-in market schema + private draft application/persistence boundary.
+- `tests/test_draft_store.py`: synthetic transaction/access/concurrency/rollback fixtures.
+- [Delivery plan](delivery-plan.md), [draft data/sequence design](draft-storage-design.md).
+
+The earlier "no persistence" description refers to the prototype/initial contract.
+Private draft persistence now exists in source; no public listing API or migration at
+server startup exists. Generic IdentityStore issuance still rejects listing scopes.

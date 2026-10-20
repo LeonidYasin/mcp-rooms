@@ -5,8 +5,10 @@
 
 Проектная схема следующего этапа, не схема уже работающего production.
 Связи описаны для запланированных компонентов; только room core/identity/operator CLI
-и Qwen adapter реализованы в базовом alpha. Web preview и listing_contract — первый
-изолированный шаг, НЕ зарегистрированные публичные API.
+и Qwen adapter реализованы в базовом alpha. Private draft persistence добавляется
+изолированным opt-in слоем; web preview/listing contract НЕ публичные API.
+[Схема таблиц и последовательность транзакции](draft-storage-design.md);
+[план поставки и зависимости](delivery-plan.md).
 
 ## Компоненты и потоки
 

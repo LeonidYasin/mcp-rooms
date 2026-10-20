@@ -245,6 +245,19 @@
       "depends_on": [
         "pilot"
       ]
+    },
+    {
+      "id": "media_http",
+      "title": "Приватная HTTP-загрузка фото",
+      "stage": "SOURCE",
+      "summary": "Общий бинарный transport для будущей web-формы и агента: owner/revision/scopes, bounded body, private JPEG read. Explicit opt-in; не публичная публикация и не VPS.",
+      "doc": "docs/media-http.md",
+      "source": "src/mcp_rooms/media_http.py",
+      "evidence": null,
+      "depends_on": [
+        "user_market_mcp",
+        "photo_drafts"
+      ]
     }
   ]
 }

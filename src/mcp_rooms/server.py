@@ -43,8 +43,9 @@ async def read_body(receive, maximum):
 
 class BearerGate:
     """Per-request identity; self signup is explicit and opt-in, never implicit login."""
-    def __init__(self, app, auth, registration_enabled=False):
+    def __init__(self, app, auth, registration_enabled=False, media_http=None):
         self.app, self.auth = app, auth
+        self.media_http = media_http
         self.registration_enabled = registration_enabled
         self.enrollment = Enrollment(auth)
         parsed = urlsplit(auth.resource)
@@ -117,7 +118,8 @@ class BearerGate:
             except Exception:
                 return await self.reply(scope, receive, send, {'error': 'registration_unavailable'}, 503)
             return await self.reply(scope, receive, send, result, 200 if result['already_registered'] else 201)
-        if path not in {'/mcp', '/identity', '/credentials', '/credentials/current'}:
+        media_match = self.media_http.match(path) if self.media_http is not None else None
+        if media_match is None and path not in {'/mcp', '/identity', '/credentials', '/credentials/current'}:
             raise RequestFailure('not_found', 404)
         auth_values = values(b'authorization')
         principal = None
@@ -133,6 +135,8 @@ class BearerGate:
         if principal is None:
             return await self.reply(scope, receive, send, {'error': 'invalid_token'}, 401,
                                     {'WWW-Authenticate': 'Bearer realm="mcp-rooms"'})
+        if media_match is not None:
+            return await self.media_http.handle(scope, receive, send, principal, media_match)
         if path == '/identity':
             if method != 'GET':
                 raise RequestFailure('method_not_allowed', 405)
@@ -175,7 +179,9 @@ class BearerGate:
             CURRENT.reset(token)
 
 
-def create_app(database, resource, registration_enabled=False, *, market=None):
+def create_app(database, resource, registration_enabled=False, *, market=None, media_http=False):
+    if type(media_http) is not bool or (media_http and market is None):
+        raise RoomError('market_binding_mismatch')
     resource = resource_url(resource)
     if market is not None:
         from .market_adapter import MarketAdapter
@@ -247,7 +253,9 @@ def create_app(database, resource, registration_enabled=False, *, market=None):
             return [TextContent(type='text',text=json.dumps(result,ensure_ascii=False))]
         register_market_tools(mcp,call_market)
 
-    return BearerGate(mcp.streamable_http_app(), auth, registration_enabled)
+    from .media_http import MediaHTTP
+    return BearerGate(mcp.streamable_http_app(), auth, registration_enabled,
+                      MediaHTTP(market) if media_http else None)
 
 
 def main():

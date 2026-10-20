@@ -85,6 +85,7 @@ nav:
     - Photo draft preview: docs/photo-drafts.md
     - Publication core: docs/live-publication.md
     - User marketplace MCP: docs/user-market-mcp.md
+    - Photo HTTP upload: docs/media-http.md
     - Web: docs/web-marketplace-plan.md
     - Отдельный admin MCP: docs/admin-mcp-design.md
   - Комнаты и клиенты:

@@ -68,3 +68,9 @@ marketplace onboarding ещё остаются; целиком этап1 не з
 GitHub Pages — версионируемая документация, а не marketplace. Сохраняется отдельный
 [single-publisher Pages gate](ci-pages.md#remaining-single-publisher-configuration-gate):
 дублирующий branch/Jekyll publisher не считается выключенным от зелёного Actions job.
+
+## M3a.2 — следующий ограниченный срез
+
+[Приватный бинарный HTTP upload/read](media-http.md) общий для человека и агента.
+Explicit opt-in, без web-формы, public photo route и автоматической marketplace
+регистрации. До exact-SHA CI это SOURCE. Первый из 6 этапов ещё не завершён.

@@ -262,15 +262,16 @@ def test_method_and_path_allowlist(http):
     assert x.client.post(path(lid)+'/../elsewhere',headers=headers(x),content=b'x').status_code==404
 
 
-def test_send_error_does_not_attempt_second_response_and_releases_slot(http):
+@pytest.mark.parametrize('error',[OSError,TimeoutError])
+def test_send_error_does_not_attempt_second_response_and_releases_slot(http,error):
     x=http;lid=create(x)['listing']['id'];mid=upload(x,lid).json()['media_id'];starts=[]
     async def run():
         async def receive():raise AssertionError('GET must not read body')
         async def send(event):
             if event['type']=='http.response.start':starts.append(event)
-            else:raise OSError('synthetic disconnected transport')
+            else:raise error('synthetic disconnected transport')
         scope={'type':'http','method':'GET','path':path(lid,mid),'query_string':b'',
                'headers':[(b'host',b'rooms.example'),(b'authorization',('Bearer '+x.ta).encode())]}
         await x.gate(scope,receive,send)
-    with pytest.raises(OSError):anyio.run(run)
+    with pytest.raises(error):anyio.run(run)
     assert len(starts)==1 and x.gate.media_http.reads.active==0

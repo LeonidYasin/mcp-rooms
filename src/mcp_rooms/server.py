@@ -54,11 +54,21 @@ class BearerGate:
     async def __call__(self, scope, receive, send):
         if scope['type'] != 'http':
             return await self.app(scope, receive, send)
+        started = False
+        async def tracked_send(message):
+            nonlocal started
+            if message['type'] == 'http.response.start':
+                started = True
+            await send(message)
         try:
-            return await self.handle(scope, receive, send)
+            return await self.handle(scope, receive, tracked_send)
         except RequestFailure as exc:
+            if started:
+                raise
             return await self.reply(scope, receive, send, {'error': exc.code}, exc.status)
         except TimeoutError:
+            if started:
+                raise
             return await self.reply(scope, receive, send, {'error': 'request_timeout'}, 408)
 
     async def reply(self, scope, receive, send, payload, status=200, headers=None):

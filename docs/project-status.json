@@ -74,10 +74,10 @@
     {
       "id": "worker",
       "title": "Изоляция декодера",
-      "stage": "SPEC",
-      "summary": "Нужны OS CPU/RAM/timeout, ограниченная очередь и завершение зависшего worker. До публичной загрузки обязательно.",
-      "doc": "docs/media-storage-design.md",
-      "source": null,
+      "stage": "SOURCE",
+      "summary": "Подготовлен Linux subprocess worker: rlimits до Pillow, bounded pipes/deadline, 2 слота без очереди. Не OS sandbox; публичная загрузка закрыта.",
+      "doc": "docs/media-worker.md",
+      "source": "src/mcp_rooms/media_worker.py",
       "evidence": null,
       "depends_on": [
         "normalize"

@@ -3,7 +3,6 @@
 Untrusted decode must run in an OS-limited worker before public integration.
 No original bytes, filename, storage path, URL, identity or publication is accepted.
 """
-from dataclasses import dataclass
 from hashlib import sha256
 from io import BytesIO
 import warnings
@@ -11,23 +10,9 @@ import warnings
 from PIL import Image, ImageOps, UnidentifiedImageError
 from .domain import DomainError
 
-MAX_INPUT_BYTES = 8 * 1024 * 1024
-MAX_PIXELS = 12_000_000
-MAX_SIDE = 6000
-OUTPUT_SIDE = 1600
-MAX_OUTPUT_BYTES = 2 * 1024 * 1024
+from .media_contract import (MAX_INPUT_BYTES, MAX_PIXELS, MAX_SIDE, OUTPUT_SIDE,
+                             MAX_OUTPUT_BYTES, NormalizedPhoto)
 _MIMES = {'image/jpeg': 'JPEG', 'image/png': 'PNG'}
-
-
-@dataclass(frozen=True)
-class NormalizedPhoto:
-    data: bytes
-    sha256: str
-    width: int
-    height: int
-    source_format: str
-    content_type: str = 'image/jpeg'
-
 
 class _Output(BytesIO):
     def write(self, data):

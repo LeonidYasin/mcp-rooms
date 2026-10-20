@@ -204,3 +204,14 @@ About is proposed text for the owner's manual update, not an API metadata mutati
 Documentation publication is not application rollout or approval to merge main.
 
 - [ ] Single-publisher gate: owner selects Pages Source **GitHub Actions**, removing the competing branch/Jekyll build; next push + external source SHA verified. Custom deploy already passed; reliability is not inferred from one successful response. [Evidence](docs/ci-pages.md#remaining-single-publisher-configuration-gate).
+
+
+## M2b.1 — internal decode worker
+
+- [x] Prepare stdlib supervisor, one-shot child rlimits, bounded pipes/deadline and immediate admission.
+- [x] Prepare synthetic codec and failure fixtures; no local project execution.
+- [ ] Accept exact-SHA GitHub CI and record evidence.
+- [ ] Prove dedicated OS filesystem/network sandbox on operator-approved TEST.
+- [ ] Implement private staged derivatives, owner checks, durable manifests and reconciliation.
+
+[Worker boundary](docs/media-worker.md). No VPS, main, public upload or listing publication changed.

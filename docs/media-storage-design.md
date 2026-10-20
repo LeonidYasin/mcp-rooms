@@ -99,3 +99,10 @@ Content-Type, nosniff и cache/unpublish policy: невозможно обеща
   symlink/hardlink rejection, full disk/quota, expiry, integrity/reopen/recovery.
 - Отдельный operator TEST подтверждает OS sandbox/память/права и не трогает старые
   MCP сервисы. До этого SOURCE/CI не означает готовность public upload или PROD.
+
+
+## M2b.1 implementation boundary
+
+[One-shot resource-limited worker](media-worker.md) is prepared as an internal
+code slice. Its CI proof is separate from OS sandbox acceptance and storage
+implementation. This overall storage document remains SPEC.

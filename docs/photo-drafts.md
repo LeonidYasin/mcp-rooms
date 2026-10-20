@@ -1,7 +1,7 @@
 # M2c.1 — versioned private photos and exact preview
 
 Internal opt-in service, not a public listing or publish endpoint. Exact-SHA CI
-acceptance is recorded separately after checks. No VPS migration or scope issuance.
+acceptance is recorded in [M2c.1 evidence](ci-m2c1.md). No VPS migration or scope issuance.
 
 ## One canonical private record
 

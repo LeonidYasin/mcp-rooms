@@ -1,5 +1,9 @@
 # MCP Rooms roadmap
 
+Current checkpoint: [M2c.1 CI](docs/ci-m2c1.md), versioned private photo drafts.
+Next: live publisher, then the [7 milestones to useful external TEST](docs/deployment-readiness.md).
+Older sections retain historical acceptance boundaries; they are not promises of a live service.
+
 ## Source extraction / private-pilot alpha
 
 - [x] Owner approved public repository and MIT.
@@ -233,7 +237,7 @@ Documentation publication is not application rollout or approval to merge main.
 - [x] Prepare opt-in SQLite staging, fixed-budget reservations, resource/draft/owner checks and safe replay.
 - [x] Prepare revoke/change-during-decode, read recheck, quota/retry/concurrency and pipeline fixtures.
 - [x] Exact-SHA CI at `d2a405a8`: Python3.12 368 passed/2 warnings; Python3.10 319 passed/30 skipped/2 warnings; application matrix + docs QA green. [Evidence](docs/ci-m2b3.md).
-- [ ] Versioned photo attachment and ordered manifest/preview consent.
+- [x] Versioned photo attachment and ordered private preview/intent checked in M2c.1; live publication consent remains a separate gate.
 - [ ] Reviewable reconciliation/retention and safe budget reclamation/recovery.
 
 [Staging boundary](docs/media-staging.md): no public API, attach, scope issuance or VPS migration.
@@ -256,7 +260,7 @@ Documentation publication is not application rollout or approval to merge main.
 - [x] Prepare media schema3, atomic ordered photo links/content/revision/receipt.
 - [x] Prepare photo-aware text edits, verified preview/private intent v2, legacy bypass refusal.
 - [x] Prepare retention promotion/detach, eight-photo budget and revoke/race/intent fixtures.
-- [ ] Accept exact-SHA GitHub CI; record evidence.
+- [x] Exact-SHA CI at `0153bd98`: Python3.12 427 passed/2 warnings; Python3.10 378 passed/30 skipped/2 warnings; matrix +14-diagram docs QA green. [Evidence](docs/ci-m2c1.md).
 - [ ] Live publisher needs a new notice/consent contract, atomic consume/state/audit and public projection.
 
 [Photo boundary](docs/photo-drafts.md); [remaining deployment milestones](docs/deployment-readiness.md).

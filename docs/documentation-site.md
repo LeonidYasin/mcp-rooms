@@ -4,8 +4,9 @@
 
 GitHub Pages — публичная карта проекта и читаемая документация, **не** backend Rooms,
 не маркетплейс, не место регистрации/ввода ключей, не публикация объявлений или переписки.
-Ожидаемый адрес после успешной настройки/деплоя: https://leonidyasin.github.io/mcp-rooms/ .
-Наличие файла workflow или зелёного build само по себе не подтверждает доступность URL.
+Опубликованный адрес: https://leonidyasin.github.io/mcp-rooms/ .
+[Build/deploy + внешнее подтверждение версии](ci-pages.md). Наличие одного файла
+workflow или зелёного build само по себе не подтверждает доступность URL.
 
 Основа: MkDocs1.6.1 + Material9.7.7 (MIT), Mermaid12.2.0 (MIT); сборка в GitHub Actions,
 отдельно от runtime зависимостей. Шрифты системные, скрипты/поиск/схемы локальные,
@@ -78,3 +79,16 @@ allowlist/checks одним reviewed коммитом; не разрешать �
 GitHub Pages — статический хостинг; backend security/abuse gates для marketplace не
 заменяются защитами docs workflow. Пока нет полноценного offline release archive,
 а strict build и browser smoke не являются полным аудитом доступности/безопасности.
+
+## История первоначальной блокировки публикации
+
+На SHA `72f0ee43efe0e7b7879dfc5c81523f46fcc7984f` strict build, browser QA и Pages artifact
+успешны, но environment protection отклонила deployment из `feat/standalone-identity`.
+[Run annotations](https://github.com/LeonidYasin/mcp-rooms/actions/runs/39474819784)
+сообщают: Branch is not allowed to deploy to github-pages. Это не ошибка приложения
+и не причина обходить environment или мержить main. Владелец должен разрешить
+именно docs source branch, сохранив остальные approval/protection правила.
+На последующем SHA `6fd4f7ad5b2c6271e3114a09e28a187a969f2370` build и deploy
+успешны, внешний version.json совпал. Блокировка больше не препятствовала этому
+запуску. Агент не изменял настройки/защиты; конкретное внешнее изменение настроек
+не устанавливалось. [Итоговая проверка](ci-pages.md).

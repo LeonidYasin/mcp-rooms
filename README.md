@@ -33,8 +33,8 @@ separate decisions. CI tests/builds but does not deploy the VPS.
 
 ## Project documentation website
 
-[Project map / docs site](https://leonidyasin.github.io/mcp-rooms/) — expected Pages URL;
-availability requires a successful Pages deployment, not merely this link.
+[Project map / docs site](https://leonidyasin.github.io/mcp-rooms/) — published development documentation.
+[Exact-SHA build/deploy and external confirmation](docs/ci-pages.md).
 [Publishing, version provenance and owner setup](docs/documentation-site.md).
 The site publishes development documentation only, not the marketplace or room history.
 Each page links to its exact Git SHA; the component map uses `docs/project-status.json`.

@@ -198,7 +198,7 @@ About is proposed text for the owner's manual update, not an API metadata mutati
 - [x] Prepare MkDocs/Material site with source-linked component registry, mindmap, architecture, roadmap and contracts.
 - [x] Exact source SHA and history on every page; version manifest and Markdown content digests.
 - [x] Prepare build/QA/artifact/deploy workflow; PR never deploys; source remains alpha branch.
-- [ ] Exact-SHA docs build, diagram/link/mobile/search smoke and visual review evidence.
-- [ ] Owner enables Pages Actions source and approved branch environment; successful deploy and external URL/SHA verified.
+- [x] Exact-SHA docs build +11 rendered diagrams/link/mobile/search smoke and visual review at `6fd4f7ad`. [Evidence](docs/ci-pages.md).
+- [x] Pages deploy succeeded at `6fd4f7ad`; external version manifest matched SHA/development channel. Initial environment rejection resolved without an agent settings change or bypass.
 
 Documentation publication is not application rollout or approval to merge main.

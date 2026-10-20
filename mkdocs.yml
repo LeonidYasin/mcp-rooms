@@ -91,6 +91,7 @@ nav:
     - CI lifecycle: docs/ci-m1b1.md
     - CI intent: docs/ci-m1b2.md
     - CI photo: docs/ci-m2a.md
+    - CI сайта и публикация: docs/ci-pages.md
     - Итоги исследования: docs/marketplace-research-final.md
     - Проверка кандидатов: docs/candidate-source-checks.md
   - Как обновляется сайт: docs/documentation-site.md

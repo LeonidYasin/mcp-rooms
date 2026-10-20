@@ -6,6 +6,7 @@ from .draft_store import _bounded_integer
 from .media_stage import POLICY, TTL_MS
 from .photo_preview import PHOTO_PREVIEW_SCHEMA, make_photo_preview
 from .preview_contract import canonical_json
+from .publication_guard import require_unpublished
 
 
 class PhotoDraftStore:
@@ -108,6 +109,7 @@ class PhotoDraftStore:
                 _, replay = self.drafts._retry(db, actor, client_id, operation, payload)
                 if replay is not None:
                     return {**replay, 'replayed': True}  # historical receipt, not current intent
+                require_unpublished(db, listing_id, now)
                 if draft['revision'] != revision:
                     raise DomainError('revision_conflict')
                 old = self._links(db, actor, draft)
@@ -121,6 +123,7 @@ class PhotoDraftStore:
                 digest, replay = self.drafts._retry(db, actor, client_id, operation, payload)
                 if replay is not None:
                     return {**replay, 'replayed': True}
+                require_unpublished(db, listing_id, now)
                 if fresh != draft or self._links(db, actor, fresh) != old:
                     raise DomainError('revision_conflict')
                 current = self._media(db, actor, fresh, [r['id'] for r in target])

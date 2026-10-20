@@ -11,6 +11,7 @@ from .domain import DomainError, identifier
 from .draft_store import _bounded_integer
 from .media_contract import MAX_INPUT_BYTES, MAX_OUTPUT_BYTES
 from .preview_contract import canonical_json
+from .publication_guard import require_unpublished
 
 POLICY = 'jpeg-normalizer-v1'
 TTL_MS = 600000
@@ -97,6 +98,8 @@ class MediaStageStore:
         now = self.store.clock()
         self.drafts._authorize(db, actor, scope, now)
         draft = self.drafts._owned(db, actor.user_id, draft_id, now)
+        if scope == 'listings:write':
+            require_unpublished(db, draft_id, now)
         if draft['status'] != 'draft':
             raise DomainError('draft_not_editable')
         if draft['revision'] != revision:

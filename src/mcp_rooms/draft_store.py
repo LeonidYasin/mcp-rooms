@@ -15,6 +15,7 @@ import sqlite3
 import uuid
 from .domain import DomainError, Principal, identifier
 from .identity import resource_url
+from .publication_guard import require_unpublished
 from .listing_contract import Listing, ListingContent, create_draft
 from .preview_contract import canonical_json as _json, make_preview, PREVIEW_SCHEMA
 
@@ -220,6 +221,7 @@ class DraftStore:
             if replay is not None:
                 return {**replay, 'replayed': True}
             row = self._owned(db, principal.user_id, listing_id, now)
+            require_unpublished(db, listing_id, now)
             if row['status'] != 'draft':
                 raise DomainError('draft_not_editable')
             if json.loads(row['content']).get('media_ids'):
@@ -317,6 +319,7 @@ class DraftStore:
             if replay is not None:
                 return {**replay, 'replayed': True}
             row = self._owned(db, principal.user_id, listing_id, now)
+            require_unpublished(db, listing_id, now)
             if row['status'] != 'draft':
                 raise DomainError('draft_not_editable')
             if row['revision'] != expected_revision:

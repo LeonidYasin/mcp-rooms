@@ -48,3 +48,19 @@ not asserted. The old blocker is history, not a current instruction to weaken pr
 - [M2b worker/storage](media-storage-design.md) remains SPEC: next code/test slice,
   no public upload or native decoder sandbox accepted by publishing these docs.
 - VPS, Caddy, runtime database, existing services and main not touched by this work.
+
+
+## Remaining single-publisher configuration gate
+
+An independent GitHub-generated **Jekyll** workflow also ran on the same push:
+[dynamic Pages run](https://github.com/LeonidYasin/mcp-rooms/actions/runs/39476008176),
+[build job](https://github.com/LeonidYasin/mcp-rooms/actions/runs/39476008176/job/118812035335).
+Its completed steps include Checkout → Build with Jekyll → Upload artifact. This is
+not the MkDocs build and can replace its site before/after the custom deployment.
+Successful custom deployment/external SHA above is real, but does NOT prove only one
+publisher is configured. Owner must select **Settings → Pages → Source: GitHub Actions**,
+not Deploy from a branch. No extra credential or application merge is required.
+
+Until a subsequent source push has only the intended documentation publisher and
+external SHA is checked again, reliable single-publisher auto-update remains pending.
+The precise admin setting was not available through MCP and is not claimed changed.

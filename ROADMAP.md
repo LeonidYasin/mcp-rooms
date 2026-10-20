@@ -202,3 +202,5 @@ About is proposed text for the owner's manual update, not an API metadata mutati
 - [x] Pages deploy succeeded at `6fd4f7ad`; external version manifest matched SHA/development channel. Initial environment rejection resolved without an agent settings change or bypass.
 
 Documentation publication is not application rollout or approval to merge main.
+
+- [ ] Single-publisher gate: owner selects Pages Source **GitHub Actions**, removing the competing branch/Jekyll build; next push + external source SHA verified. Custom deploy already passed; reliability is not inferred from one successful response. [Evidence](docs/ci-pages.md#remaining-single-publisher-configuration-gate).

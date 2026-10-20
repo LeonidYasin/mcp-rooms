@@ -92,3 +92,14 @@ GitHub Pages — статический хостинг; backend security/abuse g
 успешны, внешний version.json совпал. Блокировка больше не препятствовала этому
 запуску. Агент не изменял настройки/защиты; конкретное внешнее изменение настроек
 не устанавливалось. [Итоговая проверка](ci-pages.md).
+
+
+## Не допускать две конкурирующие публикации
+
+После успешного custom deploy обнаружен и отдельный automatic Jekyll build/deploy
+из ветки на тот же push. [Доказательство](ci-pages.md#remaining-single-publisher-configuration-gate).
+Он не является частью нашей сборки MkDocs и способен перезаписывать сайт. В Settings
+→ Pages выбрать **Source: GitHub Actions**, не **Deploy from a branch**. Не создавать
+ради этого ещё один publish workflow и не мержить приложение в main. Затем следующий
+push должен пройти только целевой custom pipeline; проверить наружный version.json.
+Текущий успешный URL не заменяет эту настройку. Agent не заявляет её выполненной.

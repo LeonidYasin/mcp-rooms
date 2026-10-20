@@ -277,3 +277,15 @@ No main, VPS, public upload/publication or new real scope issuance changed.
 - [ ] User auth/adapters/upload, actual web UI, private responses, admin and approved TEST.
 
 [Publication core boundaries](docs/live-publication.md). No real listing, VPS or main changed.
+
+
+## M3a.1 — opt-in authenticated user marketplace MCP
+
+- [x] Prepare12 typed listing tools through the official SDK and current Bearer gate.
+- [x] Separate explicit listing-scope policy; default rooms-only issuer/app/signup unchanged.
+- [x] Atomic self-delegation rechecks; no broader scopes/later expiry than source key.
+- [x] Prepare actual Bearer/ASGI workflow, cross-user/scopes/revoke/race/binding tests.
+- [ ] Accept exact-SHA CI and record evidence.
+- [ ] Bounded streaming upload, HTTP/browser/session/onboarding, web/search and approved TEST.
+
+[User MCP boundary](docs/user-market-mcp.md). No default CLI enablement, live keys, main or VPS changed.

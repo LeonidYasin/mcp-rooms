@@ -169,6 +169,20 @@
       ]
     },
     {
+      "id": "user_market_mcp",
+      "title": "Пользовательский MCP объявлений",
+      "stage": "SOURCE",
+      "summary": "Подготовлены opt-in12 listing tools над текущим Bearer/ContextVar: отдельные scopes, typed inputs, same DB/resource, безопасное делегирование. Не HTTP upload или auto market onboarding.",
+      "doc": "docs/user-market-mcp.md",
+      "source": "src/mcp_rooms/market_tools.py",
+      "evidence": null,
+      "depends_on": [
+        "identity",
+        "publish",
+        "photo_drafts"
+      ]
+    },
+    {
       "id": "web",
       "title": "Web и пользовательский MCP",
       "stage": "SPEC",
@@ -177,7 +191,8 @@
       "source": null,
       "evidence": null,
       "depends_on": [
-        "publish"
+        "publish",
+        "user_market_mcp"
       ]
     },
     {

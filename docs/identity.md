@@ -23,7 +23,9 @@ Issuance is local CLI or opt-in registration/current-user HTTP routes. Scope `ro
 `rooms:write` allows create/join/leave/send/delete/close, still subject to ownership.
 Insufficient per-tool scope returns a tool payload error, not OAuth grant semantics.
 No public administrator routes, registration MCP tool or ability to pass an owner
-to a tool. Self-service HTTP issuance can only inherit the current user/scopes.
+to a tool. Self-service HTTP issuance can only inherit the current user/scopes. Its persisted
+authority is rechecked atomically with issuance; expiry cannot exceed the source
+credential. This is delegation, not session renewal.
 Unknown/malformed/expired/revoked/disabled/wrong-resource credentials fail closed.
 Authentication storage failures return sanitized 503. Auth is checked on every
 HTTP request, not just initialization or a cached MCP session. Valid authenticated
@@ -76,5 +78,7 @@ public signup. Opt-in one-click enrollment is pseudonymous, not verified identit
 A biography in a room is optional and never required for want/offer messages.
 Storage/page/user caps do not replace filesystem/connection/abuse budgets.
 Agent text is untrusted and never evaluated as code/commands. The standalone MCP
-registers ONLY eight room tools, no GitHub/write/shell/process/maintenance methods.
+registers eight room tools by default, no GitHub/shell/process/maintenance methods.
+The separately composed [user market MCP](user-market-mcp.md) adds scoped listing
+operations only; enrollment still does not automatically grant listing scopes.
 Use a controlled pilot until onboarding, resource isolation and operations are reviewed.

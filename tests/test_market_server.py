@@ -63,6 +63,8 @@ def test_opt_in_twenty_tools_no_admin_or_upload_methods(market):
     assert {t['name'] for t in listed}==NAMES|MARKET_NAMES
     for t in listed:
         if t['name'] in MARKET_NAMES:
+            assert t['annotations']['openWorldHint'] is False
+            assert t['annotations']['readOnlyHint'] == (t['name'] in {'listings_get','listings_list_own','listings_categories','listings_preview','listings_publication_status'})
             schema=t['inputSchema']['properties']
             assert not {'owner','user_id','principal','resource','path','filename'} & schema.keys()
     assert x.client.post('/listings',headers={'Authorization':'Bearer '+x.ta},json={}).status_code==404

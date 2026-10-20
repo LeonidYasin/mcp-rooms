@@ -44,7 +44,8 @@ opt-in app; наличие в tools/list не даёт права вызова �
 bounded retry hint; повтор допустим только с тем же command UUID/payload.
 MCP POST body по-прежнему ограничен64KiB; бинарные фото через него не передаются.
 Tool descriptions называют содержимое недоверенными данными, не инструкциями.
-Admin/SQL/shell/maintenance/credential issuance MCP методов нет.
+Admin/SQL/shell/maintenance/credential issuance MCP методов нет. SDK ToolAnnotations
+помечают read-only/destructive/idempotent/closed-world свойства; это hints, не grants.
 
 ## Listing credentials — отдельный opt-in
 

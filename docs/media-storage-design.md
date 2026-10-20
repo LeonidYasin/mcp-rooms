@@ -106,3 +106,10 @@ Content-Type, nosniff и cache/unpublish policy: невозможно обеща
 [One-shot resource-limited worker](media-worker.md) is prepared as an internal
 code slice. Its CI proof is separate from OS sandbox acceptance and storage
 implementation. This overall storage document remains SPEC.
+
+
+## M2b.2 implementation boundary
+
+[Private filesystem primitives](media-private-files.md) prepare durable derivative
+bytes and integrity reads only. Ownership, reservations/manifests, attach and
+reconciliation remain SPEC. Never expose filesystem read by blob key to clients.

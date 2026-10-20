@@ -84,6 +84,18 @@
       ]
     },
     {
+      "id": "media-files",
+      "title": "Приватные файлы производных фото",
+      "stage": "SOURCE",
+      "summary": "Подготовлен внутренний dirfd/O_EXCL/fsync слой, bounded inventory/quota и digest read. Без owner ACL/manifest/API.",
+      "doc": "docs/media-private-files.md",
+      "source": "src/mcp_rooms/media_files.py",
+      "evidence": null,
+      "depends_on": [
+        "worker"
+      ]
+    },
+    {
       "id": "media",
       "title": "Хранение и права на фото",
       "stage": "SPEC",
@@ -93,7 +105,8 @@
       "evidence": null,
       "depends_on": [
         "identity",
-        "worker"
+        "worker",
+        "media-files"
       ]
     },
     {

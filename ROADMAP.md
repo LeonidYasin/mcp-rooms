@@ -215,3 +215,14 @@ Documentation publication is not application rollout or approval to merge main.
 - [ ] Implement private staged derivatives, owner checks, durable manifests and reconciliation.
 
 [Worker boundary](docs/media-worker.md). No VPS, main, public upload or listing publication changed.
+
+
+## M2b.2 — private derivative filesystem primitives
+
+- [x] Prepare fixed-root dirfd layer, exclusive files, durable writes and digest reads.
+- [x] Prepare bounded inventory quotas, symlink/hardlink/FIFO, corruption, I/O and concurrency fixtures.
+- [ ] Accept exact-SHA CI and record evidence.
+- [ ] Add persisted owner-authorized media reservations/manifests; no raw-key read API.
+- [ ] Add reconciliation/retention and consistent DB+files recovery.
+
+[Boundary](docs/media-private-files.md). No public upload, attachment or publication yet.

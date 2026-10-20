@@ -1,17 +1,17 @@
 # M3a.2 CI evidence — bounded private photo HTTP
 
 Accepted application source:
-[`dda70a04f277219422436ed77cd8d03531d2a512`](https://github.com/LeonidYasin/mcp-rooms/commit/dda70a04f277219422436ed77cd8d03531d2a512).
+[`bca0c8a0ea0336125f928edf196c927a5d6678ed`](https://github.com/LeonidYasin/mcp-rooms/commit/bca0c8a0ea0336125f928edf196c927a5d6678ed).
 Later documentation changes are not a new runtime acceptance SHA. This is an
 explicit composition option, not a new default CLI/service or live upload URL.
 
 ## Application results
 
-- [Push CI, attempt 1](https://github.com/LeonidYasin/mcp-rooms/actions/runs/39500847004): success, Python 3.10–3.13, wheel/sdist and installed-package verification.
-- Python 3.12: **538 passed, 2 warnings**. Compared with M3a.1: 37 additional parametrized cases.
-- Python 3.10: **488 passed, 31 skipped, 2 warnings**. Optional native worker remains unsupported on 3.10; transport/authorization tests still run there.
-- [PR CI](https://github.com/LeonidYasin/mcp-rooms/actions/runs/39500856703) succeeded for the same source SHA.
-- [Documentation CI](https://github.com/LeonidYasin/mcp-rooms/actions/runs/39500846823) succeeded: 15 diagrams, local links/assets, mobile overflow, Cyrillic search and screenshots. Documentation deployment is not application deployment.
+- [Push CI, attempt 1](https://github.com/LeonidYasin/mcp-rooms/actions/runs/39501660638): success, Python 3.10–3.13, wheel/sdist and installed-package verification.
+- Python 3.12: **539 passed, 2 warnings**. Compared with M3a.1: 38 additional parametrized cases.
+- Python 3.10: **489 passed, 31 skipped, 2 warnings**. Optional native worker remains unsupported on 3.10; transport/authorization tests still run there.
+- [PR CI](https://github.com/LeonidYasin/mcp-rooms/actions/runs/39501666461) succeeded for the same source SHA.
+- [Documentation CI](https://github.com/LeonidYasin/mcp-rooms/actions/runs/39501660446) succeeded: 15 diagrams, local links/assets, mobile overflow, Cyrillic search and screenshots. Documentation deployment is not application deployment.
 - Aggregate at inspection: 14 successful checks, 1 skipped, 0 failed/pending; includes documentation/deployment, not 14 separate application suites or merge authorization.
 
 All application tests, real child-worker decode, package builds and ASGI calls ran
@@ -19,7 +19,7 @@ in GitHub Actions. Locally only source preparation and AST syntax inspection.
 Synthetic users, ephemeral keys and generated fixture images; no real publication,
 credentials, listing photo or VPS request. An initial test looked for media IDs at
 the wrong nesting level; fixed to the existing `listing.content.media_ids` contract,
-without changing the API or removing the assertion. Extra negative cases were added.
+without changing the API or removing the assertion. Extra negative cases were added. A final regression also covers TimeoutError during response sending: the outer Bearer gate now tracks response-start and does not try to send a second response after transport failure.
 
 ## Accepted boundary
 

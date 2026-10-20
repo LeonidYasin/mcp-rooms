@@ -105,10 +105,10 @@ sequenceDiagram
   O->>P: publish consent ID + command UUID
   P->>F: Verify bytes outside DB write tx
   P->>D: Atomic recheck + consume + snapshot + receipt + audit
-  Note over P,D: Internal public state only; no HTTP/MCP route enabled
+  Note over P,D: Internal public state only - no HTTP or MCP route enabled
   O->>P: withdraw expected publication revision
   P->>D: Epoch increment + withdrawn + receipt + audit
-  Note over O,D: Old public version no longer served; downloaded copies cannot be erased
+  Note over O,D: Old public version no longer served - downloaded copies cannot be erased
 ```
 
 См. [план деплоя](deployment-readiness.md), [частные фото](photo-drafts.md),

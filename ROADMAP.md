@@ -265,3 +265,15 @@ Documentation publication is not application rollout or approval to merge main.
 
 [Photo boundary](docs/photo-drafts.md); [remaining deployment milestones](docs/deployment-readiness.md).
 No main, VPS, public upload/publication or new real scope issuance changed.
+
+
+## M3a — publication transaction and withdrawal core
+
+- [x] Prepare new notice/schema and explicit short-lived live-publication consent.
+- [x] Prepare atomic consume/public snapshot/receipt/audit and monotonic publication epoch.
+- [x] Freeze private mutation while active; withdraw before editing/reconfirming.
+- [x] Prepare allowlisted public getters/photo checks without enabling a transport.
+- [ ] Accept exact-SHA CI: stale/private consent, revoke/race, rollback and private/public isolation.
+- [ ] User auth/adapters/upload, actual web UI, private responses, admin and approved TEST.
+
+[Publication core boundaries](docs/live-publication.md). No real listing, VPS or main changed.

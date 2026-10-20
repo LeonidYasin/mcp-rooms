@@ -158,14 +158,14 @@
     {
       "id": "publish",
       "title": "Публикация объявления",
-      "stage": "SPEC",
-      "summary": "Новое согласие с фото, одноразовое потребление intent, транзакция публикации и audit. Старое намерение не использовать.",
-      "doc": "docs/marketplace-conformance.md",
-      "source": null,
+      "stage": "SOURCE",
+      "summary": "Подготовлены new-schema live consent, atomic consume/snapshot/receipt/audit, withdrawal и public read primitives. Пока internal opt-in, не HTTP/MCP endpoint.",
+      "doc": "docs/live-publication.md",
+      "source": "src/mcp_rooms/publication_store.py",
       "evidence": null,
       "depends_on": [
         "intent",
-        "media"
+        "photo_drafts"
       ]
     },
     {

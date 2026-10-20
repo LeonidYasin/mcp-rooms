@@ -298,3 +298,49 @@ def test_initialize_failure_is_atomic_and_room_identifiers_unchanged(photos,monk
     with original() as db:
         assert tuple(db.execute('PRAGMA '+q).fetchone()[0] for q in ('application_id','user_version'))==identifiers
         assert not db.execute('PRAGMA foreign_key_check').fetchall()
+
+
+def test_withdraw_audit_failure_rolls_back_state_and_receipt(market,monkeypatch):
+    x=market; publish(x); command=key()
+    def fail(*a,**kw):raise sqlite3.OperationalError('synthetic withdrawal audit fault')
+    with monkeypatch.context() as patch:
+        patch.setattr(x.market,'_audit',fail)
+        with pytest.raises(sqlite3.OperationalError):withdraw(x,client=command)
+    assert x.market.public_get(x.draft_id)['publication_revision']==1
+    with x.store._db() as db:
+        assert not db.execute('SELECT * FROM market_commands WHERE client_id=?',(command,)).fetchall()
+    assert withdraw(x,client=command)['publication_revision']==2
+    assert [r['action'] for r in audit(x)]==['publish','withdraw']
+
+
+def test_withdraw_remains_available_when_category_or_photo_is_broken(market):
+    x=market; publish(x)
+    with x.store._db(write=True) as db:db.execute("UPDATE market_categories SET active=0 WHERE id='things'")
+    next(x.root.iterdir()).write_bytes(b'broken')
+    assert withdraw(x)['state']=='withdrawn'
+    fails('listing_unavailable',lambda:x.market.public_get(x.draft_id))
+
+
+def test_credential_revocation_does_not_erase_user_publication(market):
+    x=market; publish(x); x.auth.revoke(x.a.credential_id)
+    assert x.market.public_get(x.draft_id)['id']==x.draft_id
+    fails('authentication_required',lambda:withdraw(x))
+
+
+def test_unselected_photo_is_never_public_by_opaque_id(market):
+    x=market
+    unselected=upload(x,expected_revision=2,payload=b'another-synthetic')
+    publish(x)
+    fails('listing_unavailable',lambda:x.market.public_photo(x.draft_id,1,unselected['media_id']))
+    assert x.service.read(x.a,unselected['media_id'])
+
+
+def test_command_capacity_failure_does_not_consume_consent(market):
+    x=market; consent=approve(x)
+    with x.store._db() as db:used=db.execute('SELECT COUNT(*) FROM market_commands WHERE user_id=?',(x.a.user_id,)).fetchone()[0]
+    x.drafts.limits=replace(x.drafts.limits,commands_per_owner=used)
+    fails('owner_command_capacity',lambda:publish(x,consent))
+    with x.store._db() as db:
+        assert db.execute('SELECT consumed_at FROM publication_consents').fetchone()[0] is None
+        assert not db.execute('SELECT * FROM listing_publications').fetchall()
+    assert not audit(x)

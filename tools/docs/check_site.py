@@ -96,14 +96,17 @@ with sync_playwright() as pw:
     page.screenshot(path=str(SHOTS/'home-dark.png'),full_page=False)
     # Built-in local search must return a known document.
     page.set_viewport_size({'width':1440,'height':1050})
-    # Fresh page + settled local JS/index, then real keyboard input. A single fill
-    # immediately after navigation can precede Material's async subscriptions.
+    # Wait for the pinned Material worker READY message before testing input.
+    # Material watches keyup, not input; Playwright's Cyrillic text insertion
+    # (including press_sequentially) does not necessarily emit keyup per letter.
     page.goto(base+'/')
     page.wait_for_load_state('networkidle')
     query = page.locator('input[data-md-component="search-query"]')
     query.focus()
     page.wait_for_load_state('networkidle')
-    query.press_sequentially('фотографий', delay=80)
+    page.wait_for_function('window.__searchDebug.some(e => e[0] === "receive" && e[1] === 1)',timeout=30000)
+    query.fill('фотографий')
+    query.press('End')  # Real keyup, without navigation or changing query text.
     try:
         page.wait_for_function('document.querySelectorAll(".md-search-result__link").length > 0',timeout=30000)
     except Exception:

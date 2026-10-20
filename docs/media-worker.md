@@ -1,7 +1,7 @@
 # M2b.1 — bounded one-shot photo worker
 
-Internal implementation, not a public upload endpoint. CI acceptance is recorded
-separately after checks of the exact source SHA. No VPS deployment is implied.
+Internal implementation, not a public upload endpoint. [Exact-SHA CI evidence](ci-m2b1.md)
+accepts the resource-containment slice, not the full OS sandbox. No VPS deployment is implied.
 
 `PhotoWorker.normalize` runs the existing optional JPEG/PNG normalizer in a fresh
 installed Python module via `-I -B`, never a shell. The stdlib-only supervisor does

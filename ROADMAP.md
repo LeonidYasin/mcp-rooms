@@ -210,7 +210,7 @@ Documentation publication is not application rollout or approval to merge main.
 
 - [x] Prepare stdlib supervisor, one-shot child rlimits, bounded pipes/deadline and immediate admission.
 - [x] Prepare synthetic codec and failure fixtures; no local project execution.
-- [ ] Accept exact-SHA GitHub CI and record evidence.
+- [x] Exact-SHA CI at `583df1b9`: Python3.12 294 passed/2 warnings; Python3.10 core247 passed/28 skips/2 warnings. [Evidence](docs/ci-m2b1.md).
 - [ ] Prove dedicated OS filesystem/network sandbox on operator-approved TEST.
 - [ ] Implement private staged derivatives, owner checks, durable manifests and reconciliation.
 

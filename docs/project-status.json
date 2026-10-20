@@ -74,11 +74,11 @@
     {
       "id": "worker",
       "title": "Изоляция декодера",
-      "stage": "SOURCE",
-      "summary": "Подготовлен Linux subprocess worker: rlimits до Pillow, bounded pipes/deadline, 2 слота без очереди. Не OS sandbox; публичная загрузка закрыта.",
+      "stage": "CI",
+      "summary": "Linux subprocess resource containment проверен в CI: rlimits до Pillow, bounded pipes/deadline и admission. Не полноценный OS sandbox; публичная загрузка закрыта.",
       "doc": "docs/media-worker.md",
       "source": "src/mcp_rooms/media_worker.py",
-      "evidence": null,
+      "evidence": "docs/ci-m2b1.md",
       "depends_on": [
         "normalize"
       ]

@@ -310,3 +310,60 @@ def test_foreign_preview_and_intent_cannot_read_private_photo_draft(photos):
     fails('draft_unavailable', lambda: x.editor.preview(x.b, x.draft_id))
     b = publisher(x.store, x.b)
     fails('draft_unavailable', lambda: x.editor.get_intent(b, x.draft_id, consent['intent_id']))
+
+
+def legacy_v2(x):
+    """Synthetic predecessor schema; never run against a live database."""
+    with x.store._db(write=True) as db:
+        db.execute('DROP TABLE media_draft_photos')
+        db.execute('UPDATE media_stage_schema SET version=2')
+
+
+def test_explicit_v2_migration_preserves_media_and_room_identifiers(photos):
+    x = photos
+    media = upload(x)
+    before = rows(x)
+    with x.store._db() as db:
+        room_ids = tuple(db.execute('PRAGMA '+q).fetchone()[0] for q in ('application_id','user_version'))
+    legacy_v2(x)
+    fails('unsupported_media_schema', lambda: x.editor.preview(x.a, x.draft_id))
+    x.service.initialize()
+    x.service.initialize()
+    assert rows(x) == before and x.service.read(x.a, media['media_id'])
+    with x.store._db() as db:
+        assert db.execute('SELECT version FROM media_stage_schema').fetchone()[0] == 3
+        assert not db.execute('SELECT * FROM media_draft_photos').fetchall()
+        assert not db.execute('PRAGMA foreign_key_check').fetchall()
+        assert tuple(db.execute('PRAGMA '+q).fetchone()[0] for q in ('application_id','user_version')) == room_ids
+    assert attach(x, [media['media_id']])['listing']['revision'] == 2
+
+
+def test_v2_link_creation_failure_rolls_back_schema(photos, monkeypatch):
+    x = photos
+    upload(x)
+    before = rows(x)
+    legacy_v2(x)
+    original = x.service._create_photo_links
+    def fail_after_create(db):
+        original(db)
+        raise RuntimeError('synthetic post-DDL migration fault')
+    with monkeypatch.context() as patch:
+        patch.setattr(x.service, '_create_photo_links', fail_after_create)
+        with pytest.raises(RuntimeError):
+            x.service.initialize()
+    assert rows(x) == before
+    with x.store._db() as db:
+        assert db.execute('SELECT version FROM media_stage_schema').fetchone()[0] == 2
+        assert not db.execute("SELECT 1 FROM sqlite_master WHERE name='media_draft_photos'").fetchone()
+    x.service.initialize()
+    assert x.editor.preview(x.a, x.draft_id)['photos'] == []
+
+
+def test_partial_v3_schema_is_not_silently_recreated(photos):
+    x = photos
+    with x.store._db(write=True) as db:
+        db.execute('DROP TABLE media_draft_photos')
+    fails('unsupported_media_schema', x.service.initialize)
+    with x.store._db() as db:
+        assert db.execute('SELECT version FROM media_stage_schema').fetchone()[0] == 3
+        assert not db.execute("SELECT 1 FROM sqlite_master WHERE name='media_draft_photos'").fetchone()

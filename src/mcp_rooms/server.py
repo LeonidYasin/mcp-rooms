@@ -43,13 +43,15 @@ async def read_body(receive, maximum):
 
 class BearerGate:
     """Per-request identity; self signup is explicit and opt-in, never implicit login."""
-    def __init__(self, app, auth, registration_enabled=False, media_http=None):
+    def __init__(self, app, auth, registration_enabled=False, media_http=None, browser_sessions=None):
         self.app, self.auth = app, auth
         self.media_http = media_http
         self.registration_enabled = registration_enabled
         self.enrollment = Enrollment(auth)
         parsed = urlsplit(auth.resource)
         self.authority, self.origin = parsed.netloc, parsed.scheme + '://' + parsed.netloc
+        from .browser_http import BrowserHTTP
+        self.browser_http = BrowserHTTP(browser_sessions,auth,self.origin,self.authority) if browser_sessions is not None else None
 
     async def __call__(self, scope, receive, send):
         if scope['type'] != 'http':
@@ -96,6 +98,8 @@ class BearerGate:
         if (len(origins) > 1 or (origins and origins[0] != self.origin)
                 or ('cross-site' in sites and not signup_navigation)):
             raise RequestFailure('invalid_origin', 403)
+        if path == '/browser/session' and self.browser_http is not None:
+            return await self.browser_http.handle(scope, receive, send)
         if path in {'/signup', '/signup.js', '/register'}:
             if not self.registration_enabled:
                 raise RequestFailure('registration_disabled', 403)
@@ -189,10 +193,17 @@ class BearerGate:
             CURRENT.reset(token)
 
 
-def create_app(database, resource, registration_enabled=False, *, market=None, media_http=False):
+def create_app(database, resource, registration_enabled=False, *, market=None, media_http=False, browser_sessions=None):
     if type(media_http) is not bool or (media_http and market is None):
         raise RoomError('market_binding_mismatch')
     resource = resource_url(resource)
+    if browser_sessions is not None:
+        from .browser_sessions import BrowserSessions
+        if (not isinstance(browser_sessions,BrowserSessions) or market is None
+                or browser_sessions.drafts is not getattr(market,'drafts',None)):
+            raise RoomError('browser_binding_mismatch')
+        with browser_sessions.store._db() as db:
+            browser_sessions._schema(db)
     if market is not None:
         from .market_adapter import MarketAdapter
         if not isinstance(market,MarketAdapter):
@@ -265,7 +276,7 @@ def create_app(database, resource, registration_enabled=False, *, market=None, m
 
     from .media_http import MediaHTTP
     return BearerGate(mcp.streamable_http_app(), auth, registration_enabled,
-                      MediaHTTP(market) if media_http else None)
+                      MediaHTTP(market) if media_http else None, browser_sessions)
 
 
 def main():

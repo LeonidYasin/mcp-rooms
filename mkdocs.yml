@@ -88,6 +88,7 @@ nav:
     - User marketplace MCP: docs/user-market-mcp.md
     - Photo HTTP upload: docs/media-http.md
     - Browser session core: docs/browser-sessions.md
+    - Browser session HTTP: docs/browser-http.md
     - Web: docs/web-marketplace-plan.md
     - Отдельный admin MCP: docs/admin-mcp-design.md
   - Комнаты и клиенты:

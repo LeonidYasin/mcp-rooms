@@ -38,8 +38,10 @@ framework без измеренного blocker. Исследование кан
 - `market_adapter.py`, `market_tools.py`, `server.py`: explicit market composition,
   8 rooms +12 scoped listing tools. Default CLI по-прежнему8 rooms.
 - `media_http.py`: explicit opt-in bounded binary upload/private JPEG read; не public photo route.
-- `browser_sessions.py`: следующий ограниченный слой; статус приёмки — в work-state,
-  а не из самого факта наличия файла. Пока не подключён к HTTP/CLI.
+- `browser_sessions.py`: отдельный bounded session core, browser schema1.
+- `browser_http.py`: opt-in session login/bootstrap/logout bridge; статус в work-state.
+  Cookie ещё не является authority для listing/media writes: сначала transaction-time
+  session binding (M3b.3), затем browser commands. Default CLI не изменён.
 
 Сервисный слой повторно проверяет persisted authority, не доверяет Principal из JSON.
 Адаптер должен строить Principal только из проверенного credential/session. Ранее
@@ -57,7 +59,7 @@ MCP сам не открывает диск пользователя. Будущ
 
 ## Что ещё НЕ сделано
 
-Browser HTTP/session login/onboarding/recovery и форма, публичная витрина/search/
+Cookie-authorized market commands, автоматический onboarding/recovery и форма, публичная витрина/search/
 photo serving, приватный отклик, отдельный admin MCP; полная OS isolation/load/RAM
 приёмка, DB+files disaster restore/security-state reconciliation, безопасная очистка
 долгоживущих auth receipts/сессий. Не считать стадией production наличие public_get

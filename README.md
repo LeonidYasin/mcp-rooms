@@ -64,7 +64,9 @@ is not yet accepted.
 Separate bounded browser session core (no HTTP wiring yet), plus
 [M3a.2 private photo HTTP](docs/ci-m3a2.md) and12 scoped listing MCP tools on top of8 rooms.
 Default CLI stays rooms-only; signup does not grant listing scopes.
-Next: same-origin browser HTTP/session/onboarding, then draft/photo/preview form.
+In review: [M3b.2 session HTTP bridge](docs/browser-http.md). Cookie authority is not yet
+forwarded to marketplace writes: transaction-time session binding is the next security gate.
+Automatic onboarding/recovery and the draft/photo form remain unimplemented.
 No browser login/form, public marketplace or VPS rollout yet.
 [Six remaining stages to useful external TEST](docs/deployment-readiness.md).
 

@@ -3,7 +3,8 @@
 Current checkpoint: [M3b.1 CI](docs/ci-m3b1.md), separate bounded browser session core
 and repository-native [AI handoff](docs/ai-handoff.md) / [work-state](docs/work-state.json).
 Built on [private photo HTTP](docs/ci-m3a2.md) and [listing MCP](docs/ci-m3a1.md).
-Next: M3b.2 same-origin browser HTTP auth/onboarding, then draft/photo form;
+In review: [M3b.2 HTTP session bridge](docs/browser-http.md).
+Next: M3b.3 transaction-time session authority, then onboarding/typed browser commands/form;
 [6 remaining milestones to useful external TEST](docs/deployment-readiness.md).
 Older sections retain historical acceptance boundaries; they are not promises of a live service.
 

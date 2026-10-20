@@ -10,23 +10,23 @@
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
-    "id": "M3b.1",
-    "stage": "CI",
-    "contract": "docs/browser-sessions.md",
-    "source": "src/mcp_rooms/browser_sessions.py",
-    "tests": "tests/test_browser_sessions.py",
-    "evidence": "docs/ci-m3b1.md"
+    "id": "M3b.2",
+    "stage": "SOURCE",
+    "contract": "docs/browser-http.md",
+    "source": "src/mcp_rooms/browser_http.py",
+    "tests": "tests/test_browser_http.py",
+    "evidence": null
   },
   "next_task": {
-    "id": "M3b.2",
-    "title": "Same-origin browser HTTP session adapter before the listing form",
-    "contract": "docs/browser-sessions.md",
+    "id": "M3b.3",
+    "title": "Transaction-time browser session authority before cookie-authenticated marketplace writes",
+    "contract": "docs/browser-http.md",
     "acceptance": [
-      "Review automatic identity/onboarding and loss/recovery flow without requiring GitHub/email/phone or issuing an implicit publish grant.",
-      "Implement explicit opt-in, no startup/request migration, Secure HttpOnly SameSite host-only session delivery and strict Origin/CSRF.",
-      "Reject session cookies on MCP/admin; typed browser actions must use the same core and bounded binary upload.",
-      "Review session fixation/rotation, quota cleanup and login abuse budgets; negative ASGI tests then browser QA in CI.",
-      "Only after auth acceptance implement draft/photo/preview form; no automatic publication."
+      "Introduce backwards-compatible trusted session binding; never construct an authority/session identity from client JSON.",
+      "Check session user/parent credential/resource/audience/scopes/revocation/absolute and idle expiry in the same SQLite transaction as each listing/media authorization.",
+      "Prove logout, expiry and scope changes during body/native worker/filesystem IO cannot bypass the new session transaction guard.",
+      "Keep cookies disconnected from market/media routes until the new binding passes CI; default rooms-only CLI and eight room tools remain unchanged.",
+      "After this gate, finish automatic onboarding/recovery/retention and typed browser actions, then draft/photo form and real-browser QA."
     ]
   },
   "runtime_last_known": {
@@ -51,6 +51,6 @@
     "docs/ai-handoff.md",
     "docs/project-status.json",
     "docs/deployment-readiness.md",
-    "docs/browser-sessions.md"
+    "docs/browser-http.md"
   ]
 }

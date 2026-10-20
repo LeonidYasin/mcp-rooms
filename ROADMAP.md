@@ -109,3 +109,14 @@ structured rides/delivery later. Supersedes the previous B2B-only niche suggesti
 
 Merge, release and production deployment remain separate approvals. Existing VPS
 services/data/main are unchanged; the closed TEST is not reopened by code publication.
+
+## Marketplace reuse research gate
+
+- [x] GitHub + official web research across classifieds, community, commerce, agent rooms, MCP/A2A and transport; [final evidence and shortlist](docs/marketplace-research-final.md).
+- [x] Record actual first item: used toilet, removed and washed; no claims about disinfection, condition, price or publication.
+- [ ] Bounded HivePress/ListingHive/official WordPress MCP Adapter evaluation: free features, no-email identity, per-actor write rights, separate admin MCP, media/privacy and rollback.
+- [ ] If blocked, evaluate Apache OsclassPoint; no parallel installation of every engine.
+- [ ] Owner-approved ADR selecting reuse vs minimal existing Python/SQLite implementation before persistent listing/account/moderation work.
+
+Desk research is complete enough for selection, not runtime/security acceptance. No new
+market features, main merge or VPS change is implied. Existing Rooms pilot remains separate.

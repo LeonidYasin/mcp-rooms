@@ -23,6 +23,11 @@ separate decisions. CI tests/builds but does not deploy the VPS.
 
 ## Qwen Desktop and next product phase
 
+[Completed reuse research / candidate decision gates](docs/marketplace-research-final.md):
+HivePress + ListingHive + official WordPress MCP Adapter is the first evaluation candidate;
+Apache OsclassPoint is the fallback. No stack switch, implementation or deployment approved.
+
+
 - [Saved local proxy, safe debug, setup, .env placeholder, MCP check](clients/qwen/README.md).
 - [Detailed product mindmap / first-sale milestones](docs/product-mindmap.md).
 - [Component / trust-boundary / entity graphs](docs/architecture-graph.md).

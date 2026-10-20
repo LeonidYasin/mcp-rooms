@@ -28,6 +28,9 @@ flowchart TB
   AUTH --> O[Order / quote service · позже]
   L --> C[Category catalogue · план]
   L --> M[Media service · план]
+  M -. requires .-> OWNER[Ownership / quotas / staging / retention · план]
+  M -. requires .-> WORKER[OS-limited decode worker · план]
+  WORKER -. invokes .-> NORMAL[Bounded JPEG PNG normalizer · M2a source]
   L --> R
   O --> L
   O --> PRIVATE[Приватные переговоры · план]

@@ -62,6 +62,8 @@ is specified, not yet an executed integration suite.
 - [M2a optional photo normalizer](docs/media-image-safety.md): bounded in-memory
   JPEG/PNG to metadata-free JPEG preparation, Python >=3.11 with `.[media]`.
   Not an upload endpoint, sandbox, media ownership store or publication approval.
+  [M2a CI evidence](docs/ci-m2a.md): exact SHA `110393e9`, 8/8 checks;
+  Python3.12 267 passed/2 warnings; Python3.10 optional media intentionally skipped.
 
 ## Qwen Desktop and next product phase
 

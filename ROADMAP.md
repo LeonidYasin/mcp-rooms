@@ -185,7 +185,7 @@ blocked by token HTTP403; README/package description updated in the working bran
 
 - [x] Broaden documented vision to opportunities from personal AI chats, without claiming shipped jobs/investment verticals.
 - [x] Prepare optional bounded JPEG/PNG normalizer and synthetic negative fixtures; no upload/paths/network/publication.
-- [ ] Exact-SHA CI acceptance of M2a (core3.10, media3.11–3.13).
+- [x] Exact-SHA M2a CI at `110393e9`: 8/8 checks; Python3.12 267 passed/2 warnings; Python3.10 core247 passed/1 optional-media module skipped/2 warnings. [Evidence](docs/ci-m2a.md).
 - [ ] OS-limited decode worker; authenticated media ownership, storage/quotas/retention and served derivative contract.
 - [ ] Actual listing publish/consent transaction, public web/user MCP, private response and separate admin gate.
 

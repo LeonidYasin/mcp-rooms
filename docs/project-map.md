@@ -86,6 +86,13 @@ DraftStore records/checks short-lived publication intent without publishing.
 [Intent design](publication-intent.md), [public positioning](project-positioning.md).
 No listing scopes issued by signup and no new routes/tools.
 
+### M2a source increment
+
+`media_image.py`: optional pure in-memory JPEG/PNG normalizer; `tests/test_media_image.py`:
+synthetic fixtures only. No import from server/startup and no change to DraftStore's
+media refusal. Python3.11+ media extra; core3.10 stays dependency-free of Pillow.
+[Safety contract](media-image-safety.md), [exact-SHA CI](ci-m2a.md).
+
 ## Уточнение границ следующего этапа
 
 [Рынок возможностей](opportunity-model.md): вещи/услуги первыми; работа, команды,

@@ -26,7 +26,12 @@ jobs:
       - name: Test restrictive umask
         run: |
           umask 077
-          python -m pytest -q
+          # Keep provider log archives bounded; preserve pytest exit status and all tests.
+          set +e
+          python -m pytest -q --tb=short --show-capture=no > /tmp/rooms-pytest.log 2>&1
+          RESULT=$?
+          tail -n 90 /tmp/rooms-pytest.log
+          exit "$RESULT"
       - name: Build wheel and sdist
         run: python -m build
       - name: Verify package outside source tree

@@ -75,6 +75,7 @@ nav:
     - DB+photos recovery: docs/recovery-candidate.md
     - Operator offline package: docs/operator-package.md
     - Operator proposal: docs/operator-plan.md
+    - Operator lifecycle rehearsal: docs/operator-lifecycle.md
     - Roadmap: ROADMAP.md
     - Архитектурное решение: docs/decisions/001-marketplace-foundation.md
     - Первый реальный сценарий: docs/first-sale-acceptance.md

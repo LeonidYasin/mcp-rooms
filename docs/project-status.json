@@ -369,6 +369,20 @@
       "depends_on": [
         "operator_bundle"
       ]
+    },
+    {
+      "id": "operator_lifecycle",
+      "title": "Unprivileged offline lifecycle rehearsal",
+      "stage": "SOURCE",
+      "summary": "Fresh offline venv install/ready-last receipt; explicit bootstrap; owned loopback listener; pidfd stop/restart/stop-only rollback. Not root-owned/systemd/cgroup supervisor; resources pending.",
+      "doc": "docs/operator-lifecycle.md",
+      "source": "tools/operator_lifecycle.py",
+      "evidence": null,
+      "depends_on": [
+        "operator_bundle",
+        "operator_plan",
+        "test_candidate"
+      ]
     }
   ]
 }

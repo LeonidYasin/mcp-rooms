@@ -10,23 +10,23 @@
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
-    "id": "F3c.2a",
-    "stage": "CI",
-    "contract": "docs/operator-plan.md",
-    "source": "tools/operator_plan.py",
-    "tests": "tests/test_operator_plan.py",
-    "evidence": "docs/ci-f3c2a.md"
+    "id": "F3c.2b",
+    "stage": "SOURCE",
+    "contract": "docs/operator-lifecycle.md",
+    "source": "tools/operator_lifecycle.py",
+    "tests": "tests/test_operator_lifecycle.py",
+    "evidence": null
   },
   "next_task": {
-    "id": "F3c.2b",
-    "title": "Implement and test fixed fresh-only operator lifecycle plus measured resource acceptance",
-    "contract": "docs/test-candidate.md",
+    "id": "F3c.2c",
+    "title": "Fixed root-owned systemd wrapper and measured aggregate resource/cgroup acceptance",
+    "contract": "docs/operator-lifecycle.md",
     "acceptance": [
-      "Use only the exact-source verified locked offline wheelhouse; do not fetch online fallback dependencies or accept discovery artifacts.",
-      "Implement fixed fresh-only install/health/stop/rollback with repeated just-before-effect host identity/absence/port checks and interrupted/stale identity negative tests; a caller JSON plan is not authorization.",
-      "Measure parent/child resource, timeout/admission and disk requirements in Actions; tentative unit limits must not be declared suitable for VPS before a separately approved fresh preflight.",
-      "Keep recovery copies quarantined and do not issue real keys, promote restored profiles, merge main or run any remote operation without separate approval.",
-      "Document exact owner-reviewed command boundary and separately authorized read-only VPS preflight, loopback installation and HTTPS acceptance; remote operations require special password each time."
+      "Map reviewed fixed VPS user/unit/release/state paths to root-owned immutable application code; do not deploy the unprivileged rehearsal as a public supervisor.",
+      "Implement just-before-effect unit/drop-in/process/path checks and fresh/interrupted/stale identity negative tests; preserve unrelated services and all state during stop-only rollback.",
+      "Prove cgroup/control-group native descendant cleanup and measure combined parent/child CPU/RSS/Tasks/timeout/admission/disk budgets in Actions; idle samples are not capacity acceptance.",
+      "Keep real credential bootstrap separate, recovery outputs quarantined and no browser write/search/admin/public signup additions in first TEST.",
+      "Require separately approved fresh read-only VPS preflight, loopback and HTTPS acceptance; every remote execution needs explicit owner approval AND special password."
     ]
   },
   "runtime_last_known": {
@@ -57,7 +57,8 @@
     "docs/media-sandbox.md",
     "docs/recovery-candidate.md",
     "docs/operator-package.md",
-    "docs/operator-plan.md"
+    "docs/operator-plan.md",
+    "docs/operator-lifecycle.md"
   ],
   "paused_tasks": [
     {

@@ -77,7 +77,8 @@ Browser M3b.3 remains mandatory before cookie writes; paused, not dropped.
 [F3a policy](docs/media-sandbox.md) and [F3b recovery limits](docs/recovery-candidate.md)
 are accepted in CI. [F3c.1 offline wheelhouse](docs/operator-package.md) is accepted in CI with a versioned runtime hash lock.
 [F3c.2a operator proposal](docs/operator-plan.md) is accepted in CI: fixed isolated targets and full bundle verification; not host attestation/install.
-Next F3c.2b: actual lifecycle implementation/stop/rollback and measured resource acceptance, before separately approved VPS checks.
+Current [F3c.2b unprivileged lifecycle](docs/operator-lifecycle.md): SOURCE awaiting Actions; real offline installation/start/stop/restart, not a systemd installer.
+Next F3c.2c: fixed root-owned unit wrapper/cgroup and measured aggregate resources, before separately approved VPS checks.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).

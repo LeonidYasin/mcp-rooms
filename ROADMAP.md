@@ -363,3 +363,13 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 - [ ] F3c.2b actual lifecycle and measured resource/timeout/disk acceptance remain.
 
 [Contract](docs/operator-plan.md). No remote operation authorized.
+
+
+## F3c.2b — unprivileged offline lifecycle rehearsal
+
+- [x] SOURCE: actual fresh offline install with ready-last receipt/clean env/fixed commands; no implicit key issuance.
+- [x] SOURCE: explicit bootstrap, pinned interpreter/profile/process, owned loopback listener and pidfd stop; restart preserves history, rollback never rewinds/deletes data.
+- [ ] Exact-source matrix and real installed-package loopback MCP/restart/stop-only rollback CI.
+- [ ] F3c.2c root-owned/systemd/cgroup and measured aggregate resource budget acceptance.
+
+[Contract/limitations](docs/operator-lifecycle.md). Not VPS installation approval.

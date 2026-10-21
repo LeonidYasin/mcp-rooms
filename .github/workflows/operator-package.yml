@@ -41,6 +41,10 @@ jobs:
           cd /tmp
           umask 077
           /tmp/rooms-operator/venv/bin/python "$CHECKOUT/tools/ci_candidate_smoke.py"
+      - name: Unprivileged offline install and real loopback lifecycle rehearsal
+        run: |
+          umask 077
+          python tools/ci_operator_lifecycle_smoke.py /tmp/rooms-operator/bundle "$GITHUB_SHA"
       - name: Upload public wheelhouse only
         uses: actions/upload-artifact@v4
         with:

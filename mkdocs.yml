@@ -123,6 +123,7 @@ nav:
     - CI offline wheelhouse F3c.1: docs/ci-f3c1.md
     - CI operator proposal F3c.2a: docs/ci-f3c2a.md
     - CI offline lifecycle F3c.2b: docs/ci-f3c2b.md
+    - Unit and cgroup supervision: docs/operator-supervision.md
     - CI сайта и публикация: docs/ci-pages.md
     - Итоги исследования: docs/marketplace-research-final.md
     - Проверка кандидатов: docs/candidate-source-checks.md

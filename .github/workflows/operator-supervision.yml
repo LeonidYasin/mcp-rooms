@@ -1,0 +1,24 @@
+name: Operator systemd supervision proof
+on:
+  push:
+    branches: [feat/standalone-identity]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  supervision:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify fixed candidate unit syntax without installing it
+        run: |
+          python3 tools/operator_unit.py --source-sha "$GITHUB_SHA" --resource https://example.invalid/rooms-candidate/mcp > /tmp/mcp-rooms-candidate.service
+          # Verify with a synthetic executable path: release is intentionally absent.
+          sed 's|^ExecStart=.*|ExecStart=/usr/bin/python3 -I -c pass|' /tmp/mcp-rooms-candidate.service > /tmp/mcp-rooms-unit-syntax.service
+          systemd-analyze verify /tmp/mcp-rooms-unit-syntax.service
+      - name: Real cgroup fixture on disposable runner only
+        run: sudo --non-interactive env -i GITHUB_ACTIONS=true PATH=/usr/bin:/bin /usr/bin/python3 -I "$GITHUB_WORKSPACE/tools/ci_systemd_supervision.py"

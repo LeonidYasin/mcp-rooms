@@ -373,3 +373,13 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 - [ ] F3c.2c root-owned/systemd/cgroup and measured aggregate resource budget acceptance.
 
 [Contract/limitations](docs/operator-lifecycle.md). Not VPS installation approval.
+
+
+## F3c.2c.1 — fixed unit and cgroup supervision proof
+
+- [x] SOURCE: read-only fixed unit renderer; no autostart/install, provisional review resource ceilings.
+- [x] SOURCE: isolated Actions fixture verifies real cgroup accounting and cleanup of TERM-resistant child.
+- [ ] Exact-source CI acceptance.
+- [ ] F3c.2c.2 root-owned installer and real candidate/native resource/timeout/disk acceptance remain.
+
+[Contract](docs/operator-supervision.md). No VPS or main changes authorized.

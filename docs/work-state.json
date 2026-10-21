@@ -10,17 +10,17 @@
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
-    "id": "F3c.2b",
-    "stage": "CI",
-    "contract": "docs/operator-lifecycle.md",
-    "source": "tools/operator_lifecycle.py",
-    "tests": "tests/test_operator_lifecycle.py",
-    "evidence": "docs/ci-f3c2b.md"
+    "id": "F3c.2c.1",
+    "stage": "SOURCE",
+    "contract": "docs/operator-supervision.md",
+    "source": "tools/operator_unit.py",
+    "tests": "tests/test_operator_unit.py",
+    "evidence": null
   },
   "next_task": {
-    "id": "F3c.2c",
-    "title": "Fixed root-owned systemd wrapper and measured aggregate resource/cgroup acceptance",
-    "contract": "docs/operator-lifecycle.md",
+    "id": "F3c.2c.2",
+    "title": "Root-owned fresh installer and actual candidate-in-unit resource acceptance",
+    "contract": "docs/operator-supervision.md",
     "acceptance": [
       "Map reviewed fixed VPS user/unit/release/state paths to root-owned immutable application code; do not deploy the unprivileged rehearsal as a public supervisor.",
       "Implement just-before-effect unit/drop-in/process/path checks and fresh/interrupted/stale identity negative tests; preserve unrelated services and all state during stop-only rollback.",

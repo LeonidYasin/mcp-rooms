@@ -383,6 +383,19 @@
         "operator_plan",
         "test_candidate"
       ]
+    },
+    {
+      "id": "operator_supervision",
+      "title": "Fixed unit and cgroup supervision proof",
+      "stage": "SOURCE",
+      "summary": "Read-only fixed unit renderer and isolated real systemd/cgroup fixture; no candidate installation or capacity acceptance. Pending Actions.",
+      "doc": "docs/operator-supervision.md",
+      "source": "tools/operator_unit.py",
+      "evidence": null,
+      "depends_on": [
+        "operator_lifecycle",
+        "operator_plan"
+      ]
     }
   ]
 }

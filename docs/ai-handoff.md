@@ -30,7 +30,9 @@ M3b.3 session binding **не отменён**: paused до возвращени�
 [F2 принят в exact-SHA CI](ci-f2.md):686 tests на3.12 плюс installed-wheel native smoke.
 [Контракт TEST-кандидата](test-candidate.md) описывает fresh-only bootstrap, startup без
 DDL и один worker/upload. F3a [Landlock/seccomp](media-sandbox.md) [принят в exact-SHA CI](ci-f3a.md):709 tests на3.12.
-Candidate обязан отказать до app startup без рабочей политики. Следующая задача F3b — restore/security-state.
+Candidate обязан отказать до app startup без рабочей политики. F3b [offline recovery quarantine](recovery-candidate.md) подготовлен (SOURCE).
+Original current authority обязателен; output не compose-ready, все publications withdrawn.
+Следующая задача F3c — dependency/resource/operator package, без promotion обхода.
 F3b restore/security-state и F3c resources/dependency/operator package остаются
 явно в queued_tasks, не самовольный deploy.
 

@@ -334,3 +334,13 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 - [ ] F3b DB+photos restore/current security-state reconciliation, then F3c dependency/capacity/operator package.
 
 [Threat model / prerequisites / limitations](docs/media-sandbox.md).
+
+
+## F3b — offline recovery quarantine
+
+- [x] SOURCE: process/photo/SQLite freeze, consistent backup API, bounded derivative inventory/projection validation, new private snapshot/restore only.
+- [x] SOURCE: current original authority required; revoke/disable union, scopes intersection/min expiry, no new keys; all restored publications withdrawn and output not compose-ready.
+- [ ] Exact-SHA CI acceptance and installed-wheel DB+real photo recovery smoke.
+- [ ] F3c pinned dependency/resource/operator package; promotion/cutover and missing-current disaster recovery are not silently accepted.
+
+[Contract](docs/recovery-candidate.md). No VPS command or main/production change.

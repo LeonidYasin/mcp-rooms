@@ -52,6 +52,14 @@ def smoke():
                 rpc(c,raw,'listings_withdraw',dict(listing_id=lid,expected_publication_revision=1,client_id=key()))
                 assert c.get('/market/'+lid).status_code==404
                 assert c.get(f'/market/{lid}/photos/1/{mid}.jpg').status_code==404
+        from mcp_rooms.recovery import snapshot, restore, verify
+        saved=Path(parent)/'snapshot';recovered=Path(parent)/'recovered'
+        before=snapshot(state,saved,RESOURCE)
+        after=restore(saved,state,recovered,RESOURCE)
+        assert after['counts']==before['counts'] and after['photo_files']==1
+        assert verify(recovered,RESOURCE)==after and not (recovered/'profile.json').exists()
+        assert not (saved/'owner.key').exists() and not (recovered/'owner.key').exists()
+        print('RECOVERY SMOKE PASS: installed wheel; DB + native photo; isolated quarantine; no serving')
         raw=None
     print('CANDIDATE SMOKE PASS: installed wheel; real native synthetic photo; MCP consent/public/withdraw; no sockets or VPS')
 

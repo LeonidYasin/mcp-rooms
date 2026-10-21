@@ -10,23 +10,23 @@
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
-    "id": "F3a",
-    "stage": "CI",
-    "contract": "docs/media-sandbox.md",
-    "source": "src/mcp_rooms/media_sandbox.py",
-    "tests": "tests/test_media_sandbox.py",
-    "evidence": "docs/ci-f3a.md"
+    "id": "F3b",
+    "stage": "SOURCE",
+    "contract": "docs/recovery-candidate.md",
+    "source": "src/mcp_rooms/recovery.py",
+    "tests": "tests/test_candidate_recovery.py",
+    "evidence": null
   },
   "next_task": {
-    "id": "F3b",
-    "title": "Consistent DB+photos isolated restore and current revoked/disabled security-state reconciliation",
+    "id": "F3c",
+    "title": "Pinned dependency manifest and reviewed owner-first operator package/capacity gates",
     "contract": "docs/test-candidate.md",
     "acceptance": [
-      "Produce a consistent synthetic snapshot of database and private staged/public photo files without exposing the restored copy or overwriting live state.",
-      "Prove restored media digests/counts/publication references agree, including interrupted or missing-file failure cases without automatic repair.",
-      "Reconcile current credential revocations and disabled users before the restored copy can serve requests; a historical backup must not resurrect access.",
-      "Keep snapshot/restore tooling fixed and operator-only, fail closed on invalid targets, no arbitrary SQL/shell and no secrets in logs/artifacts.",
-      "Verify restore/security-state fixtures in Actions only; F3c dependencies/capacity/operator package and separate owner-approved VPS gates remain pending."
+      "Prepare dependency-pinned wheel/install inputs and a source-pinned verifiable operator package, with no server execution or secret delivery in logs.",
+      "Prove fresh-only dry-run/install/stop/rollback safety and independent paths/ports/users without touching existing MCP services or Caddy.",
+      "Measure bounded resource/timeout/load and disk retention requirements in Actions, retaining child sandbox failures as startup refusal; never assume current VPS kernel or RAM.",
+      "Keep restored copies quarantined; do not add promotion by copying candidate profile markers or resurrect historical publications/credentials.",
+      "Document separately approved fresh VPS preflight, loopback install and HTTPS external acceptance; every remote execution needs explicit permission and special password."
     ]
   },
   "runtime_last_known": {
@@ -54,7 +54,8 @@
     "docs/browser-http.md",
     "docs/owner-first-test.md",
     "docs/test-candidate.md",
-    "docs/media-sandbox.md"
+    "docs/media-sandbox.md",
+    "docs/recovery-candidate.md"
   ],
   "paused_tasks": [
     {
@@ -71,11 +72,5 @@
       "reason": "Required before browser writes; deferred from MCP-managed read-only first TEST."
     }
   ],
-  "queued_tasks": [
-    {
-      "id": "F3c",
-      "title": "Dependency-pinned reviewed operator package, capacity/rollback acceptance, then separately approved VPS gates",
-      "contract": "docs/test-candidate.md"
-    }
-  ]
+  "queued_tasks": []
 }

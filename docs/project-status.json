@@ -329,6 +329,20 @@
       "depends_on": [
         "worker"
       ]
+    },
+    {
+      "id": "candidate_recovery",
+      "title": "DB+photos recovery quarantine",
+      "stage": "SOURCE",
+      "summary": "Офлайн locks/SQLite backup, bounded photo manifest, current auth narrowing и withdrawn restored publications; output не compose-ready. Ожидает CI, не полный disaster recovery.",
+      "doc": "docs/recovery-candidate.md",
+      "source": "src/mcp_rooms/recovery.py",
+      "evidence": null,
+      "depends_on": [
+        "test_candidate",
+        "media_files",
+        "publish"
+      ]
     }
   ]
 }

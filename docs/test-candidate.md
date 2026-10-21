@@ -143,7 +143,7 @@ retention14days. Нет key/DB/photos/state/logs в uploaded paths. Это integ
 [work-state](work-state.json), [общий маршрут](deployment-readiness.md).
 
 
-## F3b — bounded задача следующего чата (SPEC, не реализация)
+## F3b — bounded offline recovery (SOURCE)
 
 Цель: операторский consistent DB+photos snapshot и проверка **отдельной private
 восстановленной копии**, не перезапись рабочего профиля. Минимальный первый подход:
@@ -170,4 +170,6 @@ retention14days. Нет key/DB/photos/state/logs в uploaded paths. Это integ
 - Actions-only tests; не создавать schedules, retention auto-delete, off-host uploads
   или команды VPS. F3c dependency/capacity/operator install остаётся отдельно.
 
-Это проект следующего среза; конкретная реализация и её границы требуют review.
+[F3b реализация/границы](recovery-candidate.md) подготовлена, ожидает Actions.
+Output quarantine намеренно не имеет candidate profile.json; утрата current
+security authority не обходится восстановлением старого snapshot.

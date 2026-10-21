@@ -74,7 +74,7 @@ and uses a listings-only key. No public registration, feed/search or private rep
 Browser M3b.3 remains mandatory before cookie writes; paused, not dropped.
 [Machine-readable continuation state](docs/work-state.json).
 [Shorter three-gate TEST track](docs/owner-first-test.md) · [candidate contract](docs/test-candidate.md).
-[F3a policy and limits](docs/media-sandbox.md) are accepted in CI. Next F3b restore/security state
+[F3a policy and limits](docs/media-sandbox.md) are accepted in CI. Current [F3b recovery source](docs/recovery-candidate.md) awaits exact-SHA CI; then F3c resources
 and dependency-pinned operator/rollback package before separately approved VPS checks.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).

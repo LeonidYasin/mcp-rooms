@@ -1,6 +1,7 @@
 # F3c.2a — read-only предложение операторской установки
 
-**SOURCE, ожидает exact-SHA Actions. Не installer, не выполненный dry-run VPS.**
+**CI: exact-source proposal/unit/integration проверки приняты. Не installer, не выполненный dry-run VPS.**
+[Evidence](ci-f3c2a.md).
 [Предшествующий offline bundle](operator-package.md) · [Общий контракт](test-candidate.md).
 
 `tools/operator_plan.py` не импортирует приложение, не создаёт каталогов/ключей,

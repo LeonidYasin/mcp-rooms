@@ -359,7 +359,7 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 
 - [x] SOURCE: exact wheelhouse/source/hash verification + fixed fresh candidate user/unit/paths/port, canonical resource, typed lifecycle requirements.
 - [x] SOURCE: supplied observations explicitly NOT host attestation; no effects/approval/resource acceptance, no recovery promotion.
-- [ ] Exact-SHA unit and real-wheelhouse integration CI.
+- [x] Exact-SHA `0927c82a`:826 tests3.12; real-wheelhouse proposal verification and offline native/recovery smoke green. [Evidence](docs/ci-f3c2a.md).
 - [ ] F3c.2b actual lifecycle and measured resource/timeout/disk acceptance remain.
 
 [Contract](docs/operator-plan.md). No remote operation authorized.

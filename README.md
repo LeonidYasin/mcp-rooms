@@ -59,13 +59,13 @@ is not yet accepted.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [F3c.1](docs/ci-f3c1.md), source
-`fc96fe641092b1cfc07c6fa25cc2d3a65d0a88ac`: Python3.12 **789 passed**.
-Versioned exact hashes for30 runtime dependencies;31-wheel public offline bundle.
-Fresh venv installation with no index and required hashes, dependency check and
-installed native candidate/recovery smoke verified. [F3b quarantine recovery](docs/ci-f3b.md),
-[F3a child isolation](docs/ci-f3a.md) and [F2 fresh candidate](docs/ci-f2.md) remain.
-**Not a VPS installer, complete F3c or deployment.**
+**Latest accepted checkpoint:** [F3c.2a](docs/ci-f3c2a.md), source
+`0927c82a7370b194a194d552a4cae8ee6486428a`: Python3.12 **826 passed**.
+Read-only operator proposal verifies the exact-source offline wheelhouse and fixes
+isolated candidate user/unit/paths/port. Supplied host observations are explicitly
+unattested; no install authorization/host probe/resource acceptance. [F3c.1 offline
+bundle](docs/ci-f3c1.md), [F3b quarantine recovery](docs/ci-f3b.md) and [F3a sandbox](docs/ci-f3a.md) remain.
+**Not an executable VPS installer or deployment.**
 
 Built on [F1 read-only card](docs/ci-f1.md), [session bridge](docs/ci-m3b2.md),
 [private photo HTTP](docs/ci-m3a2.md) and12 scoped listing tools on top of8 rooms.
@@ -76,7 +76,7 @@ Browser M3b.3 remains mandatory before cookie writes; paused, not dropped.
 [Shorter three-gate TEST track](docs/owner-first-test.md) · [candidate contract](docs/test-candidate.md).
 [F3a policy](docs/media-sandbox.md) and [F3b recovery limits](docs/recovery-candidate.md)
 are accepted in CI. [F3c.1 offline wheelhouse](docs/operator-package.md) is accepted in CI with a versioned runtime hash lock.
-Current [F3c.2a operator proposal](docs/operator-plan.md): SOURCE awaiting CI, fixed isolated targets and full bundle verification; not host attestation/install.
+[F3c.2a operator proposal](docs/operator-plan.md) is accepted in CI: fixed isolated targets and full bundle verification; not host attestation/install.
 Next F3c.2b: actual lifecycle implementation/stop/rollback and measured resource acceptance, before separately approved VPS checks.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).

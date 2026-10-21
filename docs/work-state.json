@@ -4,18 +4,18 @@
   "branch": "feat/standalone-identity",
   "pull_request": 1,
   "accepted": {
-    "source_sha": "fc96fe641092b1cfc07c6fa25cc2d3a65d0a88ac",
-    "evidence": "docs/ci-f3c1.md",
-    "python312_passed": 789,
+    "source_sha": "0927c82a7370b194a194d552a4cae8ee6486428a",
+    "evidence": "docs/ci-f3c2a.md",
+    "python312_passed": 826,
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
     "id": "F3c.2a",
-    "stage": "SOURCE",
+    "stage": "CI",
     "contract": "docs/operator-plan.md",
     "source": "tools/operator_plan.py",
     "tests": "tests/test_operator_plan.py",
-    "evidence": null
+    "evidence": "docs/ci-f3c2a.md"
   },
   "next_task": {
     "id": "F3c.2b",

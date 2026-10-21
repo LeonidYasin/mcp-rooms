@@ -122,3 +122,12 @@ reviewed fresh-only operator plan/install/health/stop/rollback и ресурсн
 preflight VPS → loopback TEST → HTTPS/external acceptance. Не обещание четырёх
 команд: возможны исправления совместимости. Browser/search/replies не блокируют
 этот узкий TEST, но обязательны для полного marketplace. Production не принят.
+
+
+## Актуализация после F3c.2a
+
+[Read-only operator proposal принят в CI](ci-f3c2a.md). Это concretized plan, не
+готовая установка: F3c.2b lifecycle implementation/negative interruption tests и
+measured resource budget остаются. Supplied host observations не доказывают
+свободный порт/paths/account и не заменяют свежий owner-approved VPS preflight.
+Количество инфраструктурных ворот не изменилось: preflight → loopback → HTTPS.

@@ -361,11 +361,11 @@
     {
       "id": "operator_plan",
       "title": "Read-only operator proposal",
-      "stage": "SOURCE",
-      "summary": "Fixed isolated TEST identity/paths/port; trusted wheelhouse verification; typed seven-stage proposal. Caller observations unattested; no host probe, install or resource acceptance.",
+      "stage": "CI",
+      "summary": "Trusted real-wheelhouse verifier and fixed isolated seven-stage proposal accepted in Actions. Observations unattested; no host probe/effects/resources accepted. Lifecycle implementation F3c.2b remains.",
       "doc": "docs/operator-plan.md",
       "source": "tools/operator_plan.py",
-      "evidence": null,
+      "evidence": "docs/ci-f3c2a.md",
       "depends_on": [
         "operator_bundle"
       ]

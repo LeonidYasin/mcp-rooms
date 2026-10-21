@@ -33,7 +33,7 @@ DDL и один worker/upload. F3a [Landlock/seccomp](media-sandbox.md) [при�
 Candidate обязан отказать до app startup без рабочей политики. F3b [offline recovery quarantine](recovery-candidate.md) [принят в CI](ci-f3b.md):761 tests на3.12.
 Original current authority обязателен; output не compose-ready, все publications withdrawn.
 F3c.1 [offline wheelhouse](operator-package.md) [принят в CI](ci-f3c1.md):789 tests;
-30 runtime hash pins, offline clean venv/native+recovery smoke. Current F3c.2a [read-only proposal](operator-plan.md) — SOURCE awaiting CI;
+30 runtime hash pins, offline clean venv/native+recovery smoke. F3c.2a [read-only proposal](operator-plan.md) [принят в CI](ci-f3c2a.md):826 tests;
 unattested observations, fixed isolated targets, no host probe/effects.
 F3c.2b lifecycle implementation/resources — next_task; recovery promotion/missing-current disaster policy сохранены в
 paused_tasks (RECOVERY-CUTOVER). Ни один из них не означает самовольный deploy.
@@ -115,3 +115,12 @@ Cookie-authorized market commands, автоматический onboarding/recov
    Docs-коммит проверяется отдельно и не подменяет source acceptance SHA.
 7. Завершить понятной сводкой: что принято, что не работает извне, следующий bounded
    шаг, нужны ли разрешения владельца. Не просить пользователя заново пересказывать чат.
+
+
+## Исходный mcp-server — отдельный durable handoff
+
+Для GitHub/research/binary и embedded rooms не восстанавливать старую переписку:
+[документационный PR118](https://github.com/LeonidYasin/mcp-server/pull/118),
+[pinned entry](https://github.com/LeonidYasin/mcp-server/blob/8f07bafce89f350badaf48b59abea30b495c4aab/AGENTS.md).
+Там индексированы исходники/проверки/незавершённые gates и исторический extraction.
+Это отдельный незамерженный docs PR, не runtime dependency Rooms и не общий deploy.

@@ -17,6 +17,7 @@ import runpy
 import shutil
 import signal
 import socket
+import stat
 import struct
 import subprocess
 import sys
@@ -249,6 +250,12 @@ def main(bundle,source):
         private_bundle=TRUSTED/'bundle';shutil.copytree(bundle,private_bundle)
         installer=runpy.run_path(str(TRUSTED/'tools/operator_install.py'))
         lock=sha256((TRUSTED/'operator/runtime-linux-x86_64-py312.lock').read_bytes()).hexdigest()
+        # Fixed non-secret OS path metadata only; never keys, DBs or request bodies.
+        for parent in ('/','/opt','/var','/var/lib','/etc','/etc/systemd','/etc/systemd/system',
+                       '/usr','/usr/bin','/usr/lib','/usr/lib/python3.12'):
+            meta=Path(parent).lstat()
+            print('CANDIDATE TRUST: '+json.dumps({'path':parent,'uid':meta.st_uid,
+                'mode':oct(stat.S_IMODE(meta.st_mode))}),flush=True)
         old_umask=os.umask(0o077)
         try:installed=installer['install'](private_bundle,source,lock,RESOURCE)
         finally:os.umask(old_umask)

@@ -77,7 +77,7 @@ def _wheel(path):
     with zipfile.ZipFile(path) as z:
         names=[i for i in z.infolist() if i.filename.endswith('.dist-info/METADATA')]
         if len(names)!=1 or names[0].file_size>MAX_META:
-            raise BundleError('operator_invalid_wheel_metadata')
+            raise BundleError(f'operator_invalid_wheel_metadata:{path.name}:entries={len(names)}:bytes={names[0].file_size if len(names)==1 else -1}')
         # No extracting wheels here. pip performs its own wheel compatibility check.
         msg=BytesParser().parsebytes(z.read(names[0]))
         if len(msg.get_all('Name',[]))!=1 or len(msg.get_all('Version',[]))!=1:

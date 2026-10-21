@@ -222,7 +222,9 @@ def compose(state,resource):
         store=RoomStore(root/DB,initialize=False)
         drafts=DraftStore(store,resource)
         files=PrivatePhotoFiles(root/'photos')
-        worker=PhotoWorker(max_parallel=1)
+        from .media_sandbox import NativeSandbox
+        worker=PhotoWorker(max_parallel=1,sandbox=NativeSandbox(root))
+        worker.check_sandbox()  # Fail closed before constructing/exposing any app.
         stages=MediaStageStore(drafts,files,worker)
         photos=PhotoDraftStore(stages);publisher=PublicationStore(photos)
         adapter=MarketAdapter(drafts,photos,publisher)

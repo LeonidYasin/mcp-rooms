@@ -72,7 +72,8 @@ and uses a listings-only key. No public registration, feed/search or private rep
 Browser M3b.3 remains mandatory before cookie writes; paused, not dropped.
 [Machine-readable continuation state](docs/work-state.json).
 [Shorter three-gate TEST track](docs/owner-first-test.md) · [candidate contract](docs/test-candidate.md).
-Next F3a: native child OS filesystem/network isolation, then restore/security state
+Current [F3a source](docs/media-sandbox.md): mandatory Landlock/seccomp child isolation,
+awaiting exact-SHA CI; then F3b restore/security state
 and dependency-pinned operator/rollback package before separately approved VPS checks.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).

@@ -20,7 +20,8 @@ MAX_WIRE_BYTES = MAX_OUTPUT_BYTES + 2048
 ERRORS = frozenset(('media_invalid_bytes', 'media_input_too_large',
                     'media_type_not_allowed', 'media_type_mismatch',
                     'media_dimensions_exceeded', 'media_animation_not_allowed',
-                    'media_output_too_large', 'media_invalid_image'))
+                    'media_output_too_large', 'media_invalid_image',
+                    'media_sandbox_unavailable','media_sandbox_policy_invalid','media_sandbox_probe_failed'))
 
 
 def _launch():
@@ -28,6 +29,16 @@ def _launch():
         [sys.executable, '-I', '-B', '-m', 'mcp_rooms.media_worker_child'],
         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
         env={'LANG': 'C.UTF-8'}, cwd='/', close_fds=True, start_new_session=True)
+
+
+def _launch_sandbox(policy, *, check=False):
+    from .media_sandbox import NativeSandbox
+    if not isinstance(policy,NativeSandbox):raise DomainError('media_sandbox_policy_invalid')
+    return subprocess.Popen(
+        [sys.executable,'-I','-B','-m','mcp_rooms.media_worker_child',
+         '--sandbox-check' if check else '--sandbox',str(policy.protected_root)],
+        stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
+        env={'LANG':'C.UTF-8'},cwd='/',close_fds=True,start_new_session=True)
 
 
 def _terminate(process):
@@ -121,11 +132,51 @@ class PhotoWorker:
     Reuse one instance per app process. Do not expose creation/limits over an API.
     Results are internal bytes, not a persisted or publishable media manifest.
     """
-    def __init__(self, *, max_parallel=2):
+    def __init__(self, *, max_parallel=2, sandbox=None):
         if type(max_parallel) is not int or max_parallel not in (1,2):
             raise DomainError('invalid_worker_parallelism')
+        from .media_sandbox import NativeSandbox
+        if sandbox is not None and not isinstance(sandbox,NativeSandbox):
+            raise DomainError('media_sandbox_policy_invalid')
+        self.sandbox=sandbox
         self.max_parallel = max_parallel
         self._slots = threading.BoundedSemaphore(max_parallel)
+
+    def check_sandbox(self):
+        from .media_sandbox import POLICY
+        if self.sandbox is None:raise DomainError('media_sandbox_policy_invalid')
+        if not self._slots.acquire(blocking=False):raise DomainError('media_worker_busy')
+        process=None
+        try:
+            process=_launch_sandbox(self.sandbox,check=True)
+            wire=_exchange(process,b'')
+            if len(wire)>2048:raise DomainError('media_worker_protocol')
+            def unique(items):
+                value={}
+                for key,item in items:
+                    if key in value:raise ValueError
+                    value[key]=item
+                return value
+            try:result=json.loads(wire,object_pairs_hook=unique)
+            except (ValueError,UnicodeError,RecursionError):raise DomainError('media_worker_protocol') from None
+            fields={'v','policy','abi','state_denied','db_denied','key_denied_or_absent',
+                    'marker_denied','inet_denied','inet6_denied','unix_denied'}
+            if type(result) is dict and set(result)=={'v','error'} and result.get('error') in ERRORS:
+                raise DomainError(result['error'])
+            if (type(result) is not dict or set(result)!=fields or type(result['v']) is not int
+                    or result['v']!=1 or result['policy']!=POLICY or type(result['abi']) is not int
+                    or result['abi']<3 or not all(result[k] is True for k in fields-{'v','policy','abi'})):
+                raise DomainError('media_worker_protocol')
+            return {'policy':POLICY,'abi':result['abi'],'checked':True}
+        except OSError:raise DomainError('media_sandbox_unavailable') from None
+        finally:
+            try:
+                if process is not None:
+                    try:_terminate(process)
+                    finally:
+                        if not process.stdin.closed:process.stdin.close()
+                        process.stdout.close()
+            finally:self._slots.release()
 
     def normalize(self, payload: bytes, declared_type: str) -> NormalizedPhoto:
         if sys.platform != 'linux' or sys.version_info < (3, 11):
@@ -140,7 +191,7 @@ class PhotoWorker:
             raise DomainError('media_worker_busy')
         process = None
         try:
-            process = _launch()
+            process = _launch() if self.sandbox is None else _launch_sandbox(self.sandbox)
             return _parse(_exchange(process, declared_type.encode('ascii') + b'\n' + payload), declared_type)
         except OSError:
             raise DomainError('media_worker_failed') from None

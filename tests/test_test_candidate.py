@@ -233,3 +233,13 @@ def test_hot_journal_requires_explicit_review_not_startup_recovery(profile):
     journal=profile/(m.DB+'-journal');journal.write_bytes(b'synthetic journal marker');journal.chmod(0o600)
     with pytest.raises(DomainError,match='candidate_database_mismatch'):m.check(profile,RESOURCE)
     assert journal.read_bytes()==b'synthetic journal marker'
+
+
+@pytest.mark.skipif(not NATIVE,reason='Linux native candidate requires Python>=3.11')
+def test_sandbox_startup_failure_releases_profile_lock_without_plain_fallback(profile,monkeypatch):
+    def fail(self):raise DomainError('media_sandbox_unavailable')
+    with monkeypatch.context() as patch:
+        patch.setattr(PhotoWorker,'check_sandbox',fail)
+        with pytest.raises(DomainError,match='media_sandbox_unavailable'):m.compose(profile,RESOURCE)
+    with m.compose(profile,RESOURCE) as candidate:
+        assert candidate.app is not None

@@ -316,6 +316,19 @@
         "worker",
         "media_files"
       ]
+    },
+    {
+      "id": "native_sandbox",
+      "title": "OS-изоляция native photo child",
+      "stage": "SOURCE",
+      "summary": "Landlock ABI≥3 + seccomp x86_64, fail-closed перед Pillow и startup candidate. Synthetic CI proofs ожидаются; VPS не проверен.",
+      "doc": "docs/media-sandbox.md",
+      "source": "src/mcp_rooms/media_sandbox.py",
+      "evidence": null,
+      "depends_on": [
+        "worker",
+        "test_candidate"
+      ]
     }
   ]
 }

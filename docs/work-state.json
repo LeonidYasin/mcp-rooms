@@ -10,23 +10,23 @@
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
-    "id": "F2",
-    "stage": "CI",
-    "contract": "docs/test-candidate.md",
-    "source": "src/mcp_rooms/test_candidate.py",
-    "tests": "tests/test_test_candidate.py",
-    "evidence": "docs/ci-f2.md"
+    "id": "F3a",
+    "stage": "SOURCE",
+    "contract": "docs/media-sandbox.md",
+    "source": "src/mcp_rooms/media_sandbox.py",
+    "tests": "tests/test_media_sandbox.py",
+    "evidence": null
   },
   "next_task": {
-    "id": "F3a",
-    "title": "Fail-closed OS filesystem/network isolation for native photo child",
+    "id": "F3b",
+    "title": "Consistent DB+photos isolated restore and current revoked/disabled security-state reconciliation",
     "contract": "docs/test-candidate.md",
     "acceptance": [
-      "Choose a minimal reviewed Linux isolation mechanism; prove the child cannot read synthetic parent state/key/database and cannot access network, while parent services still function.",
-      "Prepare a fixed trusted launcher with no client-selected paths/commands, preserve one slot/RLIMIT/kill-reap and deny processing when isolation is unsupported; no silent fallback to plain native child.",
-      "Verify installed-wheel valid native normalization, sandbox-denied file/network probes, unavailable-policy and timeout/child cleanup fixtures in GitHub Actions only.",
-      "Document exact kernel/binary/runtime prerequisites and scope limits without assuming availability on VPS; installing/probing remote software remains separately owner-approved with special password.",
-      "Keep F3b restore/security-state and F3c dependency/operator package/capacity gates visible; no real credentials, main merge, VPS deployment or enabled public registration."
+      "Produce a consistent synthetic snapshot of database and private staged/public photo files without exposing the restored copy or overwriting live state.",
+      "Prove restored media digests/counts/publication references agree, including interrupted or missing-file failure cases without automatic repair.",
+      "Reconcile current credential revocations and disabled users before the restored copy can serve requests; a historical backup must not resurrect access.",
+      "Keep snapshot/restore tooling fixed and operator-only, fail closed on invalid targets, no arbitrary SQL/shell and no secrets in logs/artifacts.",
+      "Verify restore/security-state fixtures in Actions only; F3c dependencies/capacity/operator package and separate owner-approved VPS gates remain pending."
     ]
   },
   "runtime_last_known": {
@@ -53,7 +53,8 @@
     "docs/deployment-readiness.md",
     "docs/browser-http.md",
     "docs/owner-first-test.md",
-    "docs/test-candidate.md"
+    "docs/test-candidate.md",
+    "docs/media-sandbox.md"
   ],
   "paused_tasks": [
     {
@@ -71,11 +72,6 @@
     }
   ],
   "queued_tasks": [
-    {
-      "id": "F3b",
-      "title": "Consistent DB+photos isolated restore and revoked/disabled security-state reconciliation",
-      "contract": "docs/test-candidate.md"
-    },
     {
       "id": "F3c",
       "title": "Dependency-pinned reviewed operator package, capacity/rollback acceptance, then separately approved VPS gates",

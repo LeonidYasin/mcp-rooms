@@ -71,6 +71,7 @@ nav:
     - До деплоя: docs/deployment-readiness.md
     - Короткий owner-first TEST: docs/owner-first-test.md
     - Fresh TEST candidate: docs/test-candidate.md
+    - Native child OS policy: docs/media-sandbox.md
     - Roadmap: ROADMAP.md
     - Архитектурное решение: docs/decisions/001-marketplace-foundation.md
     - Первый реальный сценарий: docs/first-sale-acceptance.md

@@ -14,8 +14,25 @@ def main():
     resource.setrlimit(resource.RLIMIT_NPROC, (0, 0))
     from .media_contract import MAX_INPUT_BYTES
     from .domain import DomainError
-    from .media_image import normalize_photo
     from .media_worker import ERRORS
+    # Parse only trusted supervisor arguments; policy precedes all decoder imports
+    # and input bytes. Failure returns a typed error, never an unprotected retry.
+    if sys.argv[1:]:
+        try:
+            if len(sys.argv)!=3 or sys.argv[1] not in ('--sandbox','--sandbox-check'):
+                raise DomainError('media_sandbox_policy_invalid')
+            from pathlib import Path
+            from .media_sandbox import NativeSandbox, enforce, probe
+            policy=NativeSandbox(Path(sys.argv[2]))
+            abi=enforce(policy)
+            if sys.argv[1]=='--sandbox-check':
+                sys.stdout.buffer.write(json.dumps(probe(policy,abi),separators=(',',':')).encode()+b'\n')
+                return 0
+        except (DomainError,OSError) as exc:
+            code=exc.code if isinstance(exc,DomainError) else 'media_sandbox_unavailable'
+            sys.stdout.buffer.write(json.dumps({'v':1,'error':code}).encode()+b'\n')
+            return 0
+    from .media_image import normalize_photo
     line = sys.stdin.buffer.readline(128)
     if line not in (b'image/png\n', b'image/jpeg\n'):
         return 2

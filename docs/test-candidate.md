@@ -6,7 +6,8 @@
 пользователи/ключи не создаются, VPS/Caddy/unit/main не меняются.
 
 [Exact-SHA F2 CI acceptance](ci-f2.md):686 tests на3.12 плюс installed-wheel native smoke.
-Это не серверная установка или OS sandbox.
+Это исторический F2 baseline, не серверная установка. Текущий candidate дополнен
+обязательной [F3a OS policy](media-sandbox.md), SOURCE до exact-SHA CI.
 
 ## Отдельный профиль вместо старого installer
 
@@ -122,10 +123,10 @@ retention14days. Нет key/DB/photos/state/logs в uploaded paths. Это integ
 ## Следующий bounded gate F3a и оставшиеся F3b/F3c
 
 Пока **нельзя называть этот кандидат готовым к VPS TEST**. Следующий отдельный
-кодовый срез — только F3a (пункт1 ниже). Остальные пункты остаются F3b/F3c, не
+кодовый срез F3a (пункт1 ниже) подготовлен, ожидает Actions. Остальные пункты остаются F3b/F3c, не
 должны теряться или запускаться на VPS автоматически. Нужны:
 
-1. Реальная OS filesystem/network sandbox native child: отдельно проверить, что он
+1. [F3a Landlock/seccomp child](media-sandbox.md): отдельно проверить, что он
    не читает parent state/owner.key/БД и не имеет network. RLIMIT/isolated Python —
    не такая sandbox. Root-only systemd ограничения не считаются существующими.
 2. Один worker всё ещё имеет RLIMIT_AS512MiB; подобрать общий MemoryMax/CPU/Tasks/

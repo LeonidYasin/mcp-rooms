@@ -29,7 +29,8 @@ M3b.3 session binding **не отменён**: paused до возвращени�
 [F1 принят в exact-SHA CI](ci-f1.md):645 tests на Python3.12.
 [F2 принят в exact-SHA CI](ci-f2.md):686 tests на3.12 плюс installed-wheel native smoke.
 [Контракт TEST-кандидата](test-candidate.md) описывает fresh-only bootstrap, startup без
-DDL и один worker/upload. Следующая bounded задача F3a — только OS filesystem/network isolation child.
+DDL и один worker/upload. F3a [Landlock/seccomp](media-sandbox.md) подготовлен (SOURCE, CI ещё не принят).
+Candidate обязан отказать до app startup без рабочей политики. Следующая задача F3b — restore/security-state.
 F3b restore/security-state и F3c resources/dependency/operator package остаются
 явно в queued_tasks, не самовольный deploy.
 
@@ -44,7 +45,8 @@ framework без измеренного blocker. Исследование кан
 - `store.py`, `identity.py`: SQLite, UUID users, digest-only Bearer, resource/scopes/revoke/disable.
 - `draft_store.py`, `listing_contract.py`: private drafts/category/CAS/idempotency, market schema2.
 - `media_image.py`, `media_worker*.py`: normalize JPEG/PNG → metadata-free JPEG; bounded isolated
-  child, **не полная OS filesystem/network sandbox**. Native >=3.11, core >=3.10.
+  child; candidate дополнительно требует `media_sandbox.py` Landlock/seccomp.
+  Legacy bare worker не является OS sandbox. Native >=3.11, core >=3.10.
 - `media_files.py`, `media_stage.py`, `media_cleanup.py`: private pinned root, media schema3,
   owner-bound staging, reviewed plan/apply cleanup. Crashes/orphans fail closed; не auto-delete.
 - `photo_drafts.py`, `publication_store.py`: ordered0–8 photos; publication schema1;

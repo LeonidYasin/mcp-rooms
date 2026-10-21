@@ -324,3 +324,13 @@ F3a — только fail-closed filesystem/network изоляция native chil
 F3b — consistent DB+files restore/security-state reconciliation. F3c — dependency
 pinning, resource/capacity gates и reviewed operator install/stop/rollback package.
 Только затем отдельно одобренные VPS действия. Не объединять эти задачи в скрытый rollout.
+
+
+## F3a — native child OS policy
+
+- [x] SOURCE: fixed unprivileged Landlock ABI≥3 + seccomp x86_64 before Pillow/input; candidate preflight, no bare fallback.
+- [x] Prepare synthetic file/key/DB read, metadata mutation, network/process denial, unavailable/timeout/reap and installed-wheel integration tests.
+- [ ] Exact-SHA Actions acceptance pending; no VPS/kernel availability claim.
+- [ ] F3b DB+photos restore/current security-state reconciliation, then F3c dependency/capacity/operator package.
+
+[Threat model / prerequisites / limitations](docs/media-sandbox.md).

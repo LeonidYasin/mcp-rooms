@@ -1,5 +1,6 @@
 """Fresh synthetic profiles only, in Actions. No VPS/systemd/network sockets."""
 import json
+from hashlib import sha256
 import os
 from pathlib import Path
 import sqlite3
@@ -48,9 +49,9 @@ def test_fresh_profile_minimum_grants_private_files_and_no_raw_output(profile,ca
 
 
 def test_existing_profile_never_reinitialized(profile):
-    before={p.name:p.read_bytes() for p in profile.iterdir() if p.is_file()}
+    before={p.name:sha256(p.read_bytes()).hexdigest() for p in profile.iterdir() if p.is_file()}
     with pytest.raises(FileExistsError):m.bootstrap(profile,RESOURCE)
-    assert {p.name:p.read_bytes() for p in profile.iterdir() if p.is_file()}==before
+    assert {p.name:sha256(p.read_bytes()).hexdigest() for p in profile.iterdir() if p.is_file()}==before
 
 
 @pytest.mark.parametrize('change',['missing_marker','duplicate_marker','future_marker','resource','missing_db','db_link',
@@ -82,10 +83,15 @@ def test_bad_state_fails_without_repair(profile,change,tmp_path):
              'new_trigger':'CREATE TRIGGER extra AFTER UPDATE ON users BEGIN SELECT 1; END',
              'new_index':'CREATE INDEX extra ON users(display_name)'}[change]
         with sqlite3.connect(root/m.DB) as db:db.execute(sql)
-    # Byte snapshots before validation, no repair/chmod/create/delete allowed.
-    before={p.name:(p.lstat().st_mode,p.read_bytes()) for p in root.iterdir() if p.is_file() and not p.is_symlink()}
+    # SQLite mode=ro may create WAL/SHM sidecars; that is NOT a schema/data repair.
+    # Hash stable payloads rather than dumping a DB/private delivery key on failure.
+    def snapshot():
+        return {p.name:(p.lstat().st_mode,sha256(p.read_bytes()).hexdigest())
+                for p in root.iterdir() if p.is_file() and not p.is_symlink()
+                and not p.name.endswith(('-wal','-shm'))}
+    before=snapshot()
     with pytest.raises((DomainError,OSError,sqlite3.Error)):m.check(root,RESOURCE)
-    after={p.name:(p.lstat().st_mode,p.read_bytes()) for p in root.iterdir() if p.is_file() and not p.is_symlink()}
+    after=snapshot()
     assert after==before
 
 

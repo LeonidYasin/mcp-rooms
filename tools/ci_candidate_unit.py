@@ -240,7 +240,13 @@ def main(bundle,source):
     with socket.socket() as probe:probe.bind(('127.0.0.1',8766))
     created_user=False;created_base=False;created_state=False;created_unit=False;loaded=False
     sampler=None;raw=None
+    opt=Path('/opt');opt_meta=opt.lstat();opt_mode=stat.S_IMODE(opt_meta.st_mode)
+    if not stat.S_ISDIR(opt_meta.st_mode) or opt_meta.st_uid!=0 or opt.resolve()!=opt:
+        raise RuntimeError('candidate_ci_opt_identity_refused')
     try:
+        # Hosted runner /opt is 0777. Tighten ONLY this disposable CI fixture;
+        # the production installer correctly refuses unsafe ancestors unchanged.
+        opt.chmod(opt_mode & ~0o022)
         TRUSTED.mkdir(mode=0o755)
         for folder in ('tools','operator'):(TRUSTED/folder).mkdir(mode=0o755)
         files=('tools/operator_install.py','tools/operator_bundle.py','tools/operator_plan.py',
@@ -389,6 +395,7 @@ def main(bundle,source):
             if created_base:shutil.rmtree(BASE)
             if created_user:command(['/usr/sbin/userdel',USER])
             if TRUSTED.exists():shutil.rmtree(TRUSTED)
+            opt.chmod(opt_mode)
         else:raise RuntimeError('candidate_ci_teardown_identity_refused')
 
 

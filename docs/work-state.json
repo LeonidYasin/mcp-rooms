@@ -10,23 +10,23 @@
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
-    "id": "F1",
-    "stage": "CI",
-    "contract": "docs/owner-first-test.md",
-    "source": "src/mcp_rooms/public_web.py",
-    "tests": "tests/test_public_web.py",
-    "evidence": "docs/ci-f1.md"
+    "id": "F2",
+    "stage": "SOURCE",
+    "contract": "docs/test-candidate.md",
+    "source": "src/mcp_rooms/test_candidate.py",
+    "tests": "tests/test_test_candidate.py",
+    "evidence": null
   },
   "next_task": {
-    "id": "F2",
-    "title": "Fresh isolated owner-first TEST composition, bootstrap and pinned package; no VPS execution",
-    "contract": "docs/owner-first-test.md",
+    "id": "F3",
+    "title": "OS decoder isolation, resource budgets and DB+files security-state recovery before VPS TEST",
+    "contract": "docs/test-candidate.md",
     "acceptance": [
-      "Define a strict fresh private state marker and validate exact database schemas read-only before RoomStore construction; no serve-time initialization or repair.",
-      "Use one process, one decoder/upload slot, explicit media/public opt-ins, no signup or browser writes; keep default rooms-only CLI unchanged.",
-      "Prepare separate operator-only fresh bootstrap and private least-privilege key delivery with cleanup/revoke on failure; never issue real keys in development.",
-      "Prove fresh install, bad binding/schema/path, synthetic photo/consent/public/withdraw smoke from installed package in GitHub Actions.",
-      "Record remaining OS resource/sandbox, DB+files security-state restore, artifact/checksum and owner-approved preflight/rollback gates; do not run old installer."
+      "Design and prove native child filesystem/network isolation that denies state/owner key/database access; do not claim RLIMIT is a full sandbox.",
+      "Prepare candidate-specific one-process resource/load/kill acceptance and MemoryMax/CPU/Tasks/disk budgets, without assuming old VPS memory reports are current.",
+      "Prepare a consistent DB+photo snapshot and isolated restore with revoked/disabled security state reconciliation; never expose restored copy publicly.",
+      "Prepare pinned dependency/install manifest and reviewed fresh-target dry-run/install/health/stop/rollback package; do not run remote commands or issue real credentials.",
+      "Require separate owner approval and special password for fresh VPS preflight, then loopback install, then external HTTPS; do not alter main or production."
     ]
   },
   "runtime_last_known": {
@@ -52,7 +52,8 @@
     "docs/project-status.json",
     "docs/deployment-readiness.md",
     "docs/browser-http.md",
-    "docs/owner-first-test.md"
+    "docs/owner-first-test.md",
+    "docs/test-candidate.md"
   ],
   "paused_tasks": [
     {

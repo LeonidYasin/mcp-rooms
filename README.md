@@ -71,6 +71,8 @@ to listing/media writes until M3b.3 transaction-time session binding passes;
 that track is paused, not dropped. Default CLI stays rooms-only; signup does not
 grant listing scopes. [Machine-readable continuation state](docs/work-state.json).
 [Shorter owner-first TEST: three major gates, not the full six-stage pilot](docs/owner-first-test.md).
+[F2 candidate](docs/test-candidate.md) adds explicit fresh-only bootstrap and no-DDL
+existing-profile startup; candidate package/CI smoke, not VPS installation or OS sandbox.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).

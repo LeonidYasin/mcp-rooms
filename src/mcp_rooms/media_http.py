@@ -68,9 +68,11 @@ async def binary_body(receive, length):
 
 
 class MediaHTTP:
-    def __init__(self, market):
+    def __init__(self, market, *, upload_slots=2):
+        if type(upload_slots) is not int or upload_slots not in (1,2):
+            raise DomainError('invalid_upload_parallelism')
         self.stages = market.photos.stages
-        self.uploads, self.reads = Admission(2, 1), Admission(4, 2)
+        self.uploads, self.reads = Admission(upload_slots, 1), Admission(4, 2)
 
     @staticmethod
     def match(path):

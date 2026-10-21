@@ -27,7 +27,10 @@ MCP Rooms / «Хочу — Предлагаю»: рынок возможност
 Нет browser editing/onboarding/search/replies/admin MCP; это меньший результат.
 M3b.3 session binding **не отменён**: paused до возвращения browser writes.
 [F1 принят в exact-SHA CI](ci-f1.md):645 tests на Python3.12.
-Ближайшая задача теперь F2 composition/bootstrap/package, не самовольный deploy.
+F2 composition/bootstrap/package подготовлен; смотрите work-state для CI acceptance.
+[Контракт TEST-кандидата](test-candidate.md) описывает fresh-only bootstrap, startup без
+DDL и один worker/upload. Следующий gate F3 — OS isolation/resources/restore/operator
+package, не самовольный deploy.
 
 ## Архитектура уже выбрана
 
@@ -48,6 +51,7 @@ framework без измеренного blocker. Исследование кан
 - `market_adapter.py`, `market_tools.py`, `server.py`: explicit market composition,
   8 rooms +12 scoped listing tools. Default CLI по-прежнему8 rooms.
 - `media_http.py`: explicit opt-in bounded binary upload/private JPEG read; не public photo route.
+- `test_candidate.py`: отдельный fresh-only операторский профиль и process lock; не VPS installer.
 - `public_web.py`: explicit opt-in anonymous read-only card/photo; нет feed, формы или cookie writes.
 - `browser_sessions.py`: отдельный bounded session core, browser schema1.
 - `browser_http.py`: opt-in session login/bootstrap/logout bridge; статус в work-state.

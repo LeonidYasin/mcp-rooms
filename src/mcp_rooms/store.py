@@ -65,12 +65,18 @@ class RoomStore:
     MAX_PAGES = 16384
     APPLICATION_ID = 0x4D435252  # MCRR: standalone, NOT the embedded database
 
-    def __init__(self, path, clock=None, limits=Limits()):
+    def __init__(self, path, clock=None, limits=Limits(), *, initialize=True):
+        if type(initialize) is not bool:
+            raise RoomError('invalid_initialize_policy')
+        self._existing_only = not initialize
         self.path = private_path(path)
         self.clock = clock or (lambda: int(time.time() * 1000))
         self.limits = limits
         if not self.path.is_absolute() or not self.path.parent.is_dir() or self.path.is_symlink():
             raise RoomError('invalid_database_path')
+        if not initialize:
+            self._open_existing()
+            return
         # Admin-controlled, private directory required. Never accept a path from tool arguments.
         flags = os.O_CREAT | os.O_RDWR | getattr(os, 'O_NOFOLLOW', 0) | getattr(os, 'O_NONBLOCK', 0)
         fd = os.open(self.path, flags, 0o600)
@@ -111,6 +117,34 @@ class RoomStore:
             db.execute('CREATE TABLE IF NOT EXISTS signup_budgets (scope TEXT NOT NULL, bucket INTEGER NOT NULL, used INTEGER NOT NULL, expires_at INTEGER NOT NULL, PRIMARY KEY(scope,bucket))')
             db.execute('PRAGMA user_version=2')
 
+    def _open_existing(self):
+        """No creation, chmod, initialization or migration; candidate checks more schemas."""
+        fd = os.open(self.path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        try:
+            info = os.fstat(fd)
+            if (not stat.S_ISREG(info.st_mode) or info.st_nlink != 1
+                    or info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) != 0o600
+                    or not 0 < info.st_size <= self.MAX_PAGES * 4096):
+                raise RoomError('invalid_database_path')
+            db = sqlite3.connect(self.path.as_uri() + '?mode=ro', uri=True, timeout=5)
+            try:
+                db.execute('PRAGMA query_only=ON')
+                self._validate_identity(db)
+                if (db.execute('PRAGMA user_version').fetchone()[0] != 2
+                        or db.execute('PRAGMA application_id').fetchone()[0] != self.APPLICATION_ID
+                        or db.execute('PRAGMA page_size').fetchone()[0] != 4096):
+                    raise RoomError('existing_database_required')
+                tables = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+                if not {'actors','rooms','members','messages','users','credentials','enrollments','signup_budgets'} <= tables:
+                    raise RoomError('existing_database_required')
+                current = self.path.stat(follow_symlinks=False)
+                if (info.st_dev, info.st_ino) != (current.st_dev, current.st_ino):
+                    raise RoomError('invalid_database_path')
+            finally:
+                db.close()
+        finally:
+            os.close(fd)
+
     @classmethod
     def _validate_identity(cls, db):
         version = db.execute('PRAGMA user_version').fetchone()[0]
@@ -123,7 +157,12 @@ class RoomStore:
 
     @contextmanager
     def _db(self, write=False, initialize=False):
-        db = sqlite3.connect(str(self.path), timeout=5, isolation_level=None)
+        if initialize and self._existing_only:
+            raise RoomError('existing_database_required')
+        if self._existing_only:
+            db = sqlite3.connect(self.path.as_uri() + '?mode=rw', uri=True, timeout=5, isolation_level=None)
+        else:
+            db = sqlite3.connect(str(self.path), timeout=5, isolation_level=None)
         db.row_factory = sqlite3.Row
         try:
             db.execute('PRAGMA foreign_keys=ON')

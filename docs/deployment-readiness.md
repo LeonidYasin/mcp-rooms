@@ -17,7 +17,9 @@
 саморегистрации/встроенных откликов/admin MCP. Ориентир **3 крупных ворот**:
 кандидат+bootstrap+артефакт; OS/лимиты/DB+files restore/rollback; разрешённый
 изолированный deploy и отдельно HTTPS-приёмка. Ворота1 реализуются частями; новый
-read-only transport не означает готовый installer. Не три команды/сообщения.
+read-only transport не означает готовый installer. [F2 candidate](test-candidate.md)
+выделяет fresh bootstrap/strict startup/пакетную CI-проверку; OS sandbox/restore/
+operator install package всё ещё отдельные blockers. Не три команды/сообщения.
 
 Это сокращённый технически полезный пилот, а не выполнение полного сценария ниже.
 Browser M3b.3 отложен только пока **вообще нет cookie-auth market writes**.

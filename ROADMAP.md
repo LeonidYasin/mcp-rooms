@@ -305,3 +305,15 @@ No main, VPS, public upload/publication or new real scope issuance changed.
 [Три крупных ворот](docs/owner-first-test.md), не три команды. Browser M3b.3
 сохранён как paused обязательный track до cookie-auth writes; полный web/search/
 private replies/admin MVP не объявлен выполненным или отменённым.
+
+## F2 — fresh owner-first candidate / installed package
+
+- [x] Подготовить fresh-only bootstrap/private key delivery и ready marker last.
+- [x] Подготовить schema/fingerprint/permissions check и existing-only no-DDL startup.
+- [x] Один process lock, decoder/upload slot; регистрация/cookie editing off.
+- [x] Подготовить synthetic failure/negative tests, installed-wheel native HTTP/MCP/public smoke и checksum artifact.
+- [ ] Принять exact-SHA CI; не считать кандидата OS-sandboxed VPS install.
+- [ ] F3 OS filesystem/network isolation, resource/load budgets, DB+files security-state restore, dependency/operator package.
+- [ ] Только затем отдельно одобренные VPS preflight/loopback/HTTPS gates.
+
+[Контракт и ограничения](docs/test-candidate.md). Никаких real keys, live migration, main или VPS изменений.

@@ -198,11 +198,14 @@ class BearerGate:
             CURRENT.reset(token)
 
 
-def create_app(database, resource, registration_enabled=False, *, market=None, media_http=False, browser_sessions=None, public_market=False):
+def create_app(database, resource, registration_enabled=False, *, market=None, media_http=False, browser_sessions=None, public_market=False, media_upload_slots=2):
     if type(media_http) is not bool or (media_http and market is None):
         raise RoomError('market_binding_mismatch')
     if type(public_market) is not bool or (public_market and market is None):
         raise RoomError('market_binding_mismatch')
+    if (type(media_upload_slots) is not int or media_upload_slots not in (1,2)
+            or (not media_http and media_upload_slots != 2)):
+        raise RoomError('invalid_upload_parallelism')
     resource = resource_url(resource)
     if browser_sessions is not None:
         from .browser_sessions import BrowserSessions
@@ -284,7 +287,7 @@ def create_app(database, resource, registration_enabled=False, *, market=None, m
     from .media_http import MediaHTTP
     from .public_web import PublicMarket
     return BearerGate(mcp.streamable_http_app(), auth, registration_enabled,
-                      MediaHTTP(market) if media_http else None, browser_sessions,
+                      MediaHTTP(market, upload_slots=media_upload_slots) if media_http else None, browser_sessions,
                       PublicMarket(market.publisher, resource) if public_market else None)
 
 

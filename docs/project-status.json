@@ -301,6 +301,21 @@
         "user_market_mcp",
         "publish"
       ]
+    },
+    {
+      "id": "test_candidate",
+      "title": "Fresh owner-first TEST candidate",
+      "stage": "SOURCE",
+      "summary": "Отдельный fresh bootstrap, existing-only/schema-pinned startup, один worker/upload, process lock, installed-wheel synthetic native smoke. Не OS sandbox, installer или VPS deploy.",
+      "doc": "docs/test-candidate.md",
+      "source": "src/mcp_rooms/test_candidate.py",
+      "evidence": null,
+      "depends_on": [
+        "public_card",
+        "media_http",
+        "worker",
+        "media_files"
+      ]
     }
   ]
 }

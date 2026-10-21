@@ -103,7 +103,7 @@ HTML/photo → withdraw404; XSS, private/disabled/missing/bad epoch, невер�
 Предыдущие native worker и publication race suites сохраняются. CI не заменяет
 будущий screenshot/accessibility browser QA или external HTTPS/read/load acceptance.
 
-Следующая bounded задача — F2: strict fresh-test composition/bootstrap/package с
+[F2 candidate](test-candidate.md) реализуется как strict fresh-test composition/bootstrap/package с
 одним worker и без автоматических startup migrations; не команда запуска на VPS.
 Следуйте [AGENTS.md](../AGENTS.md), [work-state](work-state.json) и
 [handoff](ai-handoff.md). Не продолжайте автоматически M3b.3 как blocker первого

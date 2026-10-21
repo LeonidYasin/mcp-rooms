@@ -20,6 +20,7 @@ test = ["pytest>=8,<9", "httpx>=0.28,<0.29", "build>=1.2,<2"]
 [project.scripts]
 mcp-rooms = "mcp_rooms.server:main"
 mcp-rooms-admin = "mcp_rooms.admin:main"
+mcp-rooms-test-candidate = "mcp_rooms.test_candidate:main"
 mcp-rooms-maintenance = "mcp_rooms.maintenance:main"
 
 [project.urls]

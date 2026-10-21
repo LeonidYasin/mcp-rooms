@@ -37,3 +37,25 @@ jobs:
           fi
           cd /tmp
           python -c 'from mcp_rooms.server import create_app; from mcp_rooms.identity import IdentityStore; from mcp_rooms.listing_contract import ListingContent; from mcp_rooms.draft_store import DraftStore; from mcp_rooms.domain import Principal; from mcp_rooms.preview_contract import make_preview'
+      - name: Installed owner-first candidate smoke (Python >=3.11)
+        if: matrix.python != '3.10'
+        run: |
+          CHECKOUT="$PWD"
+          cd /tmp
+          umask 077
+          python "$CHECKOUT/tools/ci_candidate_smoke.py"
+      - name: Checksum candidate distribution (Python3.12)
+        if: matrix.python == '3.12'
+        run: |
+          cd dist
+          sha256sum *.whl *.tar.gz > SHA256SUMS
+      - name: Upload source-pinned candidate distribution (Python3.12)
+        if: matrix.python == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: owner-first-candidate-${{ github.sha }}-py312
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/SHA256SUMS
+          retention-days: 14

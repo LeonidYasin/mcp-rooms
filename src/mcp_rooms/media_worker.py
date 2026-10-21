@@ -116,13 +116,16 @@ def _parse(wire, mime):
 
 
 class PhotoWorker:
-    """Two immediate slots per instance; no waiting queue or global fleet claim.
+    """One or two immediate slots (default two); no queue or fleet claim.
 
     Reuse one instance per app process. Do not expose creation/limits over an API.
     Results are internal bytes, not a persisted or publishable media manifest.
     """
-    def __init__(self):
-        self._slots = threading.BoundedSemaphore(2)
+    def __init__(self, *, max_parallel=2):
+        if type(max_parallel) is not int or max_parallel not in (1,2):
+            raise DomainError('invalid_worker_parallelism')
+        self.max_parallel = max_parallel
+        self._slots = threading.BoundedSemaphore(max_parallel)
 
     def normalize(self, payload: bytes, declared_type: str) -> NormalizedPhoto:
         if sys.platform != 'linux' or sys.version_info < (3, 11):

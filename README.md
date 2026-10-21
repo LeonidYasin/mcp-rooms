@@ -59,13 +59,14 @@ is not yet accepted.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [F3a](docs/ci-f3a.md), application source
-`948b4b7ae9b8a0af4e2beb1a180781adf0c3842e`: Python3.12 **709 passed**.
-Mandatory fail-closed Landlock/seccomp isolation for native photo children in the
-explicit TEST candidate: synthetic secret/metadata/network/process denial, real
-PNG/JPEG decoding and installed-wheel upload/publish/withdraw smoke verified.
-[F2 fresh-only profile/bootstrap](docs/ci-f2.md), no-DDL startup, one process/decoder/upload
-and source-pinned distribution remain. **Not a VM, VPS installer or deployment.**
+**Latest accepted checkpoint:** [F3b](docs/ci-f3b.md), application source
+`6820fc513a34c1d129ca9843f6cc04cbb357a0f2`: Python3.12 **761 passed**.
+Offline DB+photos snapshot/recovery rehearsal: current-auth narrowing, revoke/disable
+checks, no overwrite and no resurrection of published cards; restored copies stay
+quarantined and require the original current authority. Installed-wheel native
+photo + recovery smoke verified. [F3a child isolation](docs/ci-f3a.md) and
+[F2 fresh-only candidate](docs/ci-f2.md) remain. **Not independent disaster recovery,
+a VPS installer or deployment.**
 
 Built on [F1 read-only card](docs/ci-f1.md), [session bridge](docs/ci-m3b2.md),
 [private photo HTTP](docs/ci-m3a2.md) and12 scoped listing tools on top of8 rooms.
@@ -74,8 +75,9 @@ and uses a listings-only key. No public registration, feed/search or private rep
 Browser M3b.3 remains mandatory before cookie writes; paused, not dropped.
 [Machine-readable continuation state](docs/work-state.json).
 [Shorter three-gate TEST track](docs/owner-first-test.md) · [candidate contract](docs/test-candidate.md).
-[F3a policy and limits](docs/media-sandbox.md) are accepted in CI. Current [F3b recovery source](docs/recovery-candidate.md) awaits exact-SHA CI; then F3c resources
-and dependency-pinned operator/rollback package before separately approved VPS checks.
+[F3a policy](docs/media-sandbox.md) and [F3b recovery limits](docs/recovery-candidate.md)
+are accepted in CI. Next: F3c dependency-pinned operator package and resource/rollback
+acceptance, before separately approved VPS checks.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).

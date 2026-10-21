@@ -117,3 +117,10 @@ MCP-first TEST; эта задача сохранена в paused tracks и об�
 F3c dependency/resource/operator package; затем отдельно одобренные свежий preflight,
 loopback install и HTTPS/external acceptance. Это не две команды/два сообщения и
 не обещание production. Проверка Landlock на нашем VPS пока не выполнялась.
+
+
+### Уточнение после F3b
+
+[F3b принят в CI](ci-f3b.md), output только quarantine. До подготовки fresh TEST
+остался F3c operator/dependency/resource пакет, далее отдельно разрешённые
+preflight/loopback/HTTPS. Не запускать restored copy под видом fresh профиля.

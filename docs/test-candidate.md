@@ -143,7 +143,7 @@ retention14days. Нет key/DB/photos/state/logs в uploaded paths. Это integ
 [work-state](work-state.json), [общий маршрут](deployment-readiness.md).
 
 
-## F3b — bounded offline recovery (SOURCE)
+## F3b — bounded offline recovery (CI)
 
 Цель: операторский consistent DB+photos snapshot и проверка **отдельной private
 восстановленной копии**, не перезапись рабочего профиля. Минимальный первый подход:
@@ -170,6 +170,28 @@ retention14days. Нет key/DB/photos/state/logs в uploaded paths. Это integ
 - Actions-only tests; не создавать schedules, retention auto-delete, off-host uploads
   или команды VPS. F3c dependency/capacity/operator install остаётся отдельно.
 
-[F3b реализация/границы](recovery-candidate.md) подготовлена, ожидает Actions.
+[F3b реализация/границы](recovery-candidate.md) [принята в CI](ci-f3b.md).
 Output quarantine намеренно не имеет candidate profile.json; утрата current
 security authority не обходится восстановлением старого snapshot.
+
+
+## F3c — ближайший операторский пакет (SPEC, не installer на VPS)
+
+Следующий bounded маршрут: закреплённый install/dependency manifest и checksum
+дистрибутива; затем reviewed package с dry-run, fresh target refusal, health/stop/
+rollback и изолированными paths/user/unit/port. Не копировать прежний Rooms unit.
+
+В Actions проверить resource/timeout/abuse и disk budgets (worker AS512MiB не
+равен общему MemoryMax сервиса); не объявлять budget подходящим реальному VPS
+без свежего разрешённого preflight. До готовности не добавлять публичную регистрацию,
+web editing/search/replies или общий admin shell. Поиск/большой marketplace остаются
+другим этапом, а не скрытым условием первого fresh owner-first TEST.
+
+Restore artifacts остаются quarantined: operator package не должен автоматически
+копировать profile.json, выдавать старый ключ или запускать восстановленную копию.
+Promotion/утрата current authority вынесены в RECOVERY-CUTOVER paused track.
+First fresh-only TEST не означает независимый production disaster recovery.
+
+Только после кодовой/CI приёмки пакета — отдельные разрешения на свежий read-only
+VPS preflight, отдельный loopback install и затем HTTPS/external acceptance. Каждое
+удалённое исполнение требует отдельного подтверждения и специального пароля.

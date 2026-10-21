@@ -333,11 +333,11 @@
     {
       "id": "candidate_recovery",
       "title": "DB+photos recovery quarantine",
-      "stage": "SOURCE",
-      "summary": "Офлайн locks/SQLite backup, bounded photo manifest, current auth narrowing и withdrawn restored publications; output не compose-ready. Ожидает CI, не полный disaster recovery.",
+      "stage": "CI",
+      "summary": "Офлайн DB+photos snapshot/restore с locks, current auth narrowing и withdrawals принят в Actions. Копия в карантине, current original обязателен; не полноценный disaster recovery.",
       "doc": "docs/recovery-candidate.md",
       "source": "src/mcp_rooms/recovery.py",
-      "evidence": null,
+      "evidence": "docs/ci-f3b.md",
       "depends_on": [
         "test_candidate",
         "media_files",

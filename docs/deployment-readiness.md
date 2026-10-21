@@ -18,8 +18,8 @@
 кандидат+bootstrap+артефакт; OS/лимиты/DB+files restore/rollback; разрешённый
 изолированный deploy и отдельно HTTPS-приёмка. Ворота1 реализуются частями; новый
 read-only transport не означает готовый installer. [F2 candidate](test-candidate.md)
-выделяет fresh bootstrap/strict startup/пакетную CI-проверку; OS sandbox/restore/
-operator install package всё ещё отдельные blockers. Не три команды/сообщения.
+выделяет fresh bootstrap/strict startup/пакетную CI-проверку; F3a child policy и
+F3b offline recovery приняты в CI, F3c operator/resource package ещё blocker. Не три команды/сообщения.
 
 Это сокращённый технически полезный пилот, а не выполнение полного сценария ниже.
 Browser M3b.3 отложен только пока **вообще нет cookie-auth market writes**.
@@ -101,3 +101,13 @@ restore/current security-state, F3c pinned dependencies/capacity/operator packag
 затем отдельно разрешённые preflight → loopback → HTTPS/external checks.
 [Следующая bounded задача F3b](test-candidate.md#f3b-bounded-задача-следующего-чата-spec-не-реализация).
 Ни main, ни production не меняются автоматически.
+
+
+## Актуализация после F3b
+
+[Offline DB+photos recovery quarantine принят](ci-f3b.md). До fresh-only первого
+VPS TEST остаётся подготовительный блок F3c: pinned dependencies, operator package
+и resource/rollback acceptance. После него — отдельно разрешённые preflight →
+loopback → HTTPS/external проверки. Один блок может потребовать нескольких срезов/
+коммитов; это не обещание установки за один шаг. F3b требует доступного original
+current security authority; независимый disaster recovery/promotion не закрыт.

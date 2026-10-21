@@ -116,6 +116,7 @@ nav:
     - CI public card F1: docs/ci-f1.md
     - CI TEST candidate F2: docs/ci-f2.md
     - CI native sandbox F3a: docs/ci-f3a.md
+    - CI recovery F3b: docs/ci-f3b.md
     - CI сайта и публикация: docs/ci-pages.md
     - Итоги исследования: docs/marketplace-research-final.md
     - Проверка кандидатов: docs/candidate-source-checks.md

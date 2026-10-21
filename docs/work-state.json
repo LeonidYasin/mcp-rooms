@@ -4,18 +4,18 @@
   "branch": "feat/standalone-identity",
   "pull_request": 1,
   "accepted": {
-    "source_sha": "948b4b7ae9b8a0af4e2beb1a180781adf0c3842e",
-    "evidence": "docs/ci-f3a.md",
-    "python312_passed": 709,
+    "source_sha": "6820fc513a34c1d129ca9843f6cc04cbb357a0f2",
+    "evidence": "docs/ci-f3b.md",
+    "python312_passed": 761,
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
     "id": "F3b",
-    "stage": "SOURCE",
+    "stage": "CI",
     "contract": "docs/recovery-candidate.md",
     "source": "src/mcp_rooms/recovery.py",
     "tests": "tests/test_candidate_recovery.py",
-    "evidence": null
+    "evidence": "docs/ci-f3b.md"
   },
   "next_task": {
     "id": "F3c",
@@ -70,6 +70,18 @@
         "After this gate, finish automatic onboarding/recovery/retention and typed browser actions, then draft/photo form and real-browser QA."
       ],
       "reason": "Required before browser writes; deferred from MCP-managed read-only first TEST."
+    },
+    {
+      "id": "RECOVERY-CUTOVER",
+      "title": "Promotion and independent disaster recovery after loss of original authority",
+      "contract": "docs/recovery-candidate.md",
+      "reason": "F3b output is deliberately quarantined; not required for fresh-only first TEST installation and must never be bypassed by copying profile markers.",
+      "acceptance": [
+        "Specify a fresh authoritative anti-rollback security checkpoint or explicit revoke-all/new-identity disaster policy when original current state is unavailable.",
+        "Never resurrect withdrawn publications or consume historical consent as new permission; require fresh owner consent after separately approved promotion.",
+        "Prove cutover/rollback preserves current revocations, disabled users and consistent DB+photos under a controlled downtime window.",
+        "Require separate operator authorization and no arbitrary SQL/shell or backup credentials exposed to web/MCP; backups stay private."
+      ]
     }
   ],
   "queued_tasks": []

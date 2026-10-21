@@ -30,11 +30,11 @@ M3b.3 session binding **не отменён**: paused до возвращени�
 [F2 принят в exact-SHA CI](ci-f2.md):686 tests на3.12 плюс installed-wheel native smoke.
 [Контракт TEST-кандидата](test-candidate.md) описывает fresh-only bootstrap, startup без
 DDL и один worker/upload. F3a [Landlock/seccomp](media-sandbox.md) [принят в exact-SHA CI](ci-f3a.md):709 tests на3.12.
-Candidate обязан отказать до app startup без рабочей политики. F3b [offline recovery quarantine](recovery-candidate.md) подготовлен (SOURCE).
+Candidate обязан отказать до app startup без рабочей политики. F3b [offline recovery quarantine](recovery-candidate.md) [принят в CI](ci-f3b.md):761 tests на3.12.
 Original current authority обязателен; output не compose-ready, все publications withdrawn.
 Следующая задача F3c — dependency/resource/operator package, без promotion обхода.
-F3b restore/security-state и F3c resources/dependency/operator package остаются
-явно в queued_tasks, не самовольный deploy.
+F3c — next_task; recovery promotion/missing-current disaster policy сохранены в
+paused_tasks (RECOVERY-CUTOVER). Ни один из них не означает самовольный deploy.
 
 ## Архитектура уже выбрана
 
@@ -57,6 +57,8 @@ framework без измеренного blocker. Исследование кан
   8 rooms +12 scoped listing tools. Default CLI по-прежнему8 rooms.
 - `media_http.py`: explicit opt-in bounded binary upload/private JPEG read; не public photo route.
 - `test_candidate.py`: отдельный fresh-only операторский профиль и process lock; не VPS installer.
+- `recovery.py`: offline snapshot/restore/verify, оригинальная current authority обязательна,
+  output quarantine без profile marker; не autonomous DR/promotion и не MCP endpoint.
 - `public_web.py`: explicit opt-in anonymous read-only card/photo; нет feed, формы или cookie writes.
 - `browser_sessions.py`: отдельный bounded session core, browser schema1.
 - `browser_http.py`: opt-in session login/bootstrap/logout bridge; статус в work-state.

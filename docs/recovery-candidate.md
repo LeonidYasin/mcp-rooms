@@ -1,6 +1,6 @@
 # F3b — офлайн-снимок DB+photos и карантин восстановления
 
-**SOURCE, ожидает exact-SHA Actions.** Не VPS execution и не production DR.
+**[Exact-SHA CI принят](ci-f3b.md):761 tests на3.12.** Не VPS execution и не production DR.
 [TEST candidate](test-candidate.md), [принятая child policy](ci-f3a.md).
 
 ## Состав и граница
@@ -88,3 +88,26 @@ F3c остаётся dependency-pinned operator package, capacity/disk/retention
 и отдельные owner-approved preflight/loopback/HTTPS. Каждое удалённое исполнение
 требует отдельного разрешения и специального пароля. Default rooms-only CLI, main,
 production, signup и browser writes не меняются.
+
+
+## Последовательность доверия
+
+```mermaid
+sequenceDiagram
+    participant O as Operator offline
+    participant C as Original current profile
+    participant B as Private snapshot
+    participant R as New quarantined copy
+    O->>C: Process lock, photo lock, SQLite writer reservation
+    C-->>B: SQLite backup API and checked derivatives
+    O->>B: Verify schema, counts, hashes and links
+    B-->>R: Copy into fresh private target
+    O->>C: Read current credential and user authority under locks
+    C-->>R: Only narrow grants, revoke and disable
+    O->>R: Withdraw all publications, consume old consent
+    O->>R: Verify, seal recovery.json last
+    Note over R: No profile.json, no owner.key, no listener, no promotion
+    O->>C: Release locks without source payload writes
+```
+
+Эта схема — accepted offline rehearsal, не схема автоматической работы VPS.

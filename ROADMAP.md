@@ -340,7 +340,7 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 
 - [x] SOURCE: process/photo/SQLite freeze, consistent backup API, bounded derivative inventory/projection validation, new private snapshot/restore only.
 - [x] SOURCE: current original authority required; revoke/disable union, scopes intersection/min expiry, no new keys; all restored publications withdrawn and output not compose-ready.
-- [ ] Exact-SHA CI acceptance and installed-wheel DB+real photo recovery smoke.
+- [x] Exact-SHA `6820fc51`: Python3.12 761 passed/2 warnings;3.10 700 passed/42 skipped/2 warnings; matrix/installed-wheel DB+real photo recovery/docs green. [Evidence](docs/ci-f3b.md).
 - [ ] F3c pinned dependency/resource/operator package; promotion/cutover and missing-current disaster recovery are not silently accepted.
 
 [Contract](docs/recovery-candidate.md). No VPS command or main/production change.

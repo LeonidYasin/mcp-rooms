@@ -25,7 +25,8 @@ The harness is not safe general-purpose installation tooling and must not run on
   returns429, the real10s body timeout returns408 and disconnect releases the slot.
 - Real12-megapixel synthetic PNG with synthetic metadata normalizes in the native
   isolated child, attaches to exact listing revision, publishes by explicit test
-  preview/consent, renders public loopback HTML/JPEG, and withdraws to404.
+  preview/consent, renders public loopback HTML/JPEG with the canonical Host, rejects an incorrect
+  public Host with421, and withdraws to404.
 - Root CI injects SIGSTOP only through a pidfd for the exact known child command,
   UID and candidate cgroup. The real8s worker wall timeout must return typed504,
   reap the child and allow a subsequent successful native upload. No code mocking,

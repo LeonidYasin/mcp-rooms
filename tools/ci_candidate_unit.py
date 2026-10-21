@@ -70,7 +70,8 @@ def properties():
 
 
 def request(method,path,raw=None,body=None,headers=None,timeout=20):
-    h=dict(headers or {})
+    # TCP stays loopback; public reads require the configured canonical Host.
+    h={'Host':'candidate.invalid',**(headers or {})}
     if raw is not None:h['Authorization']='Bearer '+raw
     c=http.client.HTTPConnection('127.0.0.1',8766,timeout=timeout)
     try:
@@ -334,6 +335,7 @@ def main(bundle,source,python_base):
             preview_digest=preview['digest'],consent=True,client_id=key())
         published=call(raw,'listings_publish',listing_id=listing,intent_id=consent['intent_id'],client_id=key())
         card='/market/'+listing;photo=card+'/photos/'+str(published['publication_revision'])+'/'+media+'.jpg'
+        assert request('GET',card,headers={'Host':'127.0.0.1:8766'})[0]==421,'candidate_public_host_gate'
         status,data=request('GET',card);assert status==200 and b'CI synthetic unit item' in data
         status,data=request('GET',photo);assert status==200 and jpeg_dimensions(data)==(1600,1200)
         assert b'CI-SYNTHETIC-METADATA' not in data and b'Exif\0\0' not in data
@@ -359,7 +361,7 @@ def main(bundle,source,python_base):
             'real_native_photo':True,'http_admission_429':True,'body_timeout_408':True,
             'disconnect_slot_released':True,'native_fault_timeout_504_and_reaped':True,
             'native_timeout_seconds':round(elapsed,3),'native_slot_reused':True,
-            'public_card_photo_withdraw':True,'restart_key_listing_withdrawal_preserved':True,
+            'public_card_photo_withdraw':True,'wrong_public_host_421':True,'restart_key_listing_withdrawal_preserved':True,
             'cgroup_memory_peak_bytes':peak,'sampled_tasks_peak':sampler.tasks,
             'sampled_native_parallel_peak':sampler.native,'cgroup_cpu_usage_usec':cpu_used,
             'state_logical_bytes':logical,'state_allocated_bytes':allocated,

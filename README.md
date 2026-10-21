@@ -59,8 +59,10 @@ is not yet accepted.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [F3c.2c.2](docs/ci-f3c2c2.md), source
-`8c5ac1462fdfecc82ec264b4c93c70c8751e0071`: Python3.12 **911 passed**.
+**Latest accepted checkpoint:** [F3c.2c.3a](docs/ci-f3c2c3a.md), source
+`e63134e077902d59a455f183de00e59760d3f453`: Python3.12 **939 passed**.
+Actual fresh-only offline install/inspect accepted, no bootstrap/start/enable;
+existing install refused, sealed root code/ready-last receipt.
 Real installed candidate under the exact systemd unit accepted in Actions: non-root
 service/root-owned code; TCP MCP; native12MP photo; admission/body/disconnect/native
 timeout-reap; public card/photo/withdraw; state/key-preserving restart. Kernel group
@@ -83,7 +85,7 @@ are accepted in CI. [F3c.1 offline wheelhouse](docs/operator-package.md) is acce
 Current [F3c.2b unprivileged lifecycle](docs/operator-lifecycle.md): [accepted in CI](docs/ci-f3c2b.md); real offline installation/start/stop/restart, not a systemd installer.
 Current [F3c.2c.1](docs/operator-supervision.md): [accepted in CI](docs/ci-f3c2c1.md): fixed unit renderer and real isolated systemd/cgroup fixture; not actual candidate-in-unit.
 Current [F3c.2c.2](docs/candidate-unit-ci.md): [accepted in CI](docs/ci-f3c2c2.md): real installed candidate under exact unit, native photo/body admission/timeouts and aggregate fixture measurements.
-Current [F3c.2c.3a install/inspect](docs/operator-install.md): SOURCE pending Actions; actual fresh-only installer, no bootstrap/start.
+Current [F3c.2c.3a install/inspect](docs/operator-install.md): [accepted in CI](docs/ci-f3c2c3a.md); actual fresh-only installer, no bootstrap/start.
 Next F3c.2c.3b: guarded bootstrap/start-stop and runtime/disk capacity adoption before approved VPS checks.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).

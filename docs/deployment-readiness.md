@@ -170,3 +170,20 @@ F3c.2c.3: reviewed fresh-only installer с ready-last receipt и pre-effect iden
 interruption/unrelated-service protection, capacity safety margins и full install/
 state disk/retention/exhaustion runbook. Не переписывать уже принятый CI harness.
 Затем прежние отдельно разрешённые fresh VPS preflight → loopback → HTTPS gates.
+
+## Latest bounded checkpoint — F3c.2c.3a
+
+[Fresh install/inspect accepted in Actions](ci-f3c2c3a.md):939 tests3.12 plus actual
+offline install under private umask and real unit/native regression. No profile/key
+or startup is performed by installer. This closes installation-only, not F3c whole.
+Remaining coarse gates (not a promise of three commands/turns):
+
+1. Reviewed explicit bootstrap/start/stop controller with interruption/identity guards,
+   adopted runtime margins and full install/state disk/exhaustion policy.
+2. Separately approved fresh read-only VPS preflight and isolated loopback installation/
+   synthetic acceptance, without changing existing MCP services or Caddy.
+3. Separately approved HTTPS/external client acceptance and explicit consent before
+   a real listing/photo publication. Every remote execution needs approval AND password.
+
+Browser writes/onboarding/search/replies/admin and full production remain outside
+this shortened TEST scope. Existing retained TEST DB is never a fresh install target.

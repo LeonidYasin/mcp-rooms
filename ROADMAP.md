@@ -399,7 +399,7 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 
 - [x] SOURCE: root trust, fixed OS Python, new-only account/unit/paths, nonroot transient build cgroup, sealed release/inventory and ready-last receipt.
 - [x] SOURCE: inspect/refusal and partial-build/marker/code/identity negatives; actual installer reused by real CI candidate harness.
-- [ ] Exact-source Actions acceptance.
+- [x] Exact-source `e63134e0`:939 tests3.12; actual install/inspect/no profile/start, existing-target refusal and native/unit regressions. [Evidence](docs/ci-f3c2c3a.md).
 - [ ] F3c.2c.3b guarded bootstrap/start-stop plus adopted runtime/disk criteria and owner-approved VPS gates.
 
 [Contract](docs/operator-install.md). Installing a unit is not startup authorization.

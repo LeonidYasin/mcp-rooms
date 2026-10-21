@@ -4,26 +4,26 @@
   "branch": "feat/standalone-identity",
   "pull_request": 1,
   "accepted": {
-    "source_sha": "8c5ac1462fdfecc82ec264b4c93c70c8751e0071",
-    "evidence": "docs/ci-f3c2c2.md",
-    "python312_passed": 911,
+    "source_sha": "e63134e077902d59a455f183de00e59760d3f453",
+    "evidence": "docs/ci-f3c2c3a.md",
+    "python312_passed": 939,
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
     "id": "F3c.2c.3a",
-    "stage": "SOURCE",
+    "stage": "CI",
     "contract": "docs/operator-install.md",
     "source": "tools/operator_install.py",
     "tests": "tests/test_operator_install.py",
-    "evidence": null
+    "evidence": "docs/ci-f3c2c3a.md"
   },
   "next_task": {
     "id": "F3c.2c.3b",
     "title": "Reviewed bootstrap/start-stop controller and runtime/disk capacity adoption",
     "contract": "docs/operator-install.md",
     "acceptance": [
-      "Reuse accepted F3c.2c.2 exact-unit/native/fault measurements; do not repeat completed research or rebuild the CI harness. Implement a separate reviewed fresh-only operator installer, never deploy the privileged CI harness.",
-      "Validate trusted base Python and root-owned immutable release/ancestors, fresh service identity and private state; commit ready-last bounded receipts and refuse adoption/automatic overwrite of existing or interrupted targets.",
+      "Reuse accepted F3c.2c.3a fresh install/inspect and F3c.2c.2 actual-unit/native/fault harness. Do not rebuild or deploy the privileged CI harness. Implement a separate explicit bootstrap/start/stop controller.",
+      "Bootstrap only a validated installed fresh profile with separate authorization; never read or log an existing owner key. Recheck trusted OS Python, code receipt/inventory, account and ancestor/unit/drop-in/process identities immediately before each effect. Refuse unsafe drift, never adopt partial installations.",
       "Check loaded unit/drop-ins/account/path/process identities immediately before each effect and test crash/interruption/identity changes; stop-only rollback preserves all private state and unrelated services.",
       "Adopt measured aggregate capacity safety margins and full install/state disk/retention/exhaustion criteria; current172.625MiB12MP fixture peak and state-only disk samples are not VPS capacity acceptance.",
       "Keep real-key bootstrap separately authorized; no browser/signup/search/replies/admin expansion or recovery promotion in the shortened TEST track.",
@@ -62,7 +62,8 @@
     "docs/operator-lifecycle.md",
     "docs/operator-supervision.md",
     "docs/candidate-unit-ci.md",
-    "docs/operator-install.md"
+    "docs/operator-install.md",
+    "docs/ci-f3c2c3a.md"
   ],
   "paused_tasks": [
     {

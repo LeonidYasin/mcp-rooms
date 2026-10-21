@@ -1,6 +1,6 @@
 # F3c.2c.3a — fresh-only install, never implicit start
 
-**SOURCE pending exact-source Actions. No VPS execution authorized.**
+**Accepted in [exact-source Actions](ci-f3c2c3a.md),939 tests3.12. No VPS execution authorized.**
 `tools/operator_install.py`: install/inspect only. No bootstrap, key read, enable,
 start, upgrade, deletion or recovery. Presence of an installed unit is not start approval.
 
@@ -26,6 +26,7 @@ start, upgrade, deletion or recovery. Presence of an installed unit is not start
   escaping release. Trusted tools/interpreter/account/bundle rechecked before unit
   commit. Fixed root-owned `/etc/systemd/system` unit is verified and daemon-reloaded,
   **not started/enabled**. Loaded fragment must match, with no drop-ins/PID/activity.
+- Explicit new directory/file modes survive umask077; no existing path is adopted.
 - Root-only inventory and installation receipt committed ready-last with fsync and
   exclusive creation. Failure preserves partial new paths/account for review and
   permanently blocks automatic retry; no compensation deletes data or unrelated units.
@@ -55,3 +56,9 @@ Next: separately reviewed profile bootstrap and start/stop controller, just-befo
 effect identity and interrupted-start cleanup, adopted runtime/disk safety margins,
 then separately approved fresh VPS preflight → loopback → HTTPS. Every VPS execution
 requires explicit approval AND special password. Do not run CI harness on VPS.
+
+CI prerequisite: hosted Actions `/opt` is0777. The disposable fixture temporarily
+hardens that ancestor and restores it on safe teardown. This is **not** an installer
+feature or permission to change VPS ancestor modes. Installer still refuses unsafe
+existing ancestors. Legitimate empty package files are hashed in code inventory;
+empty trust inputs/receipts remain rejected. See evidence for failures and fixes.

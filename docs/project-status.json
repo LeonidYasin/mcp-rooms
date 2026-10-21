@@ -414,11 +414,11 @@
     {
       "id": "operator_install",
       "title": "Fresh-only root-trusted offline install",
-      "stage": "SOURCE",
-      "summary": "Install/inspect only, transient nonroot build cgroup, sealed root code/inventory/ready-last receipt; no bootstrap/start/enable/upgrade/delete. Pending Actions.",
+      "stage": "CI",
+      "summary": "Exact-source Actions: actual fresh-only install/inspect,939 tests3.12; transient nonroot offline build, sealed code and ready-last receipt, repeat refused. No profile/bootstrap/start/enable; lifecycle/capacity still gated.",
       "doc": "docs/operator-install.md",
       "source": "tools/operator_install.py",
-      "evidence": null,
+      "evidence": "docs/ci-f3c2c3a.md",
       "depends_on": [
         "candidate_unit_ci",
         "operator_bundle",

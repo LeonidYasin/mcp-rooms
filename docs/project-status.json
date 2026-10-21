@@ -410,6 +410,20 @@
         "operator_bundle",
         "operator_lifecycle"
       ]
+    },
+    {
+      "id": "operator_install",
+      "title": "Fresh-only root-trusted offline install",
+      "stage": "SOURCE",
+      "summary": "Install/inspect only, transient nonroot build cgroup, sealed root code/inventory/ready-last receipt; no bootstrap/start/enable/upgrade/delete. Pending Actions.",
+      "doc": "docs/operator-install.md",
+      "source": "tools/operator_install.py",
+      "evidence": null,
+      "depends_on": [
+        "candidate_unit_ci",
+        "operator_bundle",
+        "operator_supervision"
+      ]
     }
   ]
 }

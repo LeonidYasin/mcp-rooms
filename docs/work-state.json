@@ -10,17 +10,17 @@
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
-    "id": "F3c.2c.2",
-    "stage": "CI",
-    "contract": "docs/candidate-unit-ci.md",
-    "source": "tools/ci_candidate_unit.py",
-    "tests": "tests/test_candidate_unit_ci.py",
-    "evidence": "docs/ci-f3c2c2.md"
+    "id": "F3c.2c.3a",
+    "stage": "SOURCE",
+    "contract": "docs/operator-install.md",
+    "source": "tools/operator_install.py",
+    "tests": "tests/test_operator_install.py",
+    "evidence": null
   },
   "next_task": {
-    "id": "F3c.2c.3",
-    "title": "Reviewed fresh-only root installer and capacity/disk acceptance",
-    "contract": "docs/candidate-unit-ci.md",
+    "id": "F3c.2c.3b",
+    "title": "Reviewed bootstrap/start-stop controller and runtime/disk capacity adoption",
+    "contract": "docs/operator-install.md",
     "acceptance": [
       "Reuse accepted F3c.2c.2 exact-unit/native/fault measurements; do not repeat completed research or rebuild the CI harness. Implement a separate reviewed fresh-only operator installer, never deploy the privileged CI harness.",
       "Validate trusted base Python and root-owned immutable release/ancestors, fresh service identity and private state; commit ready-last bounded receipts and refuse adoption/automatic overwrite of existing or interrupted targets.",
@@ -61,7 +61,8 @@
     "docs/operator-plan.md",
     "docs/operator-lifecycle.md",
     "docs/operator-supervision.md",
-    "docs/candidate-unit-ci.md"
+    "docs/candidate-unit-ci.md",
+    "docs/operator-install.md"
   ],
   "paused_tasks": [
     {

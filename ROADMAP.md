@@ -393,3 +393,13 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 - [ ] F3c.2c.3 production installer, crash/identity protections and capacity/disk runbook remain.
 
 [Boundaries](docs/candidate-unit-ci.md). CI fixture is not deploy tooling.
+
+
+## F3c.2c.3a — reviewed fresh install/inspect, no start
+
+- [x] SOURCE: root trust, fixed OS Python, new-only account/unit/paths, nonroot transient build cgroup, sealed release/inventory and ready-last receipt.
+- [x] SOURCE: inspect/refusal and partial-build/marker/code/identity negatives; actual installer reused by real CI candidate harness.
+- [ ] Exact-source Actions acceptance.
+- [ ] F3c.2c.3b guarded bootstrap/start-stop plus adopted runtime/disk criteria and owner-approved VPS gates.
+
+[Contract](docs/operator-install.md). Installing a unit is not startup authorization.

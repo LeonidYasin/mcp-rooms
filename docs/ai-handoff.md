@@ -38,7 +38,8 @@ unattested observations, fixed isolated targets, no host probe/effects.
 Current F3c.2b [unprivileged lifecycle rehearsal](operator-lifecycle.md) — [принят в CI](ci-f3c2b.md):864 tests3.12; real offline install/loopback MCP/stop/restart, occupied-port preservation и interrupted-start cleanup. Не root/systemd supervisor.
 Current F3c.2c.1 [unit/cgroup proof](operator-supervision.md) — [accepted in CI](ci-f3c2c1.md):903 tests3.12; real synthetic descendant cleanup/accounting, not actual candidate-in-unit or capacity acceptance.
 Current F3c.2c.2 [actual candidate under exact unit](candidate-unit-ci.md) — [accepted in CI](ci-f3c2c2.md):911 tests3.12; native12MP photo/body and forced worker timeouts/reaping, publication/withdraw/restart, cgroup memory peak172.625MiB in one fixture. CI-only privileged harness, not production installer or VPS capacity. Reuse it; do not repeat completed stages.
-F3c.2c.3 fresh root installer/capacity/disk acceptance — next_task; recovery promotion/missing-current disaster policy сохранены в
+Current F3c.2c.3a [fresh install/inspect](operator-install.md) — SOURCE pending Actions; no bootstrap/start authority.
+F3c.2c.3b guarded lifecycle/runtime+disk adoption — next_task; recovery promotion/missing-current disaster policy сохранены в
 paused_tasks (RECOVERY-CUTOVER). Ни один из них не означает самовольный deploy.
 
 ## Архитектура уже выбрана

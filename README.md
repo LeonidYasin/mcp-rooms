@@ -83,7 +83,8 @@ are accepted in CI. [F3c.1 offline wheelhouse](docs/operator-package.md) is acce
 Current [F3c.2b unprivileged lifecycle](docs/operator-lifecycle.md): [accepted in CI](docs/ci-f3c2b.md); real offline installation/start/stop/restart, not a systemd installer.
 Current [F3c.2c.1](docs/operator-supervision.md): [accepted in CI](docs/ci-f3c2c1.md): fixed unit renderer and real isolated systemd/cgroup fixture; not actual candidate-in-unit.
 Current [F3c.2c.2](docs/candidate-unit-ci.md): [accepted in CI](docs/ci-f3c2c2.md): real installed candidate under exact unit, native photo/body admission/timeouts and aggregate fixture measurements.
-Remaining F3c.2c.3: reviewed production installer and capacity/disk acceptance before separately approved VPS checks.
+Current [F3c.2c.3a install/inspect](docs/operator-install.md): SOURCE pending Actions; actual fresh-only installer, no bootstrap/start.
+Next F3c.2c.3b: guarded bootstrap/start-stop and runtime/disk capacity adoption before approved VPS checks.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).

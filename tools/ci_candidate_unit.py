@@ -33,7 +33,8 @@ NAME=USER+'.service'
 BASE=Path('/opt')/USER
 STATE=Path('/var/lib')/USER
 PROFILE=STATE/'owner-first'
-UNIT=Path('/run/systemd/system')/NAME
+UNIT=Path('/etc/systemd/system')/NAME
+TRUSTED=Path('/opt/mcp-rooms-operator-ci')
 RESOURCE='https://candidate.invalid/rooms-candidate/mcp'
 ENV={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','PYTHONUTF8':'1'}
 LIMIT=1024*1024
@@ -224,18 +225,14 @@ def account_absent():
         raise RuntimeError('candidate_existing_identity')
 
 
-def main(bundle,source,python_base):
+def main(bundle,source):
     if os.environ.get('GITHUB_ACTIONS')!='true' or os.geteuid()!=0 or sys.version_info[:2]!=(3,12):
         raise RuntimeError('disposable_actions_root_only')
     if not re.fullmatch('[0-9a-f]{40}',source):raise RuntimeError('candidate_invalid_source')
     if not Path('/sys/fs/cgroup/cgroup.controllers').is_file():raise RuntimeError('cgroup_v2_required')
-    python_base=Path(python_base)
-    if not python_base.is_absolute() or python_base.resolve()!=python_base or not str(python_base).startswith('/opt/hostedtoolcache/Python/3.12.'):
-        raise RuntimeError('candidate_ci_interpreter_required')
-    assert (python_base/'bin/python3.12').is_file()
     old=properties()
     account_absent()
-    targets=[BASE,STATE,UNIT,Path('/etc/systemd/system')/NAME,
+    targets=[BASE,STATE,UNIT,TRUSTED,Path('/run/systemd/system')/NAME,
         Path('/etc/systemd/system')/(NAME+'.d'),Path(str(UNIT)+'.d')]
     if any(p.exists() or p.is_symlink() for p in targets) or old.get('FragmentPath') or old.get('MainPID')!='0':
         raise RuntimeError('candidate_existing_target')
@@ -243,37 +240,32 @@ def main(bundle,source,python_base):
     created_user=False;created_base=False;created_state=False;created_unit=False;loaded=False
     sampler=None;raw=None
     try:
-        command(['/usr/sbin/useradd','--system','--user-group','--no-create-home','--home-dir',str(STATE),'--shell','/usr/sbin/nologin',USER])
-        created_user=True;uid=pwd.getpwnam(USER).pw_uid;gid=grp.getgrnam(USER).gr_gid
-        BASE.mkdir(mode=0o755);created_base=True
-        release=BASE/'releases'/source;release.mkdir(parents=True,mode=0o755)
-        interpreter=release/'python';shutil.copytree(python_base,interpreter,symlinks=False)
-        immutable(interpreter)
-        STATE.mkdir(mode=0o700);created_state=True;os.chown(STATE,uid,gid)
-        venv=release/'venv';venv.mkdir(mode=0o755);os.chown(venv,uid,gid)
+        TRUSTED.mkdir(mode=0o755)
+        for folder in ('tools','operator'):(TRUSTED/folder).mkdir(mode=0o755)
+        files=('tools/operator_install.py','tools/operator_bundle.py','tools/operator_plan.py',
+               'tools/operator_unit.py','operator/runtime-linux-x86_64-py312.lock')
+        for name in files:
+            target=TRUSTED/name;target.write_bytes((ROOT/name).read_bytes());target.chmod(0o644)
+        private_bundle=TRUSTED/'bundle';shutil.copytree(bundle,private_bundle)
+        installer=runpy.run_path(str(TRUSTED/'tools/operator_install.py'))
+        lock=sha256((TRUSTED/'operator/runtime-linux-x86_64-py312.lock').read_bytes()).hexdigest()
+        installed=installer['install'](private_bundle,source,lock,RESOURCE)
+        created_user=created_base=created_state=created_unit=loaded=True
+        assert installed['installed'] and not installed['start_authorized']
+        assert installer['inspect']()['checked'] and not (PROFILE).exists()
+        before=(BASE/'installation.json').read_bytes()
+        try:installer['install'](private_bundle,source,lock,RESOURCE)
+        except installer['InstallError']:pass
+        else:raise AssertionError('operator installer adopted an existing target')
+        assert (BASE/'installation.json').read_bytes()==before
+        print('CANDIDATE UNIT STEP: reviewed-installer-ready-no-profile',flush=True)
+        uid=pwd.getpwnam(USER).pw_uid;gid=grp.getgrnam(USER).gr_gid
+        release=BASE/'releases'/source;venv=release/'venv'
         run_as=['/usr/sbin/runuser','-u',USER,'--']
-        command([*run_as,str(interpreter/'bin/python3.12'),'-I','-m','venv','--copies',str(venv)])
-        # Verify root-private copy before exposing read-only wheel bytes to install user.
-        with tempfile.TemporaryDirectory(prefix='rooms-root-bundle-') as temp:
-            verified=Path(temp)/'bundle';shutil.copytree(bundle,verified)
-            lock=sha256((ROOT/'operator/runtime-linux-x86_64-py312.lock').read_bytes()).hexdigest()
-            runpy.run_path(str(ROOT/'tools/operator_bundle.py'))['verify'](verified,source,lock)
-            wheels=BASE/'bootstrap-wheelhouse';shutil.copytree(verified,wheels)
-            immutable(wheels)
-            command([*run_as,str(venv/'bin/python'),'-I','-m','pip','--isolated','install',
-                '--disable-pip-version-check','--no-index','--no-deps','--only-binary=:all:',
-                '--find-links',str(wheels/'wheels'),'--require-hashes','-r',str(wheels/'install.lock')])
-            command([*run_as,str(venv/'bin/python'),'-I','-m','pip','check'])
-        immutable(venv)
         cli=[*run_as,str(venv/'bin/python'),'-I','-m','mcp_rooms.test_candidate']
         command([*cli,'bootstrap','--state',str(PROFILE),'--resource',RESOURCE])
         raw=(PROFILE/'owner.key').read_text().strip()
         key_hash=sha256((PROFILE/'owner.key').read_bytes()).hexdigest()
-        rendered=runpy.run_path(str(ROOT/'tools/operator_unit.py'))['render'](source,RESOURCE)
-        with UNIT.open('x') as f:created_unit=True;f.write(rendered)
-        UNIT.chmod(0o644)
-        command(['/usr/bin/systemd-analyze','verify',str(UNIT)])
-        command(['/usr/bin/systemctl','daemon-reload']);loaded=True
         command(['/usr/bin/systemctl','start',NAME])
         group=await_ready(uid);start_cpu=cpu(group)['usage_usec']
         print('CANDIDATE UNIT STEP: unit-ready',flush=True)
@@ -366,7 +358,8 @@ def main(bundle,source,python_base):
             'sampled_native_parallel_peak':sampler.native,'cgroup_cpu_usage_usec':cpu_used,
             'state_logical_bytes':logical,'state_allocated_bytes':allocated,
             'fixture_capacity_bounds_only':True,'vps_capacity_accepted':False,
-            'production_installer':False},sort_keys=True))
+            'production_installer':False,'reviewed_install_only_tool':True,
+            'existing_install_refused':True,'installer_did_not_bootstrap_or_start':True},sort_keys=True))
     finally:
         raw=None
         if sampler is not None and sampler.thread.is_alive():sampler.stop()
@@ -386,15 +379,17 @@ def main(bundle,source,python_base):
             if created_state:shutil.rmtree(STATE)
             if created_base:shutil.rmtree(BASE)
             if created_user:command(['/usr/sbin/userdel',USER])
+            if TRUSTED.exists():shutil.rmtree(TRUSTED)
         else:raise RuntimeError('candidate_ci_teardown_identity_refused')
 
 
 if __name__=='__main__':
-    try:main(Path(sys.argv[1]),sys.argv[2],sys.argv[3])
+    try:main(Path(sys.argv[1]),sys.argv[2])
     except Exception as exc:
         # Do not stringify subprocess exception/argv/stdout or HTTP payloads.
         frames=[f for f in traceback.extract_tb(exc.__traceback__) if f.filename==__file__]
         frame=next((f for f in reversed(frames) if f.name=='main'),frames[-1] if frames else traceback.extract_tb(exc.__traceback__)[-1])
         print('CANDIDATE UNIT FAILED: '+json.dumps({'exception':type(exc).__name__,
-            'function':frame.name,'line':frame.lineno}),file=sys.stderr)
+            'function':frame.name,'line':frame.lineno,
+            'safe_code':str(exc) if type(exc).__name__=='InstallError' and re.fullmatch(r'[a-z_]{1,80}',str(exc)) else None}),file=sys.stderr)
         raise SystemExit(1)

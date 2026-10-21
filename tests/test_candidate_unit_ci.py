@@ -11,7 +11,7 @@ m=runpy.run_path(str(ROOT/'tools/ci_candidate_unit.py'))
 def test_ci_privileged_harness_refuses_without_actions(monkeypatch):
     monkeypatch.delenv('GITHUB_ACTIONS',raising=False)
     with pytest.raises(RuntimeError,match='disposable_actions_root_only'):
-        m['main'](Path('/missing'),'a'*40,'/missing')
+        m['main'](Path('/missing'),'a'*40)
 
 
 def test_png_synthetic_metadata_and_crc():

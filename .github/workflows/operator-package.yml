@@ -9,7 +9,7 @@ permissions:
 jobs:
   wheelhouse:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -46,10 +46,14 @@ jobs:
           umask 077
           python tools/ci_operator_lifecycle_smoke.py /tmp/rooms-operator/bundle "$GITHUB_SHA"
       - name: Real installed candidate under exact systemd unit (disposable CI only)
-        timeout-minutes: 6
+        timeout-minutes: 8
         run: |
-          PYTHON_BASE="$(python -c 'import sys; print(sys.base_prefix)')"
-          sudo --non-interactive env -i GITHUB_ACTIONS=true PATH=/usr/bin:/bin /usr/bin/python3 -I "$GITHUB_WORKSPACE/tools/ci_candidate_unit.py" /tmp/rooms-operator/bundle "$GITHUB_SHA" "$PYTHON_BASE"
+          # Host prerequisite only on ephemeral CI. Installer itself never apt-installs.
+          if [ ! -d /usr/lib/python3.12/ensurepip ]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq python3.12-venv
+          fi
+          sudo --non-interactive env -i GITHUB_ACTIONS=true PATH=/usr/bin:/bin /usr/bin/python3 -I "$GITHUB_WORKSPACE/tools/ci_candidate_unit.py" /tmp/rooms-operator/bundle "$GITHUB_SHA"
       - name: Upload public wheelhouse only
         uses: actions/upload-artifact@v4
         with:

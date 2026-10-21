@@ -125,6 +125,7 @@ nav:
     - CI offline lifecycle F3c.2b: docs/ci-f3c2b.md
     - Unit and cgroup supervision: docs/operator-supervision.md
     - Candidate under exact unit: docs/candidate-unit-ci.md
+    - Fresh operator installation: docs/operator-install.md
     - CI unit/cgroup F3c.2c.1: docs/ci-f3c2c1.md
     - CI real candidate unit F3c.2c.2: docs/ci-f3c2c2.md
     - CI сайта и публикация: docs/ci-pages.md

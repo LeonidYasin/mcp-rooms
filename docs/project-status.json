@@ -396,6 +396,20 @@
         "operator_lifecycle",
         "operator_plan"
       ]
+    },
+    {
+      "id": "candidate_unit_ci",
+      "title": "Real candidate under exact systemd unit",
+      "stage": "SOURCE",
+      "summary": "CI-only root-owned release/nonroot service; real MCP/native photo/admission/timeouts/restart/cgroup measurements pending Actions. Not a production installer or VPS capacity acceptance.",
+      "doc": "docs/candidate-unit-ci.md",
+      "source": "tools/ci_candidate_unit.py",
+      "evidence": null,
+      "depends_on": [
+        "operator_supervision",
+        "operator_bundle",
+        "operator_lifecycle"
+      ]
     }
   ]
 }

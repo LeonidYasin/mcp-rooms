@@ -124,6 +124,7 @@ nav:
     - CI operator proposal F3c.2a: docs/ci-f3c2a.md
     - CI offline lifecycle F3c.2b: docs/ci-f3c2b.md
     - Unit and cgroup supervision: docs/operator-supervision.md
+    - Candidate under exact unit: docs/candidate-unit-ci.md
     - CI unit/cgroup F3c.2c.1: docs/ci-f3c2c1.md
     - CI сайта и публикация: docs/ci-pages.md
     - Итоги исследования: docs/marketplace-research-final.md

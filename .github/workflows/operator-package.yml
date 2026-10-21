@@ -45,6 +45,11 @@ jobs:
         run: |
           umask 077
           python tools/ci_operator_lifecycle_smoke.py /tmp/rooms-operator/bundle "$GITHUB_SHA"
+      - name: Real installed candidate under exact systemd unit (disposable CI only)
+        timeout-minutes: 6
+        run: |
+          PYTHON_BASE="$(python -c 'import sys; print(sys.base_prefix)')"
+          sudo --non-interactive env -i GITHUB_ACTIONS=true PATH=/usr/bin:/bin /usr/bin/python3 -I "$GITHUB_WORKSPACE/tools/ci_candidate_unit.py" /tmp/rooms-operator/bundle "$GITHUB_SHA" "$PYTHON_BASE"
       - name: Upload public wheelhouse only
         uses: actions/upload-artifact@v4
         with:

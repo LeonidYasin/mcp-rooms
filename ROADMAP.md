@@ -383,3 +383,13 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 - [ ] F3c.2c.2 root-owned installer and real candidate/native resource/timeout/disk acceptance remain.
 
 [Contract](docs/operator-supervision.md). No VPS or main changes authorized.
+
+
+## F3c.2c.2 — actual installed candidate under fixed systemd unit
+
+- [x] SOURCE: isolated root-owned code/nonroot pip+bootstrap+service, exact rendered unit.
+- [x] SOURCE: real TCP MCP/native12MP photo/admission/body timeout/disconnect/native SIGSTOP timeout/reap/slot reuse/publication-withdrawal/restart; aggregate fixture counters.
+- [ ] Exact-source Actions acceptance; no runtime claim before logs.
+- [ ] F3c.2c.3 production installer, crash/identity protections and capacity/disk runbook remain.
+
+[Boundaries](docs/candidate-unit-ci.md). CI fixture is not deploy tooling.

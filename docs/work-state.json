@@ -10,17 +10,17 @@
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
-    "id": "F3c.2c.1",
-    "stage": "CI",
-    "contract": "docs/operator-supervision.md",
-    "source": "tools/operator_unit.py",
-    "tests": "tests/test_operator_unit.py",
-    "evidence": "docs/ci-f3c2c1.md"
+    "id": "F3c.2c.2",
+    "stage": "SOURCE",
+    "contract": "docs/candidate-unit-ci.md",
+    "source": "tools/ci_candidate_unit.py",
+    "tests": "tests/test_candidate_unit_ci.py",
+    "evidence": null
   },
   "next_task": {
-    "id": "F3c.2c.2",
-    "title": "Root-owned fresh installer and actual candidate-in-unit resource acceptance",
-    "contract": "docs/operator-supervision.md",
+    "id": "F3c.2c.3",
+    "title": "Reviewed fresh-only root installer and capacity/disk acceptance",
+    "contract": "docs/candidate-unit-ci.md",
     "acceptance": [
       "Map reviewed fixed VPS user/unit/release/state paths to root-owned immutable application code; do not deploy the unprivileged rehearsal as a public supervisor.",
       "Implement just-before-effect unit/drop-in/process/path checks and fresh/interrupted/stale identity negative tests; preserve unrelated services and all state during stop-only rollback.",
@@ -59,7 +59,8 @@
     "docs/operator-package.md",
     "docs/operator-plan.md",
     "docs/operator-lifecycle.md",
-    "docs/operator-supervision.md"
+    "docs/operator-supervision.md",
+    "docs/candidate-unit-ci.md"
   ],
   "paused_tasks": [
     {

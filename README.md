@@ -76,8 +76,9 @@ Browser M3b.3 remains mandatory before cookie writes; paused, not dropped.
 [Machine-readable continuation state](docs/work-state.json).
 [Shorter three-gate TEST track](docs/owner-first-test.md) · [candidate contract](docs/test-candidate.md).
 [F3a policy](docs/media-sandbox.md) and [F3b recovery limits](docs/recovery-candidate.md)
-are accepted in CI. Next: F3c dependency-pinned operator package and resource/rollback
-acceptance, before separately approved VPS checks.
+are accepted in CI. Current [F3c.1 offline wheelhouse](docs/operator-package.md) is SOURCE pending lock adoption/CI.
+Next F3c.2: fresh-only operator install/stop/rollback and resource acceptance, before
+separately approved VPS checks.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).

@@ -10,23 +10,23 @@
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
-    "id": "F3b",
-    "stage": "CI",
-    "contract": "docs/recovery-candidate.md",
-    "source": "src/mcp_rooms/recovery.py",
-    "tests": "tests/test_candidate_recovery.py",
-    "evidence": "docs/ci-f3b.md"
+    "id": "F3c.1",
+    "stage": "SOURCE",
+    "contract": "docs/operator-package.md",
+    "source": "tools/operator_bundle.py",
+    "tests": "tests/test_operator_bundle.py",
+    "evidence": null
   },
   "next_task": {
-    "id": "F3c",
-    "title": "Pinned dependency manifest and reviewed owner-first operator package/capacity gates",
+    "id": "F3c.2",
+    "title": "Reviewed fresh-only operator plan/install/stop/rollback and resource budget acceptance",
     "contract": "docs/test-candidate.md",
     "acceptance": [
-      "Prepare dependency-pinned wheel/install inputs and a source-pinned verifiable operator package, with no server execution or secret delivery in logs.",
-      "Prove fresh-only dry-run/install/stop/rollback safety and independent paths/ports/users without touching existing MCP services or Caddy.",
-      "Measure bounded resource/timeout/load and disk retention requirements in Actions, retaining child sandbox failures as startup refusal; never assume current VPS kernel or RAM.",
-      "Keep restored copies quarantined; do not add promotion by copying candidate profile markers or resurrect historical publications/credentials.",
-      "Document separately approved fresh VPS preflight, loopback install and HTTPS external acceptance; every remote execution needs explicit permission and special password."
+      "Use only the exact-source verified locked offline wheelhouse; do not fetch online fallback dependencies or accept discovery artifacts.",
+      "Prepare and test fresh-only dry-run/install/health/stop/rollback with independent user/unit/paths/port and no modifications of existing MCP services or Caddy.",
+      "Measure parent/child resource, timeout/admission and disk requirements in Actions; tentative unit limits must not be declared suitable for VPS before a separately approved fresh preflight.",
+      "Keep recovery copies quarantined and do not issue real keys, promote restored profiles, merge main or run any remote operation without separate approval.",
+      "Document exact owner-reviewed command boundary and separately authorized read-only VPS preflight, loopback installation and HTTPS acceptance; remote operations require special password each time."
     ]
   },
   "runtime_last_known": {
@@ -55,7 +55,8 @@
     "docs/owner-first-test.md",
     "docs/test-candidate.md",
     "docs/media-sandbox.md",
-    "docs/recovery-candidate.md"
+    "docs/recovery-candidate.md",
+    "docs/operator-package.md"
   ],
   "paused_tasks": [
     {

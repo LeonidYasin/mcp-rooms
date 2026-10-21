@@ -343,6 +343,20 @@
         "media_files",
         "publish"
       ]
+    },
+    {
+      "id": "operator_bundle",
+      "title": "Офлайн hash-pinned wheelhouse",
+      "stage": "SOURCE",
+      "summary": "Actions-only discovery → reviewed runtime hash-lock → binary-only offline bundle/install/native smoke; source/hash verifier. Не VPS installer; operator/resources F3c.2 отдельно.",
+      "doc": "docs/operator-package.md",
+      "source": "tools/operator_bundle.py",
+      "evidence": null,
+      "depends_on": [
+        "test_candidate",
+        "native_sandbox",
+        "candidate_recovery"
+      ]
     }
   ]
 }

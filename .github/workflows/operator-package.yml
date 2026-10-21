@@ -1,0 +1,47 @@
+name: Operator offline package
+on:
+  push:
+    branches: [feat/standalone-identity]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  wheelhouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build candidate wheel
+        run: |
+          python -m pip install build
+          python -m build --wheel
+      - name: Prepare exact wheelhouse or unaccepted discovery
+        run: |
+          umask 077
+          mkdir -m 700 /tmp/rooms-operator
+          if [ -f operator/runtime-linux-x86_64-py312.lock ]; then
+            python tools/operator_bundle.py --wheel dist/*.whl --output /tmp/rooms-operator/bundle --source-sha "$GITHUB_SHA" --lock operator/runtime-linux-x86_64-py312.lock
+          else
+            python tools/operator_bundle.py --wheel dist/*.whl --output /tmp/rooms-operator/bundle --source-sha "$GITHUB_SHA"
+          fi
+      - name: Offline install into clean venv
+        run: |
+          python -m venv /tmp/rooms-operator/venv
+          /tmp/rooms-operator/venv/bin/python -m pip --isolated install --disable-pip-version-check --no-index --only-binary=:all: --find-links /tmp/rooms-operator/bundle/wheels --require-hashes -r /tmp/rooms-operator/bundle/install.lock
+          /tmp/rooms-operator/venv/bin/python -m pip check
+      - name: Installed candidate and recovery smoke without online dependencies
+        run: |
+          CHECKOUT="$PWD"
+          cd /tmp
+          umask 077
+          /tmp/rooms-operator/venv/bin/python "$CHECKOUT/tools/ci_candidate_smoke.py"
+      - name: Upload public wheelhouse only
+        uses: actions/upload-artifact@v4
+        with:
+          name: operator-wheelhouse-${{ github.sha }}-linux-x86_64-py312
+          path: /tmp/rooms-operator/bundle.tar.gz
+          retention-days: 14

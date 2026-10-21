@@ -32,8 +32,10 @@ M3b.3 session binding **не отменён**: paused до возвращени�
 DDL и один worker/upload. F3a [Landlock/seccomp](media-sandbox.md) [принят в exact-SHA CI](ci-f3a.md):709 tests на3.12.
 Candidate обязан отказать до app startup без рабочей политики. F3b [offline recovery quarantine](recovery-candidate.md) [принят в CI](ci-f3b.md):761 tests на3.12.
 Original current authority обязателен; output не compose-ready, все publications withdrawn.
-Следующая задача F3c — dependency/resource/operator package, без promotion обхода.
-F3c — next_task; recovery promotion/missing-current disaster policy сохранены в
+F3c.1 [offline wheelhouse](operator-package.md) подготовлен (SOURCE); discovery lock
+ещё должен быть принят отдельным commit после Actions. Следующий F3c.2 —
+operator install/stop/rollback/resources, без promotion обхода.
+F3c.2 — next_task; recovery promotion/missing-current disaster policy сохранены в
 paused_tasks (RECOVERY-CUTOVER). Ни один из них не означает самовольный deploy.
 
 ## Архитектура уже выбрана

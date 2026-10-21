@@ -73,6 +73,7 @@ nav:
     - Fresh TEST candidate: docs/test-candidate.md
     - Native child OS policy: docs/media-sandbox.md
     - DB+photos recovery: docs/recovery-candidate.md
+    - Operator offline package: docs/operator-package.md
     - Roadmap: ROADMAP.md
     - Архитектурное решение: docs/decisions/001-marketplace-foundation.md
     - Первый реальный сценарий: docs/first-sale-acceptance.md

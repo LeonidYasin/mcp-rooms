@@ -344,3 +344,12 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 - [ ] F3c pinned dependency/resource/operator package; promotion/cutover and missing-current disaster recovery are not silently accepted.
 
 [Contract](docs/recovery-candidate.md). No VPS command or main/production change.
+
+
+## F3c.1 — locked offline wheelhouse
+
+- [x] SOURCE: binary-only dependency discovery, explicit lock adoption, expected-source/hash verifier and allowlisted public archive.
+- [ ] Commit proposed Linux x86_64 CPython3.12 runtime lock after Actions discovery; verify locked download, fresh offline venv and native candidate/recovery smoke.
+- [ ] F3c.2 fresh-only operator install/dry-run/stop/rollback and resource/disk gates remain; this artifact is not a VPS installer.
+
+[Contract and limits](docs/operator-package.md). No remote execution authorized.

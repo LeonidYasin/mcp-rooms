@@ -41,8 +41,19 @@ LIMIT=1024*1024
 
 def command(args,timeout=120):
     # Output may contain pip/bootstrap details; never print it or raw subprocess errors.
-    return subprocess.run(args,env=ENV,cwd='/',stdin=subprocess.DEVNULL,
-        stdout=subprocess.PIPE,stderr=subprocess.PIPE,check=True,timeout=timeout).stdout
+    try:
+        return subprocess.run(args,env=ENV,cwd='/',stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,check=True,timeout=timeout).stdout
+    except subprocess.CalledProcessError as exc:
+        stderr=exc.stderr or b'';stdout=exc.stdout or b''
+        categories={name:needle in stderr or needle in stdout for name,needle in (
+            ('permission',b'Permission denied'),('missing_file',b'No such file'),
+            ('libpython',b'libpython'),('ensurepip',b'ensurepip'),
+            ('readonly',b'Read-only file system'),('candidate_storage',b'candidate_storage_error'),
+            ('candidate_unavailable',b'candidate_unavailable'))}
+        print('CI COMMAND FAILURE: '+json.dumps({'caller_line':sys._getframe(1).f_lineno,
+            'program':Path(args[0]).name,'returncode':exc.returncode,'categories':categories}),flush=True)
+        raise
 
 
 def properties():
@@ -371,7 +382,8 @@ if __name__=='__main__':
     try:main(Path(sys.argv[1]),sys.argv[2],sys.argv[3])
     except Exception as exc:
         # Do not stringify subprocess exception/argv/stdout or HTTP payloads.
-        frame=traceback.extract_tb(exc.__traceback__)[-1]
+        frames=[f for f in traceback.extract_tb(exc.__traceback__) if f.filename==__file__]
+        frame=frames[0] if frames else traceback.extract_tb(exc.__traceback__)[-1]
         print('CANDIDATE UNIT FAILED: '+json.dumps({'exception':type(exc).__name__,
             'function':frame.name,'line':frame.lineno}),file=sys.stderr)
         raise SystemExit(1)

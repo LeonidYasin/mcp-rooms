@@ -103,8 +103,17 @@ HTML/photo → withdraw404; XSS, private/disabled/missing/bad epoch, невер�
 Предыдущие native worker и publication race suites сохраняются. CI не заменяет
 будущий screenshot/accessibility browser QA или external HTTPS/read/load acceptance.
 
-[F2 candidate](test-candidate.md) реализуется как strict fresh-test composition/bootstrap/package с
+[F2 candidate](test-candidate.md) принят как strict fresh-test composition/bootstrap/package с
 одним worker и без автоматических startup migrations; не команда запуска на VPS.
 Следуйте [AGENTS.md](../AGENTS.md), [work-state](work-state.json) и
 [handoff](ai-handoff.md). Не продолжайте автоматически M3b.3 как blocker первого
 MCP-first TEST; эта задача сохранена в paused tracks и обязательна до browser writes.
+
+
+### Уточнение после F3a
+
+[F3a OS child policy принят в CI](ci-f3a.md). До разрешённого VPS TEST остаются
+два подготовительных кодовых блока: F3b DB+photos restore/current security-state и
+F3c dependency/resource/operator package; затем отдельно одобренные свежий preflight,
+loopback install и HTTPS/external acceptance. Это не две команды/два сообщения и
+не обещание production. Проверка Landlock на нашем VPS пока не выполнялась.

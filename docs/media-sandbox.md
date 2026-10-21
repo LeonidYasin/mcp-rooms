@@ -1,6 +1,6 @@
 # F3a — обязательная изоляция native photo child
 
-**SOURCE, ожидает exact-SHA Actions. Не VPS TEST и не production.**
+**[Exact-SHA CI принят](ci-f3a.md):709 tests на Python3.12. Не VPS TEST и не production.**
 Дополнение [fresh candidate](test-candidate.md); предыдущая приёмка [F2](ci-f2.md)
 остаётся исторической. Никакие системные настройки VPS этим кодом не изменяются.
 

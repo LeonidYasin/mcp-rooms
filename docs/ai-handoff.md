@@ -29,7 +29,7 @@ M3b.3 session binding **не отменён**: paused до возвращени�
 [F1 принят в exact-SHA CI](ci-f1.md):645 tests на Python3.12.
 [F2 принят в exact-SHA CI](ci-f2.md):686 tests на3.12 плюс installed-wheel native smoke.
 [Контракт TEST-кандидата](test-candidate.md) описывает fresh-only bootstrap, startup без
-DDL и один worker/upload. F3a [Landlock/seccomp](media-sandbox.md) подготовлен (SOURCE, CI ещё не принят).
+DDL и один worker/upload. F3a [Landlock/seccomp](media-sandbox.md) [принят в exact-SHA CI](ci-f3a.md):709 tests на3.12.
 Candidate обязан отказать до app startup без рабочей политики. Следующая задача F3b — restore/security-state.
 F3b restore/security-state и F3c resources/dependency/operator package остаются
 явно в queued_tasks, не самовольный deploy.
@@ -77,7 +77,7 @@ MCP сам не открывает диск пользователя. Будущ
 
 ## Что ещё НЕ сделано
 
-Cookie-authorized market commands, автоматический onboarding/recovery и форма, публичный каталог/search, web-редактирование, приватный отклик, отдельный admin MCP; полная OS isolation/load/RAM
+Cookie-authorized market commands, автоматический onboarding/recovery и форма, публичный каталог/search, web-редактирование, приватный отклик, отдельный admin MCP; VPS OS-policy/load/RAM
 приёмка, DB+files disaster restore/security-state reconciliation, безопасная очистка
 долгоживущих auth receipts/сессий. Не считать стадией production наличие public_get
 внутри Python, green unit tests или GitHub Pages. [План до TEST](deployment-readiness.md)

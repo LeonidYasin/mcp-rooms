@@ -91,3 +91,13 @@ GitHub Pages — версионируемая документация, а не 
 [Приватный бинарный HTTP upload/read](media-http.md) общий для человека и агента.
 Explicit opt-in, без web-формы, public photo route и автоматической marketplace
 регистрации. [Приёмка M3a.2 в CI](ci-m3a2.md) завершена; первый из 6 этапов ещё не завершён.
+
+
+## Актуальная граница после F3a
+
+[F3a child Landlock/seccomp](ci-f3a.md) проверен в Actions; он не доказывает поддержку
+политики/нагрузки на VPS. До короткого owner-first TEST: F3b consistent DB+photos
+restore/current security-state, F3c pinned dependencies/capacity/operator package,
+затем отдельно разрешённые preflight → loopback → HTTPS/external checks.
+[Следующая bounded задача F3b](test-candidate.md#f3b-bounded-задача-следующего-чата-spec-не-реализация).
+Ни main, ни production не меняются автоматически.

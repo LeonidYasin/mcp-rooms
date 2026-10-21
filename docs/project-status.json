@@ -306,28 +306,28 @@
       "id": "test_candidate",
       "title": "Fresh owner-first TEST candidate",
       "stage": "CI",
-      "summary": "Отдельный fresh bootstrap, existing-only/schema-pinned startup, один worker/upload, process lock, installed-wheel synthetic native smoke. Не OS sandbox, installer или VPS deploy.",
+      "summary": "Fresh bootstrap, existing-only startup, один worker/upload/process, обязательная child OS policy и installed-wheel native smoke. Не VPS installer/deploy.",
       "doc": "docs/test-candidate.md",
       "source": "src/mcp_rooms/test_candidate.py",
-      "evidence": "docs/ci-f2.md",
+      "evidence": "docs/ci-f3a.md",
       "depends_on": [
         "public_card",
         "media_http",
         "worker",
-        "media_files"
+        "media_files",
+        "native_sandbox"
       ]
     },
     {
       "id": "native_sandbox",
       "title": "OS-изоляция native photo child",
-      "stage": "SOURCE",
-      "summary": "Landlock ABI≥3 + seccomp x86_64, fail-closed перед Pillow и startup candidate. Synthetic CI proofs ожидаются; VPS не проверен.",
+      "stage": "CI",
+      "summary": "Landlock ABI≥3 + seccomp x86_64: synthetic secrets/metadata/network/process denial, real codecs and fail-closed candidate startup проверены в Actions. Не VPS probe или полная VM.",
       "doc": "docs/media-sandbox.md",
       "source": "src/mcp_rooms/media_sandbox.py",
-      "evidence": null,
+      "evidence": "docs/ci-f3a.md",
       "depends_on": [
-        "worker",
-        "test_candidate"
+        "worker"
       ]
     }
   ]

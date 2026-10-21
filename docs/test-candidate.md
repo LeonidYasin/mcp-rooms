@@ -1,4 +1,4 @@
-# F2 — fresh owner-first TEST candidate, не VPS installer
+# F2/F3a — fresh owner-first TEST candidate, не VPS installer
 
 Срез продолжает [сокращённый маршрут](owner-first-test.md): один владелец управляет
 объявлением через MCP/Bearer HTTP, посетитель читает только опубликованную карточку.
@@ -7,7 +7,7 @@
 
 [Exact-SHA F2 CI acceptance](ci-f2.md):686 tests на3.12 плюс installed-wheel native smoke.
 Это исторический F2 baseline, не серверная установка. Текущий candidate дополнен
-обязательной [F3a OS policy](media-sandbox.md), SOURCE до exact-SHA CI.
+обязательной [F3a OS policy](media-sandbox.md), [приёмка](ci-f3a.md):709 tests на3.12.
 
 ## Отдельный профиль вместо старого installer
 
@@ -120,15 +120,15 @@ retention14days. Нет key/DB/photos/state/logs в uploaded paths. Это integ
 зависимостей. Установочный dependency lock/offline wheelhouse, provenance проверка
 на стороне оператора и reviewed install/stop/rollback script ещё не закрыты.
 
-## Следующий bounded gate F3a и оставшиеся F3b/F3c
+## Следующий bounded gate F3b и оставшийся F3c
 
 Пока **нельзя называть этот кандидат готовым к VPS TEST**. Следующий отдельный
-кодовый срез F3a (пункт1 ниже) подготовлен, ожидает Actions. Остальные пункты остаются F3b/F3c, не
+кодовый срез F3a (пункт1 ниже) принят в CI. Остальные пункты остаются F3b/F3c, не
 должны теряться или запускаться на VPS автоматически. Нужны:
 
-1. [F3a Landlock/seccomp child](media-sandbox.md): отдельно проверить, что он
-   не читает parent state/owner.key/БД и не имеет network. RLIMIT/isolated Python —
-   не такая sandbox. Root-only systemd ограничения не считаются существующими.
+1. [F3a Landlock/seccomp child](media-sandbox.md) принят в Actions: synthetic secrets/
+   metadata/network/process denial и real codecs. Реальная поддержка VPS ещё
+   не проверена. Root-only systemd ограничения не считаются существующими.
 2. Один worker всё ещё имеет RLIMIT_AS512MiB; подобрать общий MemoryMax/CPU/Tasks/
    disk budget по свежим данным VPS и нагрузочным/timeout/kill fixtures. Не копировать
    старый unit MemoryMax256M и не объявлять проблему RAM решённой одним semaphore.
@@ -141,3 +141,33 @@ retention14days. Нет key/DB/photos/state/logs в uploaded paths. Это integ
 Полный browser/search/private-replies/admin проект не отменён. M3b.3 paused и
 обязателен до любого cookie-authorized editing. См. [handoff](ai-handoff.md),
 [work-state](work-state.json), [общий маршрут](deployment-readiness.md).
+
+
+## F3b — bounded задача следующего чата (SPEC, не реализация)
+
+Цель: операторский consistent DB+photos snapshot и проверка **отдельной private
+восстановленной копии**, не перезапись рабочего профиля. Минимальный первый подход:
+остановленная composition/удерживаемый process lock; SQLite backup API, не копирование
+живого WAL main-file. Запрет конкурентной записи и состояния alias должен быть явным.
+Не вводить небезопасный режим «snapshot на ходу» ради сокращения работ.
+
+- Точные profile/schema/resource и synthetic fixture: staged/attached/published/withdrawn
+  фото, два независимых пользователя, отозванный ключ и disabled пользователь.
+- Снимок только в новый owner-only путь: bounded manifest версий/размеров/digest,
+  DB+необходимые derivative files. Никакого owner.key, env или stdout с secrets.
+  DB содержит sensitive auth metadata: private backup, не CI upload artifact.
+- Restore только в новый private путь, без routes/listeners, без автоматической
+  выдачи ключа, migration/repair или перезаписи original DB/files. Не принимать
+  symlink/hardlink/неожиданный файл/schema/resource/повреждённый digest.
+- Проверять DB integrity/FK, media hashes/counts/references и publication snapshots;
+  interrupted/missing-file cases дают явный отказ, не частичную готовность.
+- Исторический snapshot может воскресить revoked/disabled состояние. До любого
+  compose требовать актуальный trusted security-state reconcile (не экспорт JSON
+  от клиента), подтверждать отказ старого ключа/disabled и независимость второго
+  пользователя. Нет свежего authoritative состояния — нет serving restored copy.
+- Только fixed operator API/CLI, без произвольного SQL/shell или client path;
+  failure cleanup сохраняет оригинал и никогда не объявляет partial restore готовым.
+- Actions-only tests; не создавать schedules, retention auto-delete, off-host uploads
+  или команды VPS. F3c dependency/capacity/operator install остаётся отдельно.
+
+Это проект следующего среза; конкретная реализация и её границы требуют review.

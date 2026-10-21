@@ -330,7 +330,7 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 
 - [x] SOURCE: fixed unprivileged Landlock ABI≥3 + seccomp x86_64 before Pillow/input; candidate preflight, no bare fallback.
 - [x] Prepare synthetic file/key/DB read, metadata mutation, network/process denial, unavailable/timeout/reap and installed-wheel integration tests.
-- [ ] Exact-SHA Actions acceptance pending; no VPS/kernel availability claim.
+- [x] Exact-SHA `948b4b7a`: Python3.12 709 passed/2 warnings;3.10 648 passed/42 skipped/2 warnings; matrix/native installed smoke/docs green. [Evidence](docs/ci-f3a.md). No VPS/kernel availability claim.
 - [ ] F3b DB+photos restore/current security-state reconciliation, then F3c dependency/capacity/operator package.
 
 [Threat model / prerequisites / limitations](docs/media-sandbox.md).

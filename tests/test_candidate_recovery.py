@@ -139,7 +139,7 @@ def test_destinations_refused_without_overwrite(env,target_kind):
     elif target_kind=='nested_source':target=x.root/'nested'
     elif target_kind=='nested_backup':target=backup/'nested'
     elif target_kind=='shared_parent':
-        parent=x.parent/'shared';parent.mkdir(mode=0o755);target=parent/'never'
+        parent=x.parent/'shared';parent.mkdir(mode=0o755);parent.chmod(0o755);target=parent/'never'
     before=stable(x.root)
     with pytest.raises((DomainError,OSError)):m.restore(backup,x.root,target,RESOURCE)
     assert stable(x.root)==before
@@ -228,3 +228,31 @@ def test_stale_consent_and_publication_not_resurrected_and_cli_no_secrets(env,ca
         with pytest.raises(DomainError,match='listing_unavailable'):pub.public_get(x.lid)
     assert m.main(['verify','--source',str(x.parent/'missing'),'--resource',RESOURCE])==1
     assert 'recovery_storage_error' in capsys.readouterr().out
+
+
+@pytest.mark.parametrize('target',['credentials','content','projection','photo_item'])
+def test_malformed_persisted_documents_refuse_without_ready(env,target):
+    x=env;backup=take(x) if target=='credentials' else None
+    with x.store._db(write=True) as db:
+        if target=='credentials':db.execute("UPDATE credentials SET scopes='null' WHERE id=?",(x.actors[0].credential_id,))
+        elif target=='content':db.execute("UPDATE market_drafts SET content='null' WHERE id=?",(x.lid,))
+        elif target=='projection':db.execute("UPDATE listing_publications SET projection='null' WHERE listing_id=?",(x.lid,))
+        else:db.execute('UPDATE listing_publications SET projection=? WHERE listing_id=?',(json.dumps({'id':x.lid,'photos':[None]}),x.lid))
+    dest=x.parent/'result'
+    with pytest.raises(DomainError):
+        if backup:m.restore(backup,x.root,dest,RESOURCE)
+        else:m.snapshot(x.root,dest,RESOURCE)
+    assert not (dest/m.READY).exists() and not (dest/candidate.MARKER).exists()
+
+
+def test_sqlite_writer_freeze_is_held_while_copying_photos(env,monkeypatch):
+    x=env;original=m._copy_photos;seen=[]
+    def checked(*args):
+        db=sqlite3.connect(x.root/candidate.DB,timeout=0)
+        try:
+            with pytest.raises(sqlite3.OperationalError,match='locked'):db.execute('BEGIN IMMEDIATE')
+            seen.append(True)
+        finally:db.close()
+        return original(*args)
+    monkeypatch.setattr(m,'_copy_photos',checked)
+    take(x);assert seen==[True]

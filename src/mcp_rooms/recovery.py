@@ -34,8 +34,8 @@ MAX_MANIFEST = 128 * 1024
 DB_BOUND = RoomStore.MAX_PAGES * 4096
 
 
-def _read(path, maximum):
-    """Pinned, bounded regular file. No alias/device/shared file or mutable read."""
+def _chunks(path, maximum):
+    """Pinned bounded file stream; validate identity/metadata again at EOF."""
     fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC)
     try:
         before = os.fstat(fd)
@@ -43,24 +43,29 @@ def _read(path, maximum):
                 or stat.S_IMODE(before.st_mode) != 0o600 or before.st_nlink != 1
                 or not 0 < before.st_size <= maximum):
             raise DomainError('recovery_unsafe_file')
-        data = bytearray()
-        while len(data) <= maximum:
-            block = os.read(fd, min(65536, maximum + 1 - len(data)))
+        size = 0
+        while size <= maximum:
+            block = os.read(fd, min(65536, maximum + 1 - size))
             if not block: break
-            data.extend(block)
+            size += len(block)
+            yield block
         after, named = os.fstat(fd), path.lstat()
         fields = ('st_dev','st_ino','st_size','st_mtime_ns','st_ctime_ns','st_mode','st_nlink')
-        if (len(data) != before.st_size
+        if (size != before.st_size
                 or any(getattr(before,k) != getattr(after,k) or getattr(after,k) != getattr(named,k) for k in fields)):
             raise DomainError('recovery_changed_file')
-        return bytes(data)
     finally: os.close(fd)
 
 
+def _read(path, maximum):
+    return b''.join(_chunks(path, maximum))
+
+
 def _digest(path, maximum):
-    # DB <=64MiB; hashing is bounded, no data leaves the process. Photo <=2MiB.
-    data = _read(path, maximum)
-    return {'sha256': sha256(data).hexdigest(), 'byte_size': len(data)}
+    digest=sha256();size=0
+    for block in _chunks(path, maximum):
+        digest.update(block);size+=len(block)
+    return {'sha256':digest.hexdigest(),'byte_size':size}
 
 
 def _write(path, data):
@@ -129,6 +134,7 @@ def _audit(root, resource, *, already_locked=False):
     states require separate reviewed maintenance, not a snapshot advertised as ready.
     """
     _database(root/DB)
+    now = int(time.time()*1000)
     with PrivatePhotoFiles(root/'photos') as files, (nullcontext() if already_locked else files._guard()):
         files._inventory()
         inventory = []
@@ -167,14 +173,15 @@ def _audit(root, resource, *, already_locked=False):
                 ids = [p['media_id'] for p in links]
                 content = json.loads(draft['content'])
                 if (len(ids)>8 or [p['position'] for p in links]!=list(range(len(ids)))
-                        or content.get('media_ids')!=ids):
+                        or type(content) is not dict or content.get('media_ids')!=ids):
                     raise DomainError('recovery_media_mismatch')
                 rows = []
                 for mid in ids:
                     row = stages.get(mid)
                     if (not row or row['draft_id']!=lid or row['user_id']!=draft['user_id']
                             or row['state']!='staged' or row['revision']!=draft['revision']
-                            or row['resource']!=resource or row['cleanup_state']!='live'
+                            or row['resource']!=resource
+                            or (row['cleanup_state']!='live' and not (row['cleanup_state']=='purged' and row['expires_at']<=now))
                             or row['expires_at']>draft['expires_at']):
                         raise DomainError('recovery_media_mismatch')
                     rows.append(row)
@@ -183,9 +190,10 @@ def _audit(root, resource, *, already_locked=False):
             now = int(time.time()*1000)
             for pub in db.execute('SELECT * FROM listing_publications'):
                 card = json.loads(pub['projection']); lid=pub['listing_id']
-                if card.get('id')!=lid or type(card.get('photos')) is not list or len(card['photos'])>8:
+                if type(card) is not dict or card.get('id')!=lid or type(card.get('photos')) is not list or len(card['photos'])>8:
                     raise DomainError('recovery_publication_mismatch')
                 for p in card['photos']:
+                    if type(p) is not dict: raise DomainError('recovery_publication_mismatch')
                     row = stages.get(p.get('media_id'))
                     if (not row or row['draft_id']!=lid or row['user_id']!=pub['user_id']
                             or any(p.get(k)!=row[k] for k in ('sha256','byte_size','width','height'))):
@@ -243,7 +251,9 @@ def _verify(root, resource, *, kind=None):
             or type(m['origin']) is not dict or set(m['origin'])!={'device','inode'}
             or any(type(v) is not int or v<0 for v in m['origin'].values())
             or (m['kind']=='snapshot' and m['security'] is not None)
-            or (m['kind']=='restored' and m['security']!={'current_authority_checked':True,'publications_withdrawn':True,'quarantined':True})):
+            or (m['kind']=='restored' and (type(m['security']) is not dict
+                or set(m['security'])!={'current_authority_checked','publications_withdrawn','quarantined'}
+                or not all(v is True for v in m['security'].values())))):
         raise DomainError('recovery_invalid_manifest')
     _database(root/DB,m['schema_hash'])
     actual=_manifest(root,resource,m['kind'],m['origin'],m['schema_hash'],m['security'])

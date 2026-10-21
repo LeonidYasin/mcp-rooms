@@ -14,6 +14,7 @@ import time
 NAME='mcp-rooms-ci-supervision.service'
 WORK=Path('/run/mcp-rooms-ci-supervision')
 UNIT=Path('/run/systemd/system')/NAME
+READY=Path('/run/mcp-rooms-ci-supervision-ready')
 ENV={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8'}
 
 
@@ -48,17 +49,17 @@ def main():
         raise RuntimeError('cgroup_v2_required')
     # A pre-existing fixture or unit is never adopted, stopped, removed or replaced.
     old=props()
-    if UNIT.exists() or UNIT.is_symlink() or WORK.exists() or WORK.is_symlink() or old.get('FragmentPath') or old.get('MainPID')!='0':
+    if UNIT.exists() or UNIT.is_symlink() or WORK.exists() or WORK.is_symlink() or READY.exists() or READY.is_symlink() or old.get('FragmentPath') or old.get('MainPID')!='0':
         raise RuntimeError('existing_target_refused')
     work_created=False;unit_created=False;started=False
     try:
         WORK.mkdir(mode=0o755);work_created=True
         fixture=WORK/'fixture.py'
-        fixture.write_text("import subprocess,sys,time\nparent=bytearray(8*1024*1024)\nchild=subprocess.Popen([sys.executable,'-I','-c',\"import signal,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); data=bytearray(12*1024*1024); time.sleep(120)\"])\ntime.sleep(120)\n")
+        fixture.write_text("import subprocess,sys,time\nparent=bytearray(8*1024*1024)\nchild=subprocess.Popen([sys.executable,'-I','-c',\"import signal,time,pathlib; signal.signal(signal.SIGTERM,signal.SIG_IGN); data=bytearray(12*1024*1024); pathlib.Path('/run/mcp-rooms-ci-supervision-ready/ready').write_text('ready'); time.sleep(120)\"])\ntime.sleep(120)\n")
         fixture.chmod(0o644)
         with UNIT.open('x') as f:
             unit_created=True
-            f.write('[Unit]\nDescription=Ephemeral MCP Rooms cgroup proof\n[Service]\nType=exec\nDynamicUser=yes\nExecStart=/usr/bin/python3 -I '+str(fixture)+'\nKillMode=control-group\nSendSIGKILL=yes\nTimeoutStopSec=2s\nRuntimeMaxSec=30s\nRestart=no\nNoNewPrivileges=yes\nCapabilityBoundingSet=\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nPrivateDevices=yes\nCPUAccounting=yes\nMemoryAccounting=yes\nTasksAccounting=yes\nMemoryMax=128M\nMemorySwapMax=0\nTasksMax=16\nCPUQuota=50%\nStandardOutput=null\nStandardError=null\n')
+            f.write('[Unit]\nDescription=Ephemeral MCP Rooms cgroup proof\n[Service]\nType=exec\nDynamicUser=yes\nRuntimeDirectory=mcp-rooms-ci-supervision-ready\nRuntimeDirectoryMode=0700\nExecStart=/usr/bin/python3 -I '+str(fixture)+'\nKillMode=control-group\nSendSIGKILL=yes\nTimeoutStopSec=2s\nRuntimeMaxSec=30s\nRestart=no\nNoNewPrivileges=yes\nCapabilityBoundingSet=\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nPrivateDevices=yes\nCPUAccounting=yes\nMemoryAccounting=yes\nTasksAccounting=yes\nMemoryMax=128M\nMemorySwapMax=0\nTasksMax=16\nCPUQuota=50%\nStandardOutput=null\nStandardError=null\n')
         UNIT.chmod(0o644)
         run('/usr/bin/systemd-analyze','verify',str(UNIT))
         run('/usr/bin/systemctl','daemon-reload')
@@ -69,8 +70,13 @@ def main():
             cg=p['ControlGroup'];assert cg=='/system.slice/'+NAME
             group=Path('/sys/fs/cgroup'+cg);assert group.resolve()==group
             ids=[int(v) for v in (group/'cgroup.procs').read_text().split()]
-            if len(ids)>=2 and int((group/'memory.current').read_text())>=32*1024*1024:break
-            if time.monotonic()>deadline:raise RuntimeError('fixture_not_ready')
+            # Explicit child readiness after allocation, never an RSS guess.
+            if len(ids)>=2 and (READY/'ready').is_file() and (READY/'ready').read_text()=='ready':break
+            if time.monotonic()>deadline:
+                print('FIXTURE NOT READY: '+json.dumps({'process_count':len(ids),
+                    'memory_current':(group/'memory.current').read_text().strip(),
+                    'active_state':p['ActiveState']}))
+                raise RuntimeError('fixture_not_ready')
             time.sleep(.1)
         counters={k:(group/k).read_text().strip() for k in ('memory.current','memory.peak','memory.max','pids.current','pids.max','cpu.stat')}
         assert counters['memory.max']=='134217728' and counters['pids.max']=='16'

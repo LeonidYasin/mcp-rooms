@@ -455,8 +455,22 @@ if __name__=='__main__':
                 if info is not None:file_meta={'uid':info.st_uid,'mode':oct(stat.S_IMODE(info.st_mode)),
                     'links':info.st_nlink,'size':info.st_size}
             tb=tb.tb_next
+        def safe(item):
+            return (str(item) if type(item).__name__ in ('InstallError','ControlError')
+                and re.fullmatch(r'[a-z_]{1,80}',str(item)) else None)
+        # Safe codes only: recovery errors otherwise hide the original start failure.
+        chain=[];seen={id(exc)};pending=[('cause',exc.__cause__),('context',exc.__context__)]
+        while pending and len(chain)<6:
+            relation,item=pending.pop(0)
+            if item is None or id(item) in seen:continue
+            seen.add(id(item))
+            chain.append({'relation':relation,'exception':type(item).__name__,'safe_code':safe(item),
+                'controller_frames':[{'function':f.name,'line':f.lineno} for f in traceback.extract_tb(item.__traceback__)
+                    if f.filename.endswith('/tools/operator_control.py')]})
+            pending.extend([('cause',item.__cause__),('context',item.__context__)])
         print('CANDIDATE UNIT FAILED: '+json.dumps({'exception':type(exc).__name__,
             'installer_frames':install_frames,'controller_frames':control_frames,'file_meta':file_meta,
+            'chain':chain,
             'function':frame.name,'line':frame.lineno,
             'safe_code':str(exc) if type(exc).__name__ in ('InstallError','ControlError')
                 and re.fullmatch(r'[a-z_]{1,80}',str(exc)) else None}),file=sys.stderr)

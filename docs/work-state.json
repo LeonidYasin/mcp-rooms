@@ -18,14 +18,15 @@
     "source_sha": "88eabfb35aa7cc763d85352e3e67a48e9d5fb97f",
     "evidence": "docs/ci-f3c2c3b.md",
     "ci": "Python 3.10-3.13 success; build/install smoke success; operator systemd supervision success",
-    "kind": "CI_NOT_DEPLOYMENT"
+    "kind": "CI_NOT_DEPLOYMENT",
+    "python312_passed": 960
   },
   "current_slice": {
     "id": "F3c.2c.3b",
     "stage": "CI",
     "contract": "docs/operator-install.md",
     "source": "tools/operator_control.py",
-    "tests": "tests/test_operator_control.py; tools/ci_candidate_unit.py",
+    "tests": "tests/test_operator_control.py",
     "evidence": "docs/ci-f3c2c3b.md",
     "summary": "Guarded capacity/bootstrap/start/stop controller over the accepted fresh installer and actual-unit harness."
   },
@@ -39,7 +40,8 @@
       "Measure available memory, disk and inodes against the accepted controller criteria without claiming production capacity.",
       "Verify existing MCP/Caddy/services remain untouched; emit only a sanitized report and never upload host config, credentials, database or private logs.",
       "If preflight passes, stop and request separate approval for fresh install/bootstrap/loopback acceptance. Do not combine permission gates."
-    ]
+    ],
+    "contract": "docs/operator-install.md"
   },
   "runtime_last_known": {
     "not_a_current_probe": true,
@@ -55,7 +57,7 @@
   ],
   "verification": {
     "local": "static preparation and AST only; no project execution",
-    "runtime": "GitHub Actions only until separately authorized operator TEST",
+    "runtime": "GitHub Actions only",
     "commit_policy": "read remote HEAD and use expected_head_sha CAS; never force push"
   },
   "read_next": [

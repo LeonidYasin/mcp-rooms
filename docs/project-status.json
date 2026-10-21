@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "channel": "development",
-  "runtime_note": "Rooms TEST остановлен. Marketplace ещё не опубликован. Production MCP Rooms отсутствует.",
+  "runtime_note": "Основной интерфейс — чат пользователя со своим ИИ-агентом через MCP. Web ближайшего этапа — read-only витрина. Rooms TEST остановлен; production отсутствует.",
   "components": [
     {
       "id": "identity",
@@ -423,6 +423,19 @@
         "candidate_unit_ci",
         "operator_bundle",
         "operator_supervision"
+      ]
+    },
+    {
+      "id": "operator_control",
+      "title": "Guarded lifecycle controller",
+      "stage": "CI",
+      "summary": "Отдельно авторизованные capacity/bootstrap/start/stop; перепроверка install/unit/drop-ins/process, безопасная очистка failed start и сохранение state. Принято в Actions, не выполнено на VPS.",
+      "doc": "docs/operator-install.md",
+      "source": "tools/operator_control.py",
+      "evidence": "docs/ci-f3c2c3b.md",
+      "depends_on": [
+        "operator_install",
+        "candidate_unit_ci"
       ]
     }
   ]

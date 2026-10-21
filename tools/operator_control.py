@@ -287,10 +287,20 @@ def _ready(receipt,timeout=25):
     raise ControlError('control_start_timeout')
 
 
+def _wait_inactive(i,timeout=5):
+    deadline=time.monotonic()+timeout
+    while True:
+        try:return _validate(i,'inactive')
+        except ControlError as exc:
+            if str(exc)!='control_unit_not_inactive':raise
+        if time.monotonic()>deadline:raise ControlError('control_stop_incomplete')
+        time.sleep(.1)
+
+
 def _stop_owned(i,receipt):
     _validate(i,'active')
     _run(['/usr/bin/systemctl','stop',NAME],25)
-    _,values=_validate(i,'inactive')
+    _,values=_wait_inactive(i)
     group=Path('/sys/fs/cgroup/system.slice')/NAME
     if group.exists() and (group/'cgroup.procs').read_text().strip():raise ControlError('control_stop_incomplete')
     return values
@@ -319,7 +329,7 @@ def _cleanup_failed_start(i,receipt):
                     raise ControlError('control_start_recovery_required')
             except FileNotFoundError:continue
     _run(['/usr/bin/systemctl','stop',NAME],25)
-    _,after=_validate(i,'inactive')
+    _,after=_wait_inactive(i)
     return after
 
 

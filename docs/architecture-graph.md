@@ -1,179 +1,131 @@
 # Архитектура и граф связей MCP Rooms
 
-Эта схема отделяет уже проверенный CI-код от будущих функций. Главный принцип:
-**действия выполняются через чат пользователя с его ИИ-агентом и MCP; web пока является
-витриной только для чтения.**
+Главный принцип проекта: **пользователь работает с площадкой в чате со своим ИИ-агентом
+через MCP; web ближайшего этапа является витриной только для чтения.**
 
-## Общий поток
-
-```mermaid
-flowchart TB
-  U[Пользователь] --> CHAT[Личный чат с ИИ-агентом]
-  CHAT --> CLIENT[MCP-клиент: Notion, Qwen или другой]
-  CLIENT -->|Bearer| MCP[User MCP /mcp]
-  MCP --> GATE[Identity + resource + scopes + revoke/expiry]
-  GATE --> MARKET[Marketplace application services]
-  GATE --> ROOMS[Shared Rooms services]
-
-  VISITOR[Посетитель без агента] --> WEB[Read-only web-витрина]
-  WEB --> PUBLIC[Allowlisted public projection]
-  MARKET --> PUBLIC
-
-  MARKET --> DRAFTS[Draft/category/CAS]
-  MARKET --> MEDIA[Photo staging/attachment]
-  MARKET --> PUBLISH[Preview/consent/publish/withdraw]
-  DRAFTS --> DB[(Standalone SQLite)]
-  PUBLISH --> DB
-  ROOMS --> DB
-  GATE --> DB
-  MEDIA --> DB
-  MEDIA --> FILES[Private derivative files]
-  FILES --> PUBLIC
-
-  OP[Оператор] --> TOOLS[Fixed operator CLI]
-  TOOLS --> INSTALL[Offline install/inspect]
-  TOOLS --> CONTROL[Capacity/bootstrap/start/stop]
-  TOOLS --> RECOVERY[Offline DB+files quarantine]
-
-  CI[GitHub Actions] --> ART[Exact-SHA wheelhouse/evidence]
-  ART --> INSTALL
-```
-
-## Что может делать каждый участник
-
-| Участник | Может | Не может |
-| --- | --- | --- |
-| Пользователь через агента | Управлять собственными черновиками, фото и публикациями в пределах scopes | Задавать owner в JSON, читать чужие private данные, выполнять admin/OS команды |
-| Посетитель web | Читать active публичную карточку и её опубликованные фото | Создавать/редактировать, видеть ключи, private drafts или внутренние пути |
-| Оператор | Выполнить фиксированные install/control/recovery действия после разрешения | Получить произвольный shell/SQL через MCP, автоматически принять partial install |
-| Администратор будущего | Typed moderation через отдельную audience | Использовать обычный пользовательский ключ или общий shell |
-
-## Текущий путь объявления
-
-```mermaid
-stateDiagram-v2
-  [*] --> PrivateDraft
-  PrivateDraft --> PrivateDraft: update with expected revision
-  PrivateDraft --> Preview: exact content and photo set
-  Preview --> Consent: explicit owner command
-  Consent --> Published: transactional recheck and consume
-  Published --> Published: anonymous read-only web GET
-  Published --> Withdrawn: owner MCP command
-  Withdrawn --> [*]: public GET becomes 404
-```
-
-Изменение текста или фото меняет revision и требует нового preview/consent. Старое
-согласие не разрешает публиковать новую версию.
-
-## Trust boundaries
-
-```mermaid
-flowchart LR
-  subgraph Untrusted
-    TEXT[Messages and listing text]
-    IMG[Uploaded bytes]
-    HTTP[HTTP request fields]
-  end
-
-  subgraph AuthBoundary[Authentication boundary]
-    TOKEN[Bearer digest lookup]
-    AUTH[Fresh persisted authority check]
-  end
-
-  subgraph App[Application boundary]
-    CMD[Typed command]
-    TX[SQLite transaction + CAS + idempotency]
-  end
-
-  subgraph Media[Native media boundary]
-    ADMIT[Byte/pixel admission]
-    CHILD[Landlock/seccomp child]
-    DERIV[Re-encoded JPEG]
-  end
-
-  TEXT --> CMD
-  HTTP --> TOKEN --> AUTH --> CMD --> TX
-  IMG --> ADMIT --> CHILD --> DERIV
-  TX --> DB[(SQLite)]
-  DERIV --> FS[Private files]
-```
-
-Сообщения и объявления являются данными, а не инструкциями для агента. Нет `eval`,
-произвольных URL fetch, shell, Python или SQL через пользовательский MCP.
-
-## Реализованные связи
+## Общая схема
 
 ```mermaid
 flowchart TD
-  ID[Identity] --> R[Rooms MCP]
-  ID --> D[Private drafts]
-  D --> PD[Photo drafts]
-  MW[Media worker+sandbox] --> MS[Media staging/files]
-  MS --> PD
-  PD --> P[Publication]
-  P --> MT[Marketplace MCP]
-  P --> PW[Read-only public web]
-  MT --> C[Test candidate]
-  PW --> C
-  C --> B[Offline bundle]
-  B --> I[Fresh install]
-  I --> CTRL[Guarded lifecycle controller]
-  C --> REC[Recovery quarantine]
+  User[Пользователь] --> Chat[Чат с ИИ агентом]
+  Chat --> Client[MCP клиент]
+  Client --> MCP[User MCP]
+  MCP --> Auth[Identity scopes revoke expiry]
+  Auth --> Market[Marketplace services]
+  Auth --> Rooms[Rooms services]
+  Market --> Drafts[Drafts and categories]
+  Market --> Photos[Photo pipeline]
+  Market --> Publish[Preview consent publish withdraw]
+  Drafts --> SQLite[(SQLite)]
+  Rooms --> SQLite
+  Publish --> SQLite
+  Photos --> SQLite
+  Photos --> Files[Private photo files]
+  Publish --> Public[Public projection]
+  Files --> Public
+  Visitor[Посетитель без агента] --> Web[Read only web storefront]
+  Web --> Public
+```
+
+ИИ действует только по явному поручению пользователя. Actor берётся из проверенного
+credential, а не из JSON команды. Сообщения и объявления — данные, не инструкции.
+
+## Кто что может
+
+| Участник | Может | Не может |
+| --- | --- | --- |
+| Пользователь через агента | Управлять своими черновиками, фото и публикациями в пределах scopes | Задавать owner, читать чужие private данные, выполнять admin или OS команды |
+| Посетитель web | Читать активную публичную карточку и опубликованные фото | Создавать и редактировать, видеть ключи и private drafts |
+| Оператор | Выполнять фиксированные install, control и recovery действия после разрешения | Получать shell или SQL через MCP, принимать partial install |
+| Будущий администратор | Typed moderation через отдельную audience | Использовать обычный пользовательский ключ или общий shell |
+
+## Жизненный цикл объявления
+
+```mermaid
+flowchart LR
+  Draft[Private draft] --> Preview[Exact preview]
+  Preview --> Consent[Explicit consent]
+  Consent --> Published[Published card]
+  Published --> Storefront[Read only web]
+  Published --> Withdrawn[Withdrawn]
+  Withdrawn --> Gone[Public GET returns 404]
+  Draft --> Changed[Changed revision]
+  Changed --> Preview
+```
+
+Изменение текста или фото создаёт новую revision и требует нового preview и consent.
+Старое согласие не разрешает публикацию изменённой версии.
+
+## Границы доверия
+
+```mermaid
+flowchart TD
+  Request[Untrusted request] --> Token[Bearer digest lookup]
+  Token --> Authority[Fresh persisted authority]
+  Authority --> Command[Typed application command]
+  Command --> Tx[SQLite transaction CAS idempotency]
+  Upload[Untrusted image bytes] --> Admission[Byte and pixel limits]
+  Admission --> Sandbox[Landlock seccomp child]
+  Sandbox --> JPEG[Reencoded JPEG]
+  JPEG --> Storage[Private files]
+```
+
+Нет `eval`, arbitrary URL fetch, shell, Python или SQL через пользовательский MCP.
+Public web читает только allowlisted projection и не получает дополнительных прав от
+cookie или Authorization header.
+
+## Связи готовых компонентов
+
+```mermaid
+flowchart TD
+  Identity --> RoomsMCP[Rooms MCP]
+  Identity --> DraftStore[Draft store]
+  Worker[Media worker and sandbox] --> Media[Media storage]
+  DraftStore --> PhotoDrafts[Photo drafts]
+  Media --> PhotoDrafts
+  PhotoDrafts --> Publication
+  Publication --> MarketMCP[Marketplace MCP]
+  Publication --> PublicWeb[Read only web]
+  MarketMCP --> Candidate[Test candidate]
+  PublicWeb --> Candidate
+  Candidate --> Bundle[Offline bundle]
+  Bundle --> Install[Fresh install]
+  Install --> Control[Guarded lifecycle]
+  Candidate --> Recovery[Recovery quarantine]
 ```
 
 ## Отложенные связи
 
-```mermaid
-flowchart LR
-  BS[Browser session core] -. M3b.3 transaction binding .-> BW[Browser write commands]
-  BW -. later .-> FORM[Draft/photo web form]
-  PUB[Published listing] -. separate ACL model .-> RESP[Private responses]
-  ADM[Separate admin identity] -. typed capabilities .-> MOD[Moderation/audit]
-  REC[Quarantine restore] -. explicit cutover policy .-> LIVE[Promoted service]
-```
+- Browser session core → transaction-time authority → browser write commands.
+- Published listing → отдельная participant ACL модель → private responses.
+- Separate admin identity → typed moderation → audit.
+- Recovery quarantine → отдельная cutover policy → promoted service.
 
-Browser session уже умеет login/logout, но cookie не является authority для записи
-market/media. До M3b.3 web остаётся read-only. Shared Rooms не являются приватными
-переговорами; responses требуют отдельной модели участников.
+Browser login/logout уже существует, но cookie пока не даёт права записывать market/media.
+Shared Rooms не являются приватными переговорами.
 
-## Развёртывание
+## Путь к внешнему TEST
 
 ```mermaid
 flowchart LR
-  CODE[Accepted source SHA] --> CI[Actions matrix]
-  CI --> PKG[Hash-pinned offline package]
-  PKG --> PRE[Owner-approved read-only VPS preflight]
-  PRE --> LOOP[Fresh isolated loopback TEST]
-  LOOP --> HTTPS[Separately approved temporary HTTPS]
-  HTTPS --> REAL[Real owner MCP publish/read/withdraw]
-  REAL --> REVIEW[Evidence and next decision]
+  Source[Accepted source SHA] --> Actions[GitHub Actions]
+  Actions --> Package[Offline package]
+  Package --> Preflight[Approved VPS preflight]
+  Preflight --> Loopback[Isolated loopback TEST]
+  Loopback --> HTTPS[Temporary HTTPS]
+  HTTPS --> RealFlow[Real MCP publish read withdraw]
+  RealFlow --> Review[Evidence and decision]
 ```
 
-Ни один переход вправо не происходит автоматически. Для каждой удалённой операции
-нужны отдельное разрешение владельца и специальный пароль. Production находится после
-пилота, capacity/abuse/backup/privacy review и отдельного release-решения.
+Ни один переход не выполняется автоматически. Preflight, loopback install и HTTPS —
+три отдельных разрешения. Production находится после пилота, capacity, abuse, backup,
+privacy review и отдельного release-решения.
 
-## Целевая модель данных
+## Данные
 
-```mermaid
-erDiagram
-  USER ||--o{ CREDENTIAL : owns
-  USER ||--o{ DRAFT : owns
-  CATEGORY ||--o{ DRAFT : classifies
-  DRAFT ||--o{ PHOTO_ATTACHMENT : contains
-  MEDIA_MANIFEST ||--o{ PHOTO_ATTACHMENT : supplies
-  DRAFT ||--o{ PUBLICATION : snapshots
-  PUBLICATION ||--o{ PUBLIC_PHOTO : exposes
-  USER ||--o{ ROOM_MEMBERSHIP : joins
-  ROOM ||--o{ ROOM_MEMBERSHIP : has
-  ROOM ||--o{ MESSAGE : contains
-  USER ||--o{ MESSAGE : authors
-  USER ||--o{ WEB_SESSION : authenticates
-  PUBLICATION ||--o{ RESPONSE : receives_future
-  USER ||--o{ RESPONSE : writes_future
-  ADMIN_PRINCIPAL ||--o{ ADMIN_AUDIT : creates_future
-```
+Реализованы USER, CREDENTIAL, ROOM, MEMBERSHIP, MESSAGE, DRAFT, CATEGORY,
+MEDIA_MANIFEST, PHOTO_ATTACHMENT и PUBLICATION. WEB_SESSION реализована, но не связана
+с market writes. RESPONSE и ADMIN сущности пока только запланированы.
 
-`RESPONSE` и `ADMIN_*` пока целевые сущности, а не принятый runtime. Удаление Room не
-удаляет Listing; публичная карточка не раскрывает credential, UUID владельца, private
-заметки или точный адрес.
+Удаление Room не удаляет Listing. Публичная карточка не раскрывает credential, UUID
+владельца, private заметки, внутренние пути или точный адрес.

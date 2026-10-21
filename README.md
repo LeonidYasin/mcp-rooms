@@ -1,5 +1,17 @@
 # MCP Rooms
 
+## Current product focus and accepted checkpoint
+
+The primary interface is the user's chat with their own AI agent. The agent uses scoped
+MCP tools to create drafts, attach photos, preview, publish and withdraw. The web surface
+for the owner-first phase is an anonymous **read-only storefront** for explicitly published
+cards and photos; browser marketplace writes, feed/search, private responses and admin MCP
+remain later gates.
+
+Accepted application source: `88eabfb35aa7cc763d85352e3e67a48e9d5fb97f`
+([F3c.2c.3b evidence](docs/ci-f3c2c3b.md)). The later documentation/fix commit does not
+change that accepted application checkpoint. No production deployment is implied.
+
 **MCP-first marketplace for people and AI agents — built on shared rooms and SQLite.** MIT.
 
 People and agents will use the same listings and rules through web and MCP.
@@ -91,27 +103,27 @@ Next F3c.2c.3b: guarded bootstrap/start-stop and runtime/disk capacity adoption 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).
 - [M1a CI evidence](docs/ci-m1a.md): code SHA `784b4c6b`, 8/8 checks; Python3.12
-  197 tests passed, 2 warnings. Not public marketplace or production acceptance.
+ 197 tests passed, 2 warnings. Not public marketplace or production acceptance.
 - `draft_store.py`: explicit opt-in private create/get/update with persisted access
-  rechecks, atomic revision/command receipts, quotas and a small category tree.
-  [M1b.1 extension](docs/private-draft-lifecycle.md): own keyset list, category
-  children and terminal private archive; explicit opt-in market schema v1→v2.
-  [M1b.1 CI evidence](docs/ci-m1b1.md): code SHA `104d5a5c`, 8/8 checks;
-  Python3.12 226 tests passed, 2 warnings. Still no public listing API.
-  Historical M1 boundary: later M3a adds opt-in MCP/HTTP adapters; default enrollment
-  still does not issue listing scopes.
+ rechecks, atomic revision/command receipts, quotas and a small category tree.
+ [M1b.1 extension](docs/private-draft-lifecycle.md): own keyset list, category
+ children and terminal private archive; explicit opt-in market schema v1→v2.
+ [M1b.1 CI evidence](docs/ci-m1b1.md): code SHA `104d5a5c`, 8/8 checks;
+ Python3.12 226 tests passed, 2 warnings. Still no public listing API.
+ Historical M1 boundary: later M3a adds opt-in MCP/HTTP adapters; default enrollment
+ still does not issue listing scopes.
 - [M1b.2 private preview/intent](docs/publication-intent.md): exact content/revision/
-  category/resource binding; separate publish scope, short TTL; still published=false.
-  [M1b.2 CI evidence](docs/ci-m1b2.md): code SHA `2108b93e`, 8/8 checks,
-  Python3.12 247 tests passed, 2 warnings.
+ category/resource binding; separate publish scope, short TTL; still published=false.
+ [M1b.2 CI evidence](docs/ci-m1b2.md): code SHA `2108b93e`, 8/8 checks,
+ Python3.12 247 tests passed, 2 warnings.
 - Shared domain primitives keep legacy RoomError/Principal aliases. No room schema
-  version or default startup migration change. CI evidence is separate from source.
+ version or default startup migration change. CI evidence is separate from source.
 
 - [M2a optional photo normalizer](docs/media-image-safety.md): bounded in-memory
-  JPEG/PNG to metadata-free JPEG preparation, Python >=3.11 with `.[media]`.
-  Not an upload endpoint, sandbox, media ownership store or publication approval.
-  [M2a CI evidence](docs/ci-m2a.md): exact SHA `110393e9`, 8/8 checks;
-  Python3.12 267 passed/2 warnings; Python3.10 optional media intentionally skipped.
+ JPEG/PNG to metadata-free JPEG preparation, Python >=3.11 with `.[media]`.
+ Not an upload endpoint, sandbox, media ownership store or publication approval.
+ [M2a CI evidence](docs/ci-m2a.md): exact SHA `110393e9`, 8/8 checks;
+ Python3.12 267 passed/2 warnings; Python3.10 optional media intentionally skipped.
 
 ## Qwen Desktop and next product phase
 
@@ -123,17 +135,17 @@ Python/SQLite domain. Ready engines remain references/fallbacks, not an active s
 - [Detailed product mindmap / first-sale milestones](docs/product-mindmap.md).
 - [Component / trust-boundary / entity graphs](docs/architecture-graph.md).
 - [Separate admin MCP design](docs/admin-mcp-design.md): separate credentials/audience,
-  typed capabilities and confirmations; NOT a root/shell endpoint, not implemented.
+ typed capabilities and confirmations; NOT a root/shell endpoint, not implemented.
 - [Web market direction](docs/web-marketplace-plan.md): open to all locations;
-  geography is an optional search/fulfilment filter, not a registration restriction.
-  First segments: C2C things/services, later structured rides/delivery.
+ geography is an optional search/fulfilment filter, not a registration restriction.
+ First segments: C2C things/services, later structured rides/delivery.
 - [Standalone visual prototype](web/prototype/README.md), open `web/prototype/index.html`:
-  demo only, no network/backend, no real listing/contact/transaction.
+ demo only, no network/backend, no real listing/contact/transaction.
 - `listing_contract.py`: pure validation/status/consent/public projection. Private
-  drafts now have an opt-in persistence slice; publication/media/public APIs remain absent.
+ drafts now have an opt-in persistence slice; publication/media/public APIs remain absent.
 - [Real-item first-sale acceptance](docs/first-sale-acceptance.md): real photos and
-  explicit publication; no fabricated demand. Current shared rooms are NOT private
-  negotiations and are never silently exported onto the public web.
+ explicit publication; no fabricated demand. Current shared rooms are NOT private
+ negotiations and are never silently exported onto the public web.
 
 No real keys, operator logs or private DB snapshots are committed. Source/prototype
 progress does not reopen TEST, merge main, deploy a market or enable admin access.
@@ -150,21 +162,21 @@ MCP client + individual Bearer credential
 ```
 
 - Eight `rooms_*` tools. The official `mcp==1.26.0` SDK implements Streamable HTTP;
-  this project does not implement its own JSON-RPC/session protocol.
+ this project does not implement its own JSON-RPC/session protocol.
 - SQLite from Python's standard library; no PostgreSQL, Redis, external identity
-  provider, email delivery or paid service required for the closed pilot.
-- Stable `user:<UUID>` owner, independent credentials for different agents/clients;
-  rotation does not change ownership, membership, history or rate limits.
+ provider, email delivery or paid service required for the closed pilot.
+- Stable `user: ` owner, independent credentials for different agents/clients;
+ rotation does not change ownership, membership, history or rate limits.
 - Automatic enrollment is implemented as an OPT-IN controlled TEST mode, off by default.
-  One click creates an account and returns one server-issued 256-bit Bearer key.
-  No email, phone, questionnaire, client UUID or GitHub is required. No self-made OAuth.
-  [Registration, recovery and abuse limits](docs/registration.md).
+ One click creates an account and returns one server-issued 256-bit Bearer key.
+ No email, phone, questionnaire, client UUID or GitHub is required. No self-made OAuth.
+ [Registration, recovery and abuse limits](docs/registration.md).
 - Per-request token lookup, expiry, revocation, disabled-user and resource checks.
-  Operator-issued keys go to a private file; self-service keys are shown once in
-  a private HTTPS form/response, NEVER an MCP tool result. Only SHA-256 digests live
-  in SQLite. Tokens are never a tool argument, URL parameter or chat message.
+ Operator-issued keys go to a private file; self-service keys are shown once in
+ a private HTTPS form/response, NEVER an MCP tool result. Only SHA-256 digests live
+ in SQLite. Tokens are never a tool argument, URL parameter or chat message.
 - Shared rooms for ALL enrolled users, not private/invite-only rooms. Reading and
-  writing require join. This is not public multitenant market security.
+ writing require join. This is not public multitenant market security.
 
 ## Tools
 
@@ -284,7 +296,6 @@ reviewed contract parity and a pinned compatibility-adapter migration are ready.
 Never overwrite an embedded DB, auto-map GitHub IDs to UUID users, or maintain two
 indefinitely hand-edited copies. Source/schema/data migration requires a separate
 plan and operator approval. No PyPI release or production readiness is claimed.
-
 
 ### Internal photo pipeline checkpoint
 

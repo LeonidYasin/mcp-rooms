@@ -275,6 +275,7 @@ def main(bundle,source,python_base):
         command(['/usr/bin/systemctl','daemon-reload']);loaded=True
         command(['/usr/bin/systemctl','start',NAME])
         group=await_ready(uid);start_cpu=cpu(group)['usage_usec']
+        print('CANDIDATE UNIT STEP: unit-ready',flush=True)
         sampler=Sampler(group);sampler.start()
         assert rpc(raw,'initialize',{'protocolVersion':'2025-11-25','capabilities':{},'clientInfo':{'name':'systemd-ci','version':'1'}})['serverInfo']['name']=='MCP Rooms'
         assert len(rpc(raw,'tools/list',{})['tools'])==20
@@ -299,6 +300,7 @@ def main(bundle,source,python_base):
             assert time.monotonic()<deadline,'candidate_disconnect_slot_leaked';time.sleep(.1)
         assert status==201,'candidate_photo_upload_failed'
         media=json.loads(data)['media_id']
+        print('CANDIDATE UNIT STEP: native-photo',flush=True)
         # Exact candidate child receives STOP through a pinned handle; real8s
         # worker wall timer must then kill/reap it and return a typed504.
         with ThreadPoolExecutor(max_workers=1) as pool:
@@ -324,6 +326,7 @@ def main(bundle,source,python_base):
             assert status==504 and json.loads(data)['error']=='media_worker_timeout','candidate_native_timeout_failed'
             assert 7<=elapsed<16
         assert not children(group),'candidate_native_child_leaked'
+        print('CANDIDATE UNIT STEP: native-timeout-reaped',flush=True)
         status,_=request('POST',path,raw,image,upload_headers());assert status==201,'candidate_native_slot_leaked'
         call(raw,'listings_set_photos',listing_id=listing,expected_revision=1,client_id=key(),media_ids=[media])
         preview=call(raw,'listings_preview',listing_id=listing)
@@ -337,6 +340,7 @@ def main(bundle,source,python_base):
         call(raw,'listings_withdraw',listing_id=listing,expected_publication_revision=1,client_id=key())
         assert request('GET',card)[0]==request('GET',photo)[0]==404
         sampler.stop();assert sampler.native==1 and sampler.seen,'candidate_native_sampling_missing'
+        print('CANDIDATE UNIT STEP: publication-withdraw',flush=True)
         events={k:int(v) for k,v in (line.split() for line in (group/'memory.events').read_text().splitlines())}
         peak=int((group/'memory.peak').read_text());cpu_used=cpu(group)['usage_usec']-start_cpu
         assert events['oom_kill']==0 and peak<1024**3 and sampler.tasks<=64 and cpu_used>0
@@ -349,6 +353,7 @@ def main(bundle,source,python_base):
         assert request('GET',card)[0]==request('GET',photo)[0]==404
         assert sha256((PROFILE/'owner.key').read_bytes()).hexdigest()==key_hash
         stop_owned();assert (PROFILE/'market.sqlite3').exists()
+        print('CANDIDATE UNIT STEP: restart-preserved',flush=True)
         print('CANDIDATE UNIT PASS: '+json.dumps({'source_sha':source,'exact_rendered_unit':True,
             'root_owned_release':True,'offline_nonroot_pip':True,'nonroot_service':True,
             'real_native_photo':True,'http_admission_429':True,'body_timeout_408':True,
@@ -367,7 +372,11 @@ def main(bundle,source,python_base):
         if created_unit:
             p=properties()
             if loaded and p.get('FragmentPath')==str(UNIT) and not p.get('DropInPaths'):
-                stop_owned();command(['/usr/bin/systemctl','reset-failed',NAME])
+                stop_owned()
+                # Inactive successful units can already be garbage-collected;
+                # reset-failed does not load them and must not mask test errors.
+                if properties().get('ActiveState')=='failed':
+                    command(['/usr/bin/systemctl','reset-failed',NAME])
             elif loaded:safe=False
             if safe:UNIT.unlink();command(['/usr/bin/systemctl','daemon-reload'])
         # Teardown of disposable synthetic fixture is NOT operator rollback.
@@ -383,7 +392,7 @@ if __name__=='__main__':
     except Exception as exc:
         # Do not stringify subprocess exception/argv/stdout or HTTP payloads.
         frames=[f for f in traceback.extract_tb(exc.__traceback__) if f.filename==__file__]
-        frame=frames[0] if frames else traceback.extract_tb(exc.__traceback__)[-1]
+        frame=next((f for f in reversed(frames) if f.name=='main'),frames[-1] if frames else traceback.extract_tb(exc.__traceback__)[-1])
         print('CANDIDATE UNIT FAILED: '+json.dumps({'exception':type(exc).__name__,
             'function':frame.name,'line':frame.lineno}),file=sys.stderr)
         raise SystemExit(1)

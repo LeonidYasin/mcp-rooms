@@ -131,3 +131,17 @@ preflight VPS → loopback TEST → HTTPS/external acceptance. Не обещан
 measured resource budget остаются. Supplied host observations не доказывают
 свободный порт/paths/account и не заменяют свежий owner-approved VPS preflight.
 Количество инфраструктурных ворот не изменилось: preflight → loopback → HTTPS.
+
+
+## Актуализация после F3c.2b
+
+[Настоящий unprivileged offline lifecycle принят в CI](ci-f3c2b.md): установка,
+проверка занятого порта/прерывания старта, authenticated loopback MCP, stop/restart
+с сохранением данных и stop-only rollback.864 tests на Python3.12. Это ещё не
+root-owned/systemd installer: F3c.2c должен обеспечить неизменяемый release,
+проверку unit/drop-ins, cgroup cleanup и измеренные суммарные ресурсные бюджеты.
+Наблюдения idle RSS не закрывают capacity gate. Затем прежние отдельно разрешаемые
+шаги: fresh read-only VPS preflight → loopback TEST → HTTPS/external acceptance.
+Нет обещания фиксированного числа команд или готового production. Browser writes,
+публичная регистрация/search/replies и disaster-recovery cutover не включены в
+сокращённый TEST и не считаются выполненными.

@@ -1,6 +1,6 @@
 # F3c.2b — непривилегированный lifecycle rehearsal
 
-**SOURCE, ожидает Actions. Не root/systemd installer и не выполненный VPS deploy.**
+**CI: [exact-source evidence](ci-f3c2b.md). Не root/systemd installer и не выполненный VPS deploy.**
 [Общий контракт](test-candidate.md) · [План фиксированных VPS targets](operator-plan.md).
 
 `tools/operator_lifecycle.py` реализует настоящую fresh-only офлайн-установку,

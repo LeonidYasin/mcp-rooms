@@ -360,7 +360,7 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 - [x] SOURCE: exact wheelhouse/source/hash verification + fixed fresh candidate user/unit/paths/port, canonical resource, typed lifecycle requirements.
 - [x] SOURCE: supplied observations explicitly NOT host attestation; no effects/approval/resource acceptance, no recovery promotion.
 - [x] Exact-SHA `0927c82a`:826 tests3.12; real-wheelhouse proposal verification and offline native/recovery smoke green. [Evidence](docs/ci-f3c2a.md).
-- [ ] F3c.2b actual lifecycle and measured resource/timeout/disk acceptance remain.
+- [x] F3c.2b unprivileged lifecycle accepted separately below; root/systemd and aggregate resource/timeout/disk acceptance remain F3c.2c.
 
 [Contract](docs/operator-plan.md). No remote operation authorized.
 
@@ -369,7 +369,7 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 
 - [x] SOURCE: actual fresh offline install with ready-last receipt/clean env/fixed commands; no implicit key issuance.
 - [x] SOURCE: explicit bootstrap, pinned interpreter/profile/process, owned loopback listener and pidfd stop; restart preserves history, rollback never rewinds/deletes data.
-- [ ] Exact-source matrix and real installed-package loopback MCP/restart/stop-only rollback CI.
+- [x] Exact-source `a51d306e`:864 tests3.12; real offline install/authenticated MCP/stop/restart/stop-only rollback, occupied-port preservation and interrupted-start cleanup. [Evidence](docs/ci-f3c2b.md).
 - [ ] F3c.2c root-owned/systemd/cgroup and measured aggregate resource budget acceptance.
 
 [Contract/limitations](docs/operator-lifecycle.md). Not VPS installation approval.

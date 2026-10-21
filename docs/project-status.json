@@ -373,11 +373,11 @@
     {
       "id": "operator_lifecycle",
       "title": "Unprivileged offline lifecycle rehearsal",
-      "stage": "SOURCE",
-      "summary": "Fresh offline venv install/ready-last receipt; explicit bootstrap; owned loopback listener; pidfd stop/restart/stop-only rollback. Not root-owned/systemd/cgroup supervisor; resources pending.",
+      "stage": "CI",
+      "summary": "Real fresh offline venv install, occupied-port refusal and interrupted-start cleanup, authenticated loopback MCP, stop/restart preserving listing/key and stop-only rollback accepted in Actions. Not root/systemd/cgroup supervision; aggregate resources pending.",
       "doc": "docs/operator-lifecycle.md",
       "source": "tools/operator_lifecycle.py",
-      "evidence": null,
+      "evidence": "docs/ci-f3c2b.md",
       "depends_on": [
         "operator_bundle",
         "operator_plan",

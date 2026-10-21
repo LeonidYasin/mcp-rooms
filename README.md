@@ -59,13 +59,14 @@ is not yet accepted.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [F3c.2a](docs/ci-f3c2a.md), source
-`0927c82a7370b194a194d552a4cae8ee6486428a`: Python3.12 **826 passed**.
-Read-only operator proposal verifies the exact-source offline wheelhouse and fixes
-isolated candidate user/unit/paths/port. Supplied host observations are explicitly
-unattested; no install authorization/host probe/resource acceptance. [F3c.1 offline
-bundle](docs/ci-f3c1.md), [F3b quarantine recovery](docs/ci-f3b.md) and [F3a sandbox](docs/ci-f3a.md) remain.
-**Not an executable VPS installer or deployment.**
+**Latest accepted checkpoint:** [F3c.2b](docs/ci-f3c2b.md), source
+`a51d306e3ca5ca0b664a17494dfe606b379b9558`: Python3.12 **864 passed**.
+Real offline fresh install, authenticated synthetic loopback MCP, occupied-port
+preservation, interrupted-start cleanup, stop/restart with listing/key preservation
+and stop-only rollback accepted in Actions. This is an **unprivileged rehearsal**,
+not root-owned/systemd supervision or VPS deployment. Prior [read-only proposal](docs/ci-f3c2a.md),
+[offline bundle](docs/ci-f3c1.md), [quarantine recovery](docs/ci-f3b.md) and
+[native sandbox](docs/ci-f3a.md) evidence remain separately versioned.
 
 Built on [F1 read-only card](docs/ci-f1.md), [session bridge](docs/ci-m3b2.md),
 [private photo HTTP](docs/ci-m3a2.md) and12 scoped listing tools on top of8 rooms.
@@ -77,7 +78,7 @@ Browser M3b.3 remains mandatory before cookie writes; paused, not dropped.
 [F3a policy](docs/media-sandbox.md) and [F3b recovery limits](docs/recovery-candidate.md)
 are accepted in CI. [F3c.1 offline wheelhouse](docs/operator-package.md) is accepted in CI with a versioned runtime hash lock.
 [F3c.2a operator proposal](docs/operator-plan.md) is accepted in CI: fixed isolated targets and full bundle verification; not host attestation/install.
-Current [F3c.2b unprivileged lifecycle](docs/operator-lifecycle.md): SOURCE awaiting Actions; real offline installation/start/stop/restart, not a systemd installer.
+Current [F3c.2b unprivileged lifecycle](docs/operator-lifecycle.md): [accepted in CI](docs/ci-f3c2b.md); real offline installation/start/stop/restart, not a systemd installer.
 Next F3c.2c: fixed root-owned unit wrapper/cgroup and measured aggregate resources, before separately approved VPS checks.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).

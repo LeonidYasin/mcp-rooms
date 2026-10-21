@@ -56,11 +56,11 @@ def _chain(path):
             raise InstallError('install_untrusted_ancestor')
 
 
-def _file(path,maximum=48*1024**2):
+def _file(path,maximum=48*1024**2,*,allow_empty=False):
     path=Path(path);fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK|os.O_CLOEXEC)
     try:
         st=os.fstat(fd)
-        if not stat.S_ISREG(st.st_mode) or st.st_uid!=ROOT_UID or st.st_mode&0o022 or st.st_nlink!=1 or not 0<st.st_size<=maximum:
+        if not stat.S_ISREG(st.st_mode) or st.st_uid!=ROOT_UID or st.st_mode&0o022 or st.st_nlink!=1 or not (0 if allow_empty else 1)<=st.st_size<=maximum:
             raise InstallError('install_unsafe_file')
         data=bytearray()
         while len(data)<=maximum:
@@ -217,7 +217,7 @@ def _inventory(root):
             if st.st_mode&0o022:raise InstallError('install_unsafe_code_entry')
             row['kind']='directory'
         elif stat.S_ISREG(st.st_mode):
-            data=_file(p);total+=len(data)
+            data=_file(p,allow_empty=True);total+=len(data)
             if total>384*1024**2:raise InstallError('install_inventory_bound')
             row.update(kind='file',size=len(data),sha256=sha256(data).hexdigest())
         else:raise InstallError('install_unsafe_code_entry')

@@ -154,3 +154,11 @@ def test_new_directory_explicit_mode_and_existing_refusal(tmp_path):
     finally:os.umask(old)
     assert path.stat().st_mode & 0o777 == 0o755
     with pytest.raises(FileExistsError):m['_directory'](path,0o755)
+
+
+def test_empty_package_marker_is_inventoried_not_accepted_as_receipt(fixture):
+    install(fixture);release=fixture[0]/'releases'/SHA
+    marker=release/'py.typed';marker.write_bytes(b'')
+    assert any(row.get('path')=='py.typed' for row in json.loads(m['_inventory'](release)))
+    with pytest.raises(Error,match='install_unsafe_file'):m['_file'](marker)
+    assert m['_file'](marker,allow_empty=True)==b''

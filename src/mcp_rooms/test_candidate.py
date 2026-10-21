@@ -68,6 +68,12 @@ def _schema_hash(db):
 
 def _database(path,expected_hash=None):
     _file(path,RoomStore.MAX_PAGES*4096)
+    # Reject aliases/shared sidecars BEFORE SQLite can follow/open them.
+    for suffix,bound in [('-wal',128*1024*1024),('-shm',1024*1024)]:
+        sidecar=Path(str(path)+suffix)
+        if os.path.lexists(sidecar):_file(sidecar,bound,empty=True)
+    if os.path.lexists(str(path)+'-journal'):
+        raise DomainError('candidate_database_mismatch')
     # mode=ro, no RoomStore or sidecar initialization before validation.
     db=sqlite3.connect(path.as_uri()+'?mode=ro',uri=True,timeout=5)
     db.row_factory=sqlite3.Row

@@ -44,6 +44,9 @@ marketplace install target. Будущий профиль требует дру�
   а не mode=create; удалённый файл не создаётся заново. Default old initializer
   совместим и используется только в явном fresh bootstrap. Marketplace startup
   сначала проверяет профиль read-only, затем открывает этот existing-only store.
+- Существующие WAL/SHM до SQLite open проверяются как owner-only0600 regular
+  single-link bounded files; aliases/shared files отвергаются. Наличие rollback
+  journal требует явного разбора, не скрытого startup recovery.
 - Read-only validation может открыть обычные SQLite WAL/SHM sidecars; отсутствие
   DDL/изменения данных не означает гарантированно ноль файловой активности/atime.
   Root закрыт от чужих UID; hostile same-UID replacement остаётся вне модели.

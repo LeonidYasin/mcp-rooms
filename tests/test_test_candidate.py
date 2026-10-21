@@ -215,3 +215,21 @@ def test_cli_unexpected_error_sanitized(tmp_path,capsys,monkeypatch):
     monkeypatch.setattr(m,'check',fail)
     assert m.main(['check','--state',str(tmp_path/'x'),'--resource',RESOURCE])==1
     assert json.loads(capsys.readouterr().out)=={'ok':False,'error':'candidate_unavailable'}
+
+
+@pytest.mark.parametrize('suffix',['-wal','-shm'])
+@pytest.mark.parametrize('alias',['symlink','hardlink'])
+def test_sqlite_sidecar_alias_rejected_before_sqlite_open(profile,tmp_path,suffix,alias):
+    target=tmp_path/'protected';target.write_bytes(b'untouched synthetic file');target.chmod(0o600)
+    side=profile/(m.DB+suffix)
+    side.unlink(missing_ok=True)
+    if alias=='symlink':side.symlink_to(target)
+    else:os.link(target,side)
+    with pytest.raises((DomainError,OSError)):m.check(profile,RESOURCE)
+    assert target.read_bytes()==b'untouched synthetic file'
+
+
+def test_hot_journal_requires_explicit_review_not_startup_recovery(profile):
+    journal=profile/(m.DB+'-journal');journal.write_bytes(b'synthetic journal marker');journal.chmod(0o600)
+    with pytest.raises(DomainError,match='candidate_database_mismatch'):m.check(profile,RESOURCE)
+    assert journal.read_bytes()==b'synthetic journal marker'

@@ -1,6 +1,6 @@
 # F3c.1 — закреплённый офлайн wheelhouse
 
-**SOURCE, ожидает Actions и отдельной adoption hash-lock. Не VPS installer.**
+**SOURCE, runtime hash-lock принят отдельным commit; ожидает locked Actions. Не VPS installer.**
 [Контракт этапа F3c](test-candidate.md), [F3b recovery limits](recovery-candidate.md).
 
 ## Назначение
@@ -49,3 +49,19 @@ F3c.2: reviewed fresh-only dry-run/install/health/stop/rollback и ресурс�
 карантине: не делать promotion копированием profile.json. Main/production не менять.
 После кодовой приёмки — отдельные разрешения на preflight/loopback/HTTPS; для каждого
 remote execution нужны явное согласие и специальный пароль.
+
+## Происхождение runtime lock
+
+Discovery source `22a248751e0118b300ddb6cd99e54891edcda921`,
+[Actions attempt1](https://github.com/LeonidYasin/mcp-rooms/actions/runs/39596126281).
+Рассмотрены30 уникальных server runtime distributions (не pip freeze dev-окружения),
+включая mcp1.26.0 и Pillow13.0.0. Версии и единственный hash wheel каждой зависимости
+явно записаны в `operator/runtime-linux-x86_64-py312.lock`.
+SHA256 lock: `05f7fd5ba929c68b25b46649c25a8868834e50834d6cc0ba9addd15e411de536`.
+Это фиксация resolver output и проверяемых байтов, не сертификат отсутствия CVE.
+Изменение lock требует нового review/commit и полного offline smoke.
+Discovery artifact не принимается для установки; нужен новый locked build.
+
+Первоначальный discovery корректно отказал: Pydantic2.14.1 METADATA133006bytes
+превысил общий128KiB лимит. Введён отдельный256KiB бюджет только wheel METADATA,
+с regression acceptance/refusal cases; manifest/lock budget128KiB не увеличен.

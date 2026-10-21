@@ -32,8 +32,8 @@ UNIT=Path('/etc/systemd/system')/NAME
 LOCK=Path('/run/mcp-rooms-operator')
 PYTHON=Path('/usr/bin/python3.12')
 FORMAT='mcp-rooms/fresh-install/v1'
-TOOLS=('tools/operator_install.py','tools/operator_bundle.py','tools/operator_plan.py',
-       'tools/operator_unit.py','operator/runtime-linux-x86_64-py312.lock')
+TOOLS=('tools/operator_install.py','tools/operator_control.py','tools/operator_bundle.py',
+       'tools/operator_plan.py','tools/operator_unit.py','operator/runtime-linux-x86_64-py312.lock')
 ENV={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','PYTHONUTF8':'1','PIP_CONFIG_FILE':'/dev/null'}
 
 

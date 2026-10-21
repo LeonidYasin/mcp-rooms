@@ -239,7 +239,7 @@ def main(bundle,source):
         raise RuntimeError('candidate_existing_target')
     with socket.socket() as probe:probe.bind(('127.0.0.1',8766))
     created_user=False;created_base=False;created_state=False;created_unit=False;loaded=False
-    sampler=None;raw=None
+    sampler=None;raw=None;controller=None
     opt=Path('/opt');opt_meta=opt.lstat();opt_mode=stat.S_IMODE(opt_meta.st_mode)
     if not stat.S_ISDIR(opt_meta.st_mode) or opt_meta.st_uid!=0 or opt.resolve()!=opt:
         raise RuntimeError('candidate_ci_opt_identity_refused')
@@ -249,8 +249,8 @@ def main(bundle,source):
         opt.chmod(opt_mode & ~0o022)
         TRUSTED.mkdir(mode=0o755)
         for folder in ('tools','operator'):(TRUSTED/folder).mkdir(mode=0o755)
-        files=('tools/operator_install.py','tools/operator_bundle.py','tools/operator_plan.py',
-               'tools/operator_unit.py','operator/runtime-linux-x86_64-py312.lock')
+        files=('tools/operator_install.py','tools/operator_control.py','tools/operator_bundle.py',
+               'tools/operator_plan.py','tools/operator_unit.py','operator/runtime-linux-x86_64-py312.lock')
         for name in files:
             target=TRUSTED/name;target.write_bytes((ROOT/name).read_bytes());target.chmod(0o644)
         private_bundle=TRUSTED/'bundle';shutil.copytree(bundle,private_bundle)
@@ -276,12 +276,46 @@ def main(bundle,source):
         print('CANDIDATE UNIT STEP: reviewed-installer-ready-no-profile',flush=True)
         uid=pwd.getpwnam(USER).pw_uid;gid=grp.getgrnam(USER).gr_gid
         release=BASE/'releases'/source;venv=release/'venv'
-        run_as=['/usr/sbin/runuser','-u',USER,'--']
-        cli=[*run_as,str(venv/'bin/python'),'-I','-m','mcp_rooms.test_candidate']
-        command([*cli,'bootstrap','--state',str(PROFILE),'--resource',RESOURCE])
-        raw=(PROFILE/'owner.key').read_text().strip()
+        controller=runpy.run_path(str(TRUSTED/'tools/operator_control.py'))
+        assert controller['capacity']()['accepted']
+        try:controller['bootstrap']('WRONG-AUTHORIZATION')
+        except controller['ControlError'] as exc:assert str(exc)=='control_bootstrap_authorization_required'
+        else:raise AssertionError('controller accepted implicit bootstrap')
+        assert not PROFILE.exists()
+        created=controller['bootstrap'](controller['BOOTSTRAP_AUTH'])
+        assert created['profile_created'] and not created['key_read_or_returned']
+        raw=(PROFILE/'owner.key').read_text().strip()  # synthetic Actions fixture only
         key_hash=sha256((PROFILE/'owner.key').read_bytes()).hexdigest()
-        command(['/usr/bin/systemctl','start',NAME])
+        # A foreign listener is never killed or replaced by a failed start.
+        with socket.socket() as occupied:
+            occupied.bind(('127.0.0.1',8766));occupied.listen()
+            try:controller['start'](controller['START_AUTH'])
+            except controller['ControlError']:pass
+            else:raise AssertionError('controller replaced occupied listener')
+            assert occupied.fileno()>=0
+        control_globals=controller['start'].__globals__;real_ready=control_globals['_ready']
+        def interrupted_ready(*args,**kwargs):raise controller['ControlError']('ci_interrupted_start')
+        control_globals['_ready']=interrupted_ready
+        try:
+            try:controller['start'](controller['START_AUTH'])
+            except controller['ControlError'] as exc:assert str(exc)=='ci_interrupted_start'
+            else:raise AssertionError('controller committed interrupted start')
+            assert properties()['MainPID']=='0'
+        finally:control_globals['_ready']=real_ready
+        started=controller['start'](controller['START_AUTH'])
+        assert started['started'] and started['runtime_capacity_accepted']
+        group=await_ready(uid)
+        # Unit/drop-in drift must refuse stop and preserve the already-owned process.
+        original_pid=properties()['MainPID'];dropin=Path(str(UNIT)+'.d')
+        dropin.mkdir();(dropin/'foreign.conf').write_text('[Service]\nEnvironment=FOREIGN=1\n')
+        command(['/usr/bin/systemctl','daemon-reload'])
+        try:controller['stop']()
+        except controller['ControlError']:pass
+        else:raise AssertionError('controller stopped drifted unit')
+        assert properties()['MainPID']==original_pid and int(original_pid)>0
+        (dropin/'foreign.conf').unlink();dropin.rmdir();command(['/usr/bin/systemctl','daemon-reload'])
+        assert controller['stop']()['state_preserved']
+        assert controller['start'](controller['START_AUTH'])['started']
         group=await_ready(uid);start_cpu=cpu(group)['usage_usec']
         print('CANDIDATE UNIT STEP: unit-ready',flush=True)
         sampler=Sampler(group);sampler.start()
@@ -356,12 +390,12 @@ def main(bundle,source):
         state_files=[p for p in STATE.rglob('*') if p.is_file()]
         logical=sum(p.stat().st_size for p in state_files);allocated=sum(p.stat().st_blocks*512 for p in state_files)
         assert logical<64*1024**2 and allocated<64*1024**2
-        stop_owned();assert (PROFILE/'market.sqlite3').exists()
-        command(['/usr/bin/systemctl','start',NAME]);group=await_ready(uid)
+        assert controller['stop']()['state_preserved'];assert (PROFILE/'market.sqlite3').exists()
+        assert controller['start'](controller['START_AUTH'])['started'];group=await_ready(uid)
         assert call(raw,'listings_get',listing_id=listing)['ok']
         assert request('GET',card)[0]==request('GET',photo)[0]==404
         assert sha256((PROFILE/'owner.key').read_bytes()).hexdigest()==key_hash
-        stop_owned();assert (PROFILE/'market.sqlite3').exists()
+        assert controller['stop']()['state_preserved'];assert (PROFILE/'market.sqlite3').exists()
         print('CANDIDATE UNIT STEP: restart-preserved',flush=True)
         print('CANDIDATE UNIT PASS: '+json.dumps({'source_sha':source,'exact_rendered_unit':True,
             'root_owned_release':True,'offline_nonroot_pip':True,'nonroot_service':True,
@@ -374,6 +408,10 @@ def main(bundle,source):
             'state_logical_bytes':logical,'state_allocated_bytes':allocated,
             'fixture_capacity_bounds_only':True,'vps_capacity_accepted':False,
             'production_installer':False,'reviewed_install_only_tool':True,
+            'reviewed_lifecycle_controller':True,'explicit_bootstrap_and_start_authorization':True,
+            'occupied_listener_preserved':True,'interrupted_start_owned_cgroup_stopped':True,
+            'unit_drift_stop_refused_process_preserved':True,
+            'runtime_and_full_install_state_disk_criteria_exercised':True,
             'existing_install_refused':True,'installer_did_not_bootstrap_or_start':True},sort_keys=True))
     finally:
         raw=None

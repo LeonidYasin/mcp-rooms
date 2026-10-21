@@ -353,3 +353,13 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 - [ ] F3c.2 fresh-only operator install/dry-run/stop/rollback and resource/disk gates remain; this artifact is not a VPS installer.
 
 [Contract and limits](docs/operator-package.md). No remote execution authorized.
+
+
+## F3c.2a — read-only operator proposal
+
+- [x] SOURCE: exact wheelhouse/source/hash verification + fixed fresh candidate user/unit/paths/port, canonical resource, typed lifecycle requirements.
+- [x] SOURCE: supplied observations explicitly NOT host attestation; no effects/approval/resource acceptance, no recovery promotion.
+- [ ] Exact-SHA unit and real-wheelhouse integration CI.
+- [ ] F3c.2b actual lifecycle and measured resource/timeout/disk acceptance remain.
+
+[Contract](docs/operator-plan.md). No remote operation authorized.

@@ -28,6 +28,8 @@ jobs:
           else
             python tools/operator_bundle.py --wheel dist/*.whl --output /tmp/rooms-operator/bundle --source-sha "$GITHUB_SHA"
           fi
+      - name: Read-only operator proposal from verified wheelhouse
+        run: python tools/ci_operator_plan_smoke.py /tmp/rooms-operator/bundle "$GITHUB_SHA"
       - name: Offline install into clean venv
         run: |
           python -m venv /tmp/rooms-operator/venv

@@ -33,9 +33,9 @@ DDL и один worker/upload. F3a [Landlock/seccomp](media-sandbox.md) [при�
 Candidate обязан отказать до app startup без рабочей политики. F3b [offline recovery quarantine](recovery-candidate.md) [принят в CI](ci-f3b.md):761 tests на3.12.
 Original current authority обязателен; output не compose-ready, все publications withdrawn.
 F3c.1 [offline wheelhouse](operator-package.md) [принят в CI](ci-f3c1.md):789 tests;
-30 runtime hash pins, offline clean venv/native+recovery smoke. Следующий F3c.2 —
-operator install/stop/rollback/resources, без promotion обхода.
-F3c.2 — next_task; recovery promotion/missing-current disaster policy сохранены в
+30 runtime hash pins, offline clean venv/native+recovery smoke. Current F3c.2a [read-only proposal](operator-plan.md) — SOURCE awaiting CI;
+unattested observations, fixed isolated targets, no host probe/effects.
+F3c.2b lifecycle implementation/resources — next_task; recovery promotion/missing-current disaster policy сохранены в
 paused_tasks (RECOVERY-CUTOVER). Ни один из них не означает самовольный deploy.
 
 ## Архитектура уже выбрана

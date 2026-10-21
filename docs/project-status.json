@@ -357,6 +357,18 @@
         "native_sandbox",
         "candidate_recovery"
       ]
+    },
+    {
+      "id": "operator_plan",
+      "title": "Read-only operator proposal",
+      "stage": "SOURCE",
+      "summary": "Fixed isolated TEST identity/paths/port; trusted wheelhouse verification; typed seven-stage proposal. Caller observations unattested; no host probe, install or resource acceptance.",
+      "doc": "docs/operator-plan.md",
+      "source": "tools/operator_plan.py",
+      "evidence": null,
+      "depends_on": [
+        "operator_bundle"
+      ]
     }
   ]
 }

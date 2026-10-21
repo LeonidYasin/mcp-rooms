@@ -10,20 +10,20 @@
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
-    "id": "F3c.1",
-    "stage": "CI",
-    "contract": "docs/operator-package.md",
-    "source": "tools/operator_bundle.py",
-    "tests": "tests/test_operator_bundle.py",
-    "evidence": "docs/ci-f3c1.md"
+    "id": "F3c.2a",
+    "stage": "SOURCE",
+    "contract": "docs/operator-plan.md",
+    "source": "tools/operator_plan.py",
+    "tests": "tests/test_operator_plan.py",
+    "evidence": null
   },
   "next_task": {
-    "id": "F3c.2",
-    "title": "Reviewed fresh-only operator plan/install/stop/rollback and resource budget acceptance",
+    "id": "F3c.2b",
+    "title": "Implement and test fixed fresh-only operator lifecycle plus measured resource acceptance",
     "contract": "docs/test-candidate.md",
     "acceptance": [
       "Use only the exact-source verified locked offline wheelhouse; do not fetch online fallback dependencies or accept discovery artifacts.",
-      "Prepare and test fresh-only dry-run/install/health/stop/rollback with independent user/unit/paths/port and no modifications of existing MCP services or Caddy.",
+      "Implement fixed fresh-only install/health/stop/rollback with repeated just-before-effect host identity/absence/port checks and interrupted/stale identity negative tests; a caller JSON plan is not authorization.",
       "Measure parent/child resource, timeout/admission and disk requirements in Actions; tentative unit limits must not be declared suitable for VPS before a separately approved fresh preflight.",
       "Keep recovery copies quarantined and do not issue real keys, promote restored profiles, merge main or run any remote operation without separate approval.",
       "Document exact owner-reviewed command boundary and separately authorized read-only VPS preflight, loopback installation and HTTPS acceptance; remote operations require special password each time."
@@ -56,7 +56,8 @@
     "docs/test-candidate.md",
     "docs/media-sandbox.md",
     "docs/recovery-candidate.md",
-    "docs/operator-package.md"
+    "docs/operator-package.md",
+    "docs/operator-plan.md"
   ],
   "paused_tasks": [
     {

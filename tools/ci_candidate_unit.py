@@ -405,7 +405,17 @@ if __name__=='__main__':
         # Do not stringify subprocess exception/argv/stdout or HTTP payloads.
         frames=[f for f in traceback.extract_tb(exc.__traceback__) if f.filename==__file__]
         frame=next((f for f in reversed(frames) if f.name=='main'),frames[-1] if frames else traceback.extract_tb(exc.__traceback__)[-1])
+        install_frames=[{'function':f.name,'line':f.lineno} for f in traceback.extract_tb(exc.__traceback__)
+                        if f.filename.endswith('/tools/operator_install.py')]
+        file_meta=None;tb=exc.__traceback__
+        while tb:
+            if tb.tb_frame.f_code.co_name=='_file' and tb.tb_frame.f_code.co_filename.endswith('/tools/operator_install.py'):
+                info=tb.tb_frame.f_locals.get('st')
+                if info is not None:file_meta={'uid':info.st_uid,'mode':oct(stat.S_IMODE(info.st_mode)),
+                    'links':info.st_nlink,'size':info.st_size}
+            tb=tb.tb_next
         print('CANDIDATE UNIT FAILED: '+json.dumps({'exception':type(exc).__name__,
+            'installer_frames':install_frames,'file_meta':file_meta,
             'function':frame.name,'line':frame.lineno,
             'safe_code':str(exc) if type(exc).__name__=='InstallError' and re.fullmatch(r'[a-z_]{1,80}',str(exc)) else None}),file=sys.stderr)
         raise SystemExit(1)

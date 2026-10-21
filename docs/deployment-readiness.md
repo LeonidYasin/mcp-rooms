@@ -157,3 +157,16 @@ root-owned/systemd installer: F3c.2c должен обеспечить неиз�
 disk и interruption/state preservation. Затем отдельно разрешённые preflight →
 loopback → HTTPS. Не увеличивает продуктовый MVP: browser/search/replies/admin
 по-прежнему не включены в сокращённый owner-first TEST.
+
+
+## Актуализация после F3c.2c.2
+
+[Actual candidate under exact systemd unit принят в CI](ci-f3c2c2.md): настоящий
+native12MP photo, body admission/timeout/disconnect, принудительный worker timeout/
+reap и повторное использование slot; карточка/фото/withdraw и перезапуск сохраняют
+ключ/данные/withdrawal. Kernel group peak172.625MiB в одном синтетическом сценарии.
+Это больше не только fake-process proof, но ещё не production installer/capacity.
+F3c.2c.3: reviewed fresh-only installer с ready-last receipt и pre-effect identity,
+interruption/unrelated-service protection, capacity safety margins и full install/
+state disk/retention/exhaustion runbook. Не переписывать уже принятый CI harness.
+Затем прежние отдельно разрешённые fresh VPS preflight → loopback → HTTPS gates.

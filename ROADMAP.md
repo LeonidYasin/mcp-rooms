@@ -389,7 +389,7 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 
 - [x] SOURCE: isolated root-owned code/nonroot pip+bootstrap+service, exact rendered unit.
 - [x] SOURCE: real TCP MCP/native12MP photo/admission/body timeout/disconnect/native SIGSTOP timeout/reap/slot reuse/publication-withdrawal/restart; aggregate fixture counters.
-- [ ] Exact-source Actions acceptance; no runtime claim before logs.
+- [x] Exact-source `8c5ac146`:911 tests3.12; actual fixed unit/nonroot service/native photo/admission/timeouts/card/withdraw/restart, kernel fixture peak172.625MiB. [Evidence](docs/ci-f3c2c2.md).
 - [ ] F3c.2c.3 production installer, crash/identity protections and capacity/disk runbook remain.
 
 [Boundaries](docs/candidate-unit-ci.md). CI fixture is not deploy tooling.

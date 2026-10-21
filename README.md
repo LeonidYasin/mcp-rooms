@@ -59,14 +59,16 @@ is not yet accepted.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [F3c.2c.1](docs/ci-f3c2c1.md), source
-`8b7ef9611973ed615f9b59955cfe493659bd8d81`: Python3.12 **903 passed**.
-Fixed unit review renderer and real isolated systemd/cgroup fixture accepted in
-Actions: parent and TERM-resistant child stopped, aggregate fixture counters read.
-This is **not the real candidate-in-unit test, root installer or VPS capacity acceptance**.
-[Prior offline lifecycle](docs/ci-f3c2b.md), [read-only proposal](docs/ci-f3c2a.md),
-[offline bundle](docs/ci-f3c1.md), [quarantine recovery](docs/ci-f3b.md) and
-[native sandbox](docs/ci-f3a.md) evidence remain separately versioned.
+**Latest accepted checkpoint:** [F3c.2c.2](docs/ci-f3c2c2.md), source
+`8c5ac1462fdfecc82ec264b4c93c70c8751e0071`: Python3.12 **911 passed**.
+Real installed candidate under the exact systemd unit accepted in Actions: non-root
+service/root-owned code; TCP MCP; native12MP photo; admission/body/disconnect/native
+timeout-reap; public card/photo/withdraw; state/key-preserving restart. Kernel group
+peak172.625MiB in this bounded synthetic scenario, **not VPS capacity acceptance**.
+This is a CI harness, **not the production installer**. [Prior unit/cgroup proof](docs/ci-f3c2c1.md),
+[offline lifecycle](docs/ci-f3c2b.md), [proposal](docs/ci-f3c2a.md),
+[bundle](docs/ci-f3c1.md), [recovery](docs/ci-f3b.md) and [sandbox](docs/ci-f3a.md)
+remain separately versioned evidence.
 
 Built on [F1 read-only card](docs/ci-f1.md), [session bridge](docs/ci-m3b2.md),
 [private photo HTTP](docs/ci-m3a2.md) and12 scoped listing tools on top of8 rooms.
@@ -80,7 +82,7 @@ are accepted in CI. [F3c.1 offline wheelhouse](docs/operator-package.md) is acce
 [F3c.2a operator proposal](docs/operator-plan.md) is accepted in CI: fixed isolated targets and full bundle verification; not host attestation/install.
 Current [F3c.2b unprivileged lifecycle](docs/operator-lifecycle.md): [accepted in CI](docs/ci-f3c2b.md); real offline installation/start/stop/restart, not a systemd installer.
 Current [F3c.2c.1](docs/operator-supervision.md): [accepted in CI](docs/ci-f3c2c1.md): fixed unit renderer and real isolated systemd/cgroup fixture; not actual candidate-in-unit.
-Current [F3c.2c.2](docs/candidate-unit-ci.md): SOURCE real installed candidate under exact unit, native photo/body admission/timeouts and aggregate fixture measurements pending Actions.
+Current [F3c.2c.2](docs/candidate-unit-ci.md): [accepted in CI](docs/ci-f3c2c2.md): real installed candidate under exact unit, native photo/body admission/timeouts and aggregate fixture measurements.
 Remaining F3c.2c.3: reviewed production installer and capacity/disk acceptance before separately approved VPS checks.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).

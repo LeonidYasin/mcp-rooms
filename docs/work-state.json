@@ -4,29 +4,30 @@
   "branch": "feat/standalone-identity",
   "pull_request": 1,
   "accepted": {
-    "source_sha": "8b7ef9611973ed615f9b59955cfe493659bd8d81",
-    "evidence": "docs/ci-f3c2c1.md",
-    "python312_passed": 903,
+    "source_sha": "8c5ac1462fdfecc82ec264b4c93c70c8751e0071",
+    "evidence": "docs/ci-f3c2c2.md",
+    "python312_passed": 911,
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
     "id": "F3c.2c.2",
-    "stage": "SOURCE",
+    "stage": "CI",
     "contract": "docs/candidate-unit-ci.md",
     "source": "tools/ci_candidate_unit.py",
     "tests": "tests/test_candidate_unit_ci.py",
-    "evidence": null
+    "evidence": "docs/ci-f3c2c2.md"
   },
   "next_task": {
     "id": "F3c.2c.3",
     "title": "Reviewed fresh-only root installer and capacity/disk acceptance",
     "contract": "docs/candidate-unit-ci.md",
     "acceptance": [
-      "Map reviewed fixed VPS user/unit/release/state paths to root-owned immutable application code; do not deploy the unprivileged rehearsal as a public supervisor.",
-      "Implement just-before-effect unit/drop-in/process/path checks and fresh/interrupted/stale identity negative tests; preserve unrelated services and all state during stop-only rollback.",
-      "Prove cgroup/control-group native descendant cleanup and measure combined parent/child CPU/RSS/Tasks/timeout/admission/disk budgets in Actions; idle samples are not capacity acceptance.",
-      "Keep real credential bootstrap separate, recovery outputs quarantined and no browser write/search/admin/public signup additions in first TEST.",
-      "Require separately approved fresh read-only VPS preflight, loopback and HTTPS acceptance; every remote execution needs explicit owner approval AND special password."
+      "Reuse accepted F3c.2c.2 exact-unit/native/fault measurements; do not repeat completed research or rebuild the CI harness. Implement a separate reviewed fresh-only operator installer, never deploy the privileged CI harness.",
+      "Validate trusted base Python and root-owned immutable release/ancestors, fresh service identity and private state; commit ready-last bounded receipts and refuse adoption/automatic overwrite of existing or interrupted targets.",
+      "Check loaded unit/drop-ins/account/path/process identities immediately before each effect and test crash/interruption/identity changes; stop-only rollback preserves all private state and unrelated services.",
+      "Adopt measured aggregate capacity safety margins and full install/state disk/retention/exhaustion criteria; current172.625MiB12MP fixture peak and state-only disk samples are not VPS capacity acceptance.",
+      "Keep real-key bootstrap separately authorized; no browser/signup/search/replies/admin expansion or recovery promotion in the shortened TEST track.",
+      "Require separately approved fresh read-only VPS preflight, loopback and HTTPS/external acceptance; every remote execution needs explicit owner approval AND special password."
     ]
   },
   "runtime_last_known": {

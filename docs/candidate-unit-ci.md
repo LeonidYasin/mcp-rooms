@@ -1,6 +1,6 @@
 # F3c.2c.2 — installed candidate under exact reviewed unit
 
-**SOURCE pending Actions. CI-only harness, NOT a production/root installer.**
+**CI: [exact-source evidence](ci-f3c2c2.md). CI-only harness, NOT a production/root installer.**
 [Reviewed unit](operator-supervision.md) · [Prior lifecycle](operator-lifecycle.md).
 
 ## Scope

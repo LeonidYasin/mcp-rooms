@@ -400,11 +400,11 @@
     {
       "id": "candidate_unit_ci",
       "title": "Real candidate under exact systemd unit",
-      "stage": "SOURCE",
-      "summary": "CI-only root-owned release/nonroot service; real MCP/native photo/admission/timeouts/restart/cgroup measurements pending Actions. Not a production installer or VPS capacity acceptance.",
+      "stage": "CI",
+      "summary": "Actual installed nonroot candidate under exact root-owned unit accepted in Actions: real TCP MCP/native12MP photo/body admission-disconnect-timeouts, forced native504/reap/slot reuse, card/photo/withdraw/restart and cgroup measurements. Not a production installer or VPS capacity acceptance.",
       "doc": "docs/candidate-unit-ci.md",
       "source": "tools/ci_candidate_unit.py",
-      "evidence": null,
+      "evidence": "docs/ci-f3c2c2.md",
       "depends_on": [
         "operator_supervision",
         "operator_bundle",

@@ -15,7 +15,7 @@ operator tool, не MCP method, не web endpoint и не произвольны
    проверяет exact-source locked wheelhouse до и после установки.
 2. Новый абсолютный canonical каталог под owner-only0700 parent; no reuse/alias/
    overlap. Private lock. Новый venv `--copies`; fixed argv без shell, clean env,
-   no token/credentials/PYTHONPATH inheritance. pip no-index/only-binary/require-hashes
+   no token/credentials/PYTHONPATH inheritance. pip no-index/no-deps/only-binary/require-hashes
    и pip check. Вызовы имеют deadlines; raw stdout/stderr подавляются, не попадают
    в stdout агента или artifact.
 3. `install.json` ready-last содержит exact source/resource/lock hash, UID, root
@@ -68,3 +68,7 @@ child cleanup, interruption/other-service protection, measured aggregate resourc
 timeout/admission/disk и новый owner-reviewed runbook. Без auto-delete/recovery promotion.
 Затем отдельно разрешённые fresh read-only VPS preflight → loopback TEST → HTTPS.
 Любая remote execution требует отдельного согласия И специального пароля владельца.
+
+Полная install.lock closure устанавливается с --no-deps, чтобы не резолвить
+дополнительные/direct-URL METADATA dependencies; затем pip check. Хеши не
+сертификат отсутствия вредоносного кода и не OS network-isolation sandbox.

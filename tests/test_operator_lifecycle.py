@@ -48,7 +48,7 @@ def test_fresh_offline_install_ready_last_and_no_profile(layout):
     assert not (root/'profile').exists() and not (root/'process.json').exists()
     assert calls[0]==calls[-1]=='verify'
     pip=next(c for c in calls if type(c) is list and 'install' in c)
-    assert '--no-index' in pip and '--require-hashes' in pip and '--only-binary=:all:' in pip
+    assert '--no-index' in pip and '--no-deps' in pip and '--require-hashes' in pip and '--only-binary=:all:' in pip
     assert '--copies' in next(c for c in calls if type(c) is list and 'venv' in c)
     with pytest.raises(FileExistsError):install(layout)
 

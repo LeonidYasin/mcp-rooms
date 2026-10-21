@@ -11,7 +11,7 @@ Default CLI rooms-only; marketplace candidate остаётся explicit opt-in.
    Не выполнять непроверенный код или tar из произвольного сообщения участника.
    Доверенный verifier из repo сверяет expected source SHA и SHA-256 versioned
    runtime lock, все wheels/файлы и отсутствие лишних объектов/aliases.
-3. Только в отдельно согласованном новом venv: pip install с --no-index,
+3. Только в отдельно согласованном новом venv: pip install с --no-index --no-deps,
    --find-links на wheels, --only-binary=:all:, --require-hashes -r install.lock.
    Затем pip check. Нельзя убрать hash-checks/скачать недостающий пакет из сети.
 4. Python/pip/venv, glibc и kernel/Landlock — host prerequisites, не включены в
@@ -26,3 +26,8 @@ preflight, loopback и HTTPS. Каждая remote execution — отдельно
 
 Восстановленные F3b копии в карантине. Не добавлять profile.json, не выдавать старые
 ключи и не запускать их как fresh state. Полный disaster recovery/promotion отдельно.
+
+Полная dependency closure перечислена в install.lock; --no-deps запрещает повторный
+resolver traversal, включая direct-URL Requires-Dist из METADATA. pip check затем
+проверяет установленную closure. Это не OS-level запрет сети или гарантия
+отсутствия вредоносного кода в hash-pinned third-party wheel.

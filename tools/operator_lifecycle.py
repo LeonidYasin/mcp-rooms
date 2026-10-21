@@ -179,7 +179,7 @@ def install(bundle,root,source_sha,lock_sha,resource):
     with _lock(root):
         _run([sys.executable,'-I','-m','venv','--copies',str(root/'venv')],90)
         _run([str(_python(root)),'-I','-m','pip','--isolated','install','--disable-pip-version-check',
-              '--no-index','--only-binary=:all:','--find-links',str(bundle/'wheels'),
+              '--no-index','--no-deps','--only-binary=:all:','--find-links',str(bundle/'wheels'),
               '--require-hashes','-r',str(bundle/'install.lock')],180)
         _run([str(_python(root)),'-I','-m','pip','check'],30)
         verifier(bundle,source_sha,lock_sha) # No ready marker if inputs changed during install.

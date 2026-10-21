@@ -33,7 +33,7 @@ jobs:
       - name: Offline install into clean venv
         run: |
           python -m venv /tmp/rooms-operator/venv
-          /tmp/rooms-operator/venv/bin/python -m pip --isolated install --disable-pip-version-check --no-index --only-binary=:all: --find-links /tmp/rooms-operator/bundle/wheels --require-hashes -r /tmp/rooms-operator/bundle/install.lock
+          /tmp/rooms-operator/venv/bin/python -m pip --isolated install --disable-pip-version-check --no-index --no-deps --only-binary=:all: --find-links /tmp/rooms-operator/bundle/wheels --require-hashes -r /tmp/rooms-operator/bundle/install.lock
           /tmp/rooms-operator/venv/bin/python -m pip check
       - name: Installed candidate and recovery smoke without online dependencies
         run: |

@@ -329,7 +329,11 @@ def _cleanup_failed_start(i,receipt):
                     raise ControlError('control_start_recovery_required')
             except FileNotFoundError:continue
     _run(['/usr/bin/systemctl','stop',NAME],25)
-    _run(['/usr/bin/systemctl','reset-failed',NAME],10)
+    # systemd rejects reset-failed for a cleanly inactive unit; clear only an observed failure.
+    stopped=_show()
+    if stopped['FragmentPath']!=str(UNIT) or stopped['DropInPaths']:
+        raise ControlError('control_start_recovery_required')
+    if stopped['ActiveState']=='failed':_run(['/usr/bin/systemctl','reset-failed',NAME],10)
     _,after=_wait_inactive(i)
     return after
 

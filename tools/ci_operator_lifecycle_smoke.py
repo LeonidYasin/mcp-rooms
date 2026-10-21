@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import resource
 import runpy
+import socket
 import sys
 import tempfile
 import uuid
@@ -39,6 +40,28 @@ with tempfile.TemporaryDirectory(prefix='rooms-lifecycle-ci-') as parent:
     raw=(root/'profile/owner.key').read_text().strip()
     key_hash=sha256((root/'profile/owner.key').read_bytes()).hexdigest()
     started=False
+    # A pre-existing listener is preserved; no process receipt is created.
+    with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as occupied:
+        occupied.bind(('127.0.0.1',8766));occupied.listen(1)
+        try:m['start'](root)
+        except m['LifecycleError'] as exc:assert str(exc)=='lifecycle_port_busy'
+        else:raise AssertionError('occupied port was not refused')
+        assert occupied.fileno()>=0 and not (root/'process.json').exists()
+    # Failure AFTER native app has started but BEFORE readiness commit must reap
+    # only its pinned child, preserve state and free the rehearsal listener.
+    functions=m['start'].__globals__;writer=functions['_write_new']
+    def interrupted(path,value):
+        if path.name=='process.json':raise OSError('synthetic ready commit interruption')
+        return writer(path,value)
+    functions['_write_new']=interrupted
+    try:
+        try:m['start'](root)
+        except OSError:pass
+        else:raise AssertionError('interrupted start unexpectedly succeeded')
+    finally:functions['_write_new']=writer
+    assert not (root/'process.json').exists() and (root/'profile/market.sqlite3').exists()
+    with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as freed:
+        freed.bind(('127.0.0.1',8766))
     try:
         first=m['start'](root);started=True
         assert first['owned_loopback_listener'] and first['unauthenticated_http']==401
@@ -68,6 +91,7 @@ with tempfile.TemporaryDirectory(prefix='rooms-lifecycle-ci-') as parent:
         print('LIFECYCLE SMOKE PASS: '+json.dumps({'source_sha':sys.argv[2],'offline_install':True,
             'real_loopback_start_stop_restart':True,'authenticated_synthetic_mcp':True,
             'listing_and_key_preserved':True,'rollback':'stop-only','root_or_systemd':False,
+            'occupied_port_preserved':True,'interrupted_start_reaped':True,
             'resource_budget_accepted':False,'idle_parent_rss_kib_point_sample':idle_rss,
             'max_single_reaped_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss},sort_keys=True))
     finally:

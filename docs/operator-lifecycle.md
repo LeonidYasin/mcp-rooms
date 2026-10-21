@@ -57,7 +57,8 @@ operator tool, не MCP method, не web endpoint и не произвольны
   конкретного rehearsal, НЕ combined parent+native peak/stress/cgroup MemoryMax/
   диск или гарантированная ёмкость VPS. Resource acceptance остаётся false.
 - Health401 не authenticates client. Отдельный CI smoke делает настоящий synthetic
-  authenticated MCP initialize/tools/create/get, restart и stop-only rollback;
+  authenticated MCP initialize/tools/create/get, restart и stop-only rollback,
+  сохранность чужого listener и cleanup после interruption перед ready marker;
   это не внешний пользовательский VPS acceptance и не native photo network benchmark.
 
 ## Следующий оставшийся gate

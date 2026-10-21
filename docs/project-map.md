@@ -1,101 +1,112 @@
-# Project map
+# Карта проекта MCP Rooms
 
-Текущее направление: [ADR-001 — минимальный собственный Python/SQLite domain](decisions/001-marketplace-foundation.md).
-[Общий контракт приёмки](marketplace-conformance.md) описан, но не выполнен.
+## Что строим
+
+MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
+
+**Основной интерфейс:** пользователь разговаривает со своим ИИ-агентом, а агент работает
+с площадкой через ограниченные MCP-инструменты.
+
+**Web сейчас:** публичная витрина только для просмотра явно опубликованных карточек и
+фото. Посетителю не нужен ключ. Создание, редактирование и публикация через web пока не
+входят в ближайший owner-first TEST.
 
 ```text
-Notion personal static-Bearer connection ──────────────────┐
-Qwen Desktop → local loopback header adapter (.env secret) ├→ HTTPS /rooms-test/mcp
-                                                        │   → scoped Caddy route
-                                                        └──→ loopback :8765
-                                                            → official MCP SDK
-                                                            → BearerGate / local UUID
-                                                            → room membership/ownership
-                                                            → private standalone SQLite
+Пользователь → личный чат с ИИ → MCP tools → общие application services → SQLite/фото
+Наблюдатель → read-only web-витрина → публичная allowlist-проекция тех же объявлений
+Оператор → отдельные проверяемые CLI → install/start/stop/recovery
 ```
 
-- `src/mcp_rooms/server.py`: SDK tool registration and HTTP Bearer/Host/Origin gate;
-  eight tools only. Admin, credential issuance and maintenance are not MCP tools.
-- `identity.py`, `enrollment.py`, `signup_page.py`: digest-backed credentials,
-  explicit opt-in signup. Latest TEST window is closed; no profile,
-  phone/email/GitHub is required for want/offer messages.
-- `store.py`: shared rooms, membership/owner rules, text/reply/idempotency/TTL/cadence.
-- `admin.py`, `maintenance.py`: non-root service-user operator CLI; consistent
-  snapshot/verification, never automatic live-DB replacement.
-- `deploy/vps_install_test.py`: initial isolated install, not rerun for an existing TEST.
-- `deploy/vps_https_route.py`: legacy 30-minute public-signup route, not current default.
-- `deploy/vps_rooms_window_24h.py`: operator-accepted longer existing-account window;
-  scoped CAS route, persistent cleanup, runtime-only override, no production restart.
-- `deploy/vps_rooms_recovery_drill.py`: operator-reported snapshot/copy/restart PASS;
-  no key issuance/revocation or restored-copy exposure.
-- `deploy/vps_rooms_auth_drill.py`: operator-reported synthetic HTTP revocation
-  and isolated canary restore-rewind/reconciliation PASS; general DR journal remains open.
-- `tests/`, `.github/workflows/ci.yml`: Linux Python 3.10–3.13 tests/build; CI does
-  not operate the VPS, access real credentials or prove external-client acceptance.
+## Человеческая карта готовности
 
-Identity is `user:<UUID>`; clients with one user's keys share ownership and cadence.
-Room text is untrusted. Shared means visible to enrolled users, not a private chat.
-Client reads are explicit: no background polling, push or autonomous agent execution.
+| Область | Состояние | Что это означает |
+| --- | --- | --- |
+| Identity и ключи | TEST/CI | UUID, Bearer, scopes, revoke/disable работают; broad onboarding не принят |
+| Общие Rooms | исторический TEST | 8 инструментов проверены с Notion/Qwen; старый TEST остановлен |
+| Черновики объявлений | CI | Данные, категории, CAS и retries есть; не публичный web |
+| Фото | CI | Upload, sandbox, storage, attachment и cleanup проверены синтетически |
+| Публикация | CI | Preview/consent/publish/withdraw и публичная проекция реализованы |
+| Пользовательский marketplace MCP | CI | 12 opt-in listing tools вызывают те же services |
+| Web-витрина | CI | Анонимная карточка/фото только для чтения, без feed и форм |
+| Browser sessions | CI, paused | Login/logout bridge есть; cookie пока не даёт права записывать объявления |
+| Operator package | CI | Offline bundle, fresh install, systemd/cgroup и guarded lifecycle проверены |
+| Fresh VPS TEST | не выполнен | Нужны отдельные разрешения на preflight, loopback и HTTPS |
+| Приватные отклики | SPEC | Нужна отдельная participant ACL модель; shared Rooms не подходят |
+| Admin MCP | SPEC | Отдельная audience/credentials и typed moderation, без shell/SQL |
+| Production | отсутствует | Нет release, merge в main и production rollout |
 
-Operational truth: [acceptance](acceptance-2026-10-19.md). Remaining gates:
-[roadmap](../ROADMAP.md). Canonical-core extraction and pinned embedded GitHub
-adapter come later; the old mcp-server installation/data are not switched. Agora
-want/offer/search/matching and provider-independent embeddings remain product phases,
-not reasons to add PostgreSQL, new identity requirements or another connector now.
+## Основной пользовательский путь
 
+```mermaid
+flowchart LR
+  U[Пользователь] --> CHAT[Чат со своим ИИ-агентом]
+  CHAT --> MCP[MCP: listing tools]
+  MCP --> DRAFT[Приватный черновик]
+  DRAFT --> PHOTO[Безопасная загрузка фото]
+  PHOTO --> PREVIEW[Точный preview]
+  PREVIEW --> CONSENT[Явное согласие]
+  CONSENT --> PUBLIC[Публичная карточка]
+  OBS[Любой посетитель] --> WEB[Read-only web-витрина]
+  WEB --> PUBLIC
+  MCP --> WITHDRAW[Снять публикацию]
+  WITHDRAW --> PUBLIC
+```
 
-## Saved desktop clients and proposed web market
+ИИ не публикует личную переписку или предполагаемый интерес автоматически. Команда
+публикации должна исходить от пользователя, иметь правильный scope и относиться к
+точной версии preview.
 
-`clients/qwen/` now contains the delivered local adapter/check, safe .env example,
-key-free JSON and usage instructions. They run on the user's PC, not inside the
-Rooms server; they do not reopen the stopped TEST or add server runtime dependencies.
+## Карта исходников
 
-[Web market direction](web-marketplace-plan.md): open to all locations, C2C goods/services
-first, rides/delivery later. [Detailed mindmap](product-mindmap.md) and
-[component / trust / entity graphs](architecture-graph.md) define the next phase.
-[Admin MCP](admin-mcp-design.md) is a separate designed boundary, NOT an enabled tool.
+### Доступ и Rooms
 
-New isolated slice: pure `listing_contract.py` and CI fixtures; static responsive
-`web/prototype/index.html` with demo/empty/modal states. No storage migration, new MCP
-methods/scopes, live web, private negotiation or admin endpoint implemented yet.
-[First-sale criteria](first-sale-acceptance.md) require a real item/photos/consent and
-independent discovery/reply; no automatic publication of old enrolled-only rooms.
+- `identity.py` — пользователи, credentials, scopes, revoke/disable.
+- `store.py`, `service.py` — комнаты, membership, сообщения и idempotency.
+- `server.py` — MCP SDK, Bearer/Host/Origin gates и opt-in compositions.
 
-## Current source layout extension (not deployed)
+### Marketplace domain
 
-- `domain.py`: errors, principal, ID/text primitives; old imports re-export aliases.
-- `draft_store.py`: opt-in market schema + private draft application/persistence boundary.
-- `tests/test_draft_store.py`: synthetic transaction/access/concurrency/rollback fixtures.
-- [Delivery plan](delivery-plan.md), [draft data/sequence design](draft-storage-design.md).
+- `draft_store.py` — приватные черновики, категории, revision CAS и receipts.
+- `preview_contract.py` — точный preview и content-bound intent.
+- `publication_store.py` — publish/withdraw/snapshot/audit/public projection.
+- `market_adapter.py`, `market_tools.py` — общие application commands и 12 MCP tools.
 
-The earlier "no persistence" description refers to the prototype/initial contract.
-Private draft persistence now exists in source; no public listing API or migration at
-server startup exists. Generic IdentityStore issuance still rejects listing scopes.
+### Фото
 
-### M1b.1 source increment
+- `media_image.py` — JPEG/PNG → metadata-free JPEG.
+- `media_worker.py`, `media_sandbox.py` — bounded child, Landlock/seccomp.
+- `media_files.py`, `media_stage.py`, `media_cleanup.py` — private files, manifests,
+  quotas, staging и cleanup.
+- `photo_drafts.py` — привязка 0–8 фото к версии объявления.
+- `media_http.py` — opt-in private binary upload/read.
 
-`draft_store.py`: own list/category read/private archive; `tests/test_draft_lifecycle.py`
-adds pagination/migration/archive/concurrency negatives. [Lifecycle design](private-draft-lifecycle.md).
-Market namespace v2 is explicit opt-in; no RoomStore startup/version changes or public API.
+### Web
 
-### M1b.2 source increment / positioning
+- `public_web.py` — анонимная карточка и фото только для чтения.
+- `browser_sessions.py`, `browser_http.py` — сессии/login/logout; запись объявлений
+  через cookie намеренно не подключена до transaction-time authority gate.
 
-`preview_contract.py` defines canonical private preview/digest (not signature/HTML);
-DraftStore records/checks short-lived publication intent without publishing.
-`tests/test_publication_intent.py` covers scope/version/hash/expiry/resource/isolation.
-[Intent design](publication-intent.md), [public positioning](project-positioning.md).
-No listing scopes issued by signup and no new routes/tools.
+### Установка и восстановление
 
-### M2a source increment
+- `test_candidate.py` — fresh owner-first composition.
+- `recovery.py` — offline DB+photos restore в карантин.
+- `tools/operator_bundle.py` — hash-pinned offline wheelhouse.
+- `tools/operator_install.py` — fresh-only install/inspect, без start/bootstrap.
+- `tools/operator_control.py` — отдельно авторизованные capacity/bootstrap/start/stop.
+- `tools/operator_unit.py`, `tools/ci_candidate_unit.py` — unit/cgroup proof.
 
-`media_image.py`: optional pure in-memory JPEG/PNG normalizer; `tests/test_media_image.py`:
-synthetic fixtures only. No import from server/startup and no change to DraftStore's
-media refusal. Python3.11+ media extra; core3.10 stays dependency-free of Pillow.
-[Safety contract](media-image-safety.md), [exact-SHA CI](ci-m2a.md).
+## Источники истины
 
-## Уточнение границ следующего этапа
+1. `AGENTS.md` — обязательные ограничения.
+2. `docs/current-state.md` — понятное текущее состояние.
+3. `docs/work-state.json` — принятый source SHA и следующий gate.
+4. `docs/project-status.json` — подробный реестр компонентов.
+5. `docs/architecture-graph.md` — связи и границы доверия.
+6. `ROADMAP.md` — порядок продолжения.
+7. Exact-SHA evidence в `docs/ci-*.md`.
 
-[Рынок возможностей](opportunity-model.md): вещи/услуги первыми; работа, команды,
-проекты, стартапы и инвесторы — будущие отдельные домены, не готовые API.
-[M2a photo normalizer](media-image-safety.md) готовится отдельно от публичной загрузки,
-media storage и worker isolation. Наличие конвертера не означает готовность M2/публикации.
+## Сейчас не делаем
+
+Платежи, такси, вакансии, инвестиционный marketplace, embeddings, микросервисы,
+PostgreSQL, автономную публикацию агентом и общий admin shell. Сначала — один честный
+owner-first путь: агент создаёт и публикует, web показывает, владелец снимает.

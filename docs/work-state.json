@@ -3,31 +3,42 @@
   "repository": "LeonidYasin/mcp-rooms",
   "branch": "feat/standalone-identity",
   "pull_request": 1,
+  "product_focus": {
+    "primary_interface": "User chats with their own AI agent; the agent uses scoped MCP tools.",
+    "web_now": "Anonymous read-only storefront for explicitly published cards and photos.",
+    "not_now": [
+      "browser marketplace writes",
+      "open marketplace signup",
+      "feed/search",
+      "private responses",
+      "admin MCP"
+    ]
+  },
   "accepted": {
-    "source_sha": "e63134e077902d59a455f183de00e59760d3f453",
-    "evidence": "docs/ci-f3c2c3a.md",
-    "python312_passed": 939,
+    "source_sha": "88eabfb35aa7cc763d85352e3e67a48e9d5fb97f",
+    "evidence": "docs/ci-f3c2c3b.md",
+    "ci": "Python 3.10-3.13 success; build/install smoke success; operator systemd supervision success",
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
-    "id": "F3c.2c.3a",
+    "id": "F3c.2c.3b",
     "stage": "CI",
     "contract": "docs/operator-install.md",
-    "source": "tools/operator_install.py",
-    "tests": "tests/test_operator_install.py",
-    "evidence": "docs/ci-f3c2c3a.md"
+    "source": "tools/operator_control.py",
+    "tests": "tests/test_operator_control.py; tools/ci_candidate_unit.py",
+    "evidence": "docs/ci-f3c2c3b.md",
+    "summary": "Guarded capacity/bootstrap/start/stop controller over the accepted fresh installer and actual-unit harness."
   },
   "next_task": {
-    "id": "F3c.2c.3b",
-    "title": "Reviewed bootstrap/start-stop controller and runtime/disk capacity adoption",
-    "contract": "docs/operator-install.md",
+    "id": "OWNER-FIRST-VPS-PREFLIGHT",
+    "title": "Separately authorized fresh read-only VPS preflight before isolated loopback TEST",
+    "stage": "PERMISSION_GATE",
     "acceptance": [
-      "Reuse accepted F3c.2c.3a fresh install/inspect and F3c.2c.2 actual-unit/native/fault harness. Do not rebuild or deploy the privileged CI harness. Implement a separate explicit bootstrap/start/stop controller.",
-      "Bootstrap only a validated installed fresh profile with separate authorization; never read or log an existing owner key. Recheck trusted OS Python, code receipt/inventory, account and ancestor/unit/drop-in/process identities immediately before each effect. Refuse unsafe drift, never adopt partial installations.",
-      "Check loaded unit/drop-ins/account/path/process identities immediately before each effect and test crash/interruption/identity changes; stop-only rollback preserves all private state and unrelated services.",
-      "Adopt measured aggregate capacity safety margins and full install/state disk/retention/exhaustion criteria; current172.625MiB12MP fixture peak and state-only disk samples are not VPS capacity acceptance.",
-      "Keep real-key bootstrap separately authorized; no browser/signup/search/replies/admin expansion or recovery promotion in the shortened TEST track.",
-      "Require separately approved fresh read-only VPS preflight, loopback and HTTPS/external acceptance; every remote execution needs explicit owner approval AND special password."
+      "Do not execute remotely until the owner explicitly approves this exact preflight and supplies the special password through an approved secure mechanism.",
+      "Read-only check trusted OS Python, Linux x86_64, cgroup v2, Landlock/seccomp availability, new fixed account/unit/path/port absence and safe ancestors.",
+      "Measure available memory, disk and inodes against the accepted controller criteria without claiming production capacity.",
+      "Verify existing MCP/Caddy/services remain untouched; emit only a sanitized report and never upload host config, credentials, database or private logs.",
+      "If preflight passes, stop and request separate approval for fresh install/bootstrap/loopback acceptance. Do not combine permission gates."
     ]
   },
   "runtime_last_known": {
@@ -35,61 +46,49 @@
     "rooms_test": "stopped; temporary HTTPS route removed by owner report",
     "rooms_production": "not accepted or deployed by this project",
     "main_last_recorded_sha": "96247414c03469ade2f9fdc96047e5f3d2d39f71",
-    "main_note": "Last recorded scaffold; verify remote before decisions. Do not merge without approval.",
-    "pages": "documentation only; single-publisher owner configuration gate remains"
+    "pages": "documentation only; not the marketplace runtime"
   },
   "permission_gates": [
     "Each remote execution requires separate owner approval AND special password.",
+    "Preflight, loopback install and HTTPS acceptance are three separate approvals.",
     "No main merge/release/VPS or live database changes/real credential issuance without separate approval."
   ],
   "verification": {
     "local": "static preparation and AST only; no project execution",
-    "runtime": "GitHub Actions only",
-    "commit_policy": "read remote HEAD and expected_head_sha CAS, never force push"
+    "runtime": "GitHub Actions only until separately authorized operator TEST",
+    "commit_policy": "read remote HEAD and use expected_head_sha CAS; never force push"
   },
   "read_next": [
     "AGENTS.md",
-    "docs/ai-handoff.md",
+    "docs/current-state.md",
+    "docs/project-map.md",
+    "docs/architecture-graph.md",
+    "ROADMAP.md",
     "docs/project-status.json",
     "docs/deployment-readiness.md",
-    "docs/browser-http.md",
-    "docs/owner-first-test.md",
-    "docs/test-candidate.md",
-    "docs/media-sandbox.md",
-    "docs/recovery-candidate.md",
-    "docs/operator-package.md",
-    "docs/operator-plan.md",
-    "docs/operator-lifecycle.md",
-    "docs/operator-supervision.md",
-    "docs/candidate-unit-ci.md",
     "docs/operator-install.md",
-    "docs/ci-f3c2c3a.md"
+    "docs/ci-f3c2c3b.md"
   ],
   "paused_tasks": [
     {
       "id": "M3b.3",
       "title": "Transaction-time browser session authority before cookie-authenticated marketplace writes",
-      "contract": "docs/browser-http.md",
-      "acceptance": [
-        "Introduce backwards-compatible trusted session binding; never construct an authority/session identity from client JSON.",
-        "Check session user/parent credential/resource/audience/scopes/revocation/absolute and idle expiry in the same SQLite transaction as each listing/media authorization.",
-        "Prove logout, expiry and scope changes during body/native worker/filesystem IO cannot bypass the new session transaction guard.",
-        "Keep cookies disconnected from market/media routes until the new binding passes CI; default rooms-only CLI and eight room tools remain unchanged.",
-        "After this gate, finish automatic onboarding/recovery/retention and typed browser actions, then draft/photo form and real-browser QA."
-      ],
-      "reason": "Required before browser writes; deferred from MCP-managed read-only first TEST."
+      "reason": "Web is intentionally read-only in the owner-first MCP-first TEST. Required before any browser write path."
     },
     {
       "id": "RECOVERY-CUTOVER",
-      "title": "Promotion and independent disaster recovery after loss of original authority",
-      "contract": "docs/recovery-candidate.md",
-      "reason": "F3b output is deliberately quarantined; not required for fresh-only first TEST installation and must never be bypassed by copying profile markers.",
-      "acceptance": [
-        "Specify a fresh authoritative anti-rollback security checkpoint or explicit revoke-all/new-identity disaster policy when original current state is unavailable.",
-        "Never resurrect withdrawn publications or consume historical consent as new permission; require fresh owner consent after separately approved promotion.",
-        "Prove cutover/rollback preserves current revocations, disabled users and consistent DB+photos under a controlled downtime window.",
-        "Require separate operator authorization and no arbitrary SQL/shell or backup credentials exposed to web/MCP; backups stay private."
-      ]
+      "title": "Independent disaster recovery after loss of original current authority",
+      "reason": "Current recovery output is deliberately quarantined and cannot be promoted automatically."
+    },
+    {
+      "id": "PRIVATE-RESPONSES",
+      "title": "Participant-ACL private responses separate from shared Rooms",
+      "reason": "Required for the full marketplace pilot, not for the first read-only web storefront TEST."
+    },
+    {
+      "id": "ADMIN-MCP",
+      "title": "Separate typed moderation MCP with separate audience and audit",
+      "reason": "Required before broader public onboarding, not part of the owner-first TEST."
     }
   ],
   "queued_tasks": []

@@ -298,7 +298,8 @@ def main(bundle,source):
         control_globals['_ready']=interrupted_ready
         try:
             try:controller['start'](controller['START_AUTH'])
-            except controller['ControlError'] as exc:assert str(exc)=='ci_interrupted_start'
+            except controller['ControlError'] as exc:
+                if str(exc)!='ci_interrupted_start':raise
             else:raise AssertionError('controller committed interrupted start')
             assert properties()['MainPID']=='0'
         finally:control_globals['_ready']=real_ready
@@ -445,6 +446,8 @@ if __name__=='__main__':
         frame=next((f for f in reversed(frames) if f.name=='main'),frames[-1] if frames else traceback.extract_tb(exc.__traceback__)[-1])
         install_frames=[{'function':f.name,'line':f.lineno} for f in traceback.extract_tb(exc.__traceback__)
                         if f.filename.endswith('/tools/operator_install.py')]
+        control_frames=[{'function':f.name,'line':f.lineno} for f in traceback.extract_tb(exc.__traceback__)
+                        if f.filename.endswith('/tools/operator_control.py')]
         file_meta=None;tb=exc.__traceback__
         while tb:
             if tb.tb_frame.f_code.co_name=='_file' and tb.tb_frame.f_code.co_filename.endswith('/tools/operator_install.py'):
@@ -453,7 +456,8 @@ if __name__=='__main__':
                     'links':info.st_nlink,'size':info.st_size}
             tb=tb.tb_next
         print('CANDIDATE UNIT FAILED: '+json.dumps({'exception':type(exc).__name__,
-            'installer_frames':install_frames,'file_meta':file_meta,
+            'installer_frames':install_frames,'controller_frames':control_frames,'file_meta':file_meta,
             'function':frame.name,'line':frame.lineno,
-            'safe_code':str(exc) if type(exc).__name__=='InstallError' and re.fullmatch(r'[a-z_]{1,80}',str(exc)) else None}),file=sys.stderr)
+            'safe_code':str(exc) if type(exc).__name__ in ('InstallError','ControlError')
+                and re.fullmatch(r'[a-z_]{1,80}',str(exc)) else None}),file=sys.stderr)
         raise SystemExit(1)

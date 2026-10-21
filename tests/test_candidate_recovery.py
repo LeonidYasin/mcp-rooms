@@ -175,7 +175,7 @@ def test_interrupted_output_has_no_ready_marker_and_cannot_retry(env,monkeypatch
     def stop(*a,**kw):raise OSError('synthetic interrupt')
     with monkeypatch.context() as patch:
         patch.setattr(m,{'copy':'_copy_photos','backup':'backup_database','seal':'_write_json','reconcile':'_reconcile'}[failure],stop)
-        with pytest.raises(OSError):m.restore(backup,x.root,target,RESOURCE)
+        with pytest.raises(DomainError,match='media_storage_io'):m.restore(backup,x.root,target,RESOURCE)
     assert target.is_dir() and not (target/m.READY).exists() and not (target/candidate.MARKER).exists()
     with pytest.raises((DomainError,OSError)):m.verify(target,RESOURCE)
     with pytest.raises(FileExistsError):m.restore(backup,x.root,target,RESOURCE)
@@ -256,3 +256,31 @@ def test_sqlite_writer_freeze_is_held_while_copying_photos(env,monkeypatch):
         return original(*args)
     monkeypatch.setattr(m,'_copy_photos',checked)
     take(x);assert seen==[True]
+
+
+@pytest.mark.parametrize('operation',['snapshot','restore'])
+def test_ready_write_then_fsync_failure_removes_marker(env,monkeypatch,operation):
+    x=env;backup=take(x);target=x.parent/'interrupted';before=stable(x.root)
+    original=m._write_json
+    def failed(path,value):
+        original(path,value)
+        raise OSError('synthetic final fsync failure')
+    monkeypatch.setattr(m,'_write_json',failed)
+    with pytest.raises(DomainError,match='media_storage_io'):
+        if operation=='snapshot':m.snapshot(x.root,target,RESOURCE)
+        else:m.restore(backup,x.root,target,RESOURCE)
+    assert not (target/m.READY).exists() and not (target/candidate.MARKER).exists()
+    assert stable(x.root)==before
+
+
+def test_snapshot_includes_committed_wal_not_just_main_database(env):
+    x=env
+    db=sqlite3.connect(x.root/candidate.DB)
+    try:
+        db.execute('PRAGMA wal_autocheckpoint=0')
+        db.execute('UPDATE users SET display_name=? WHERE id=?',('CI committed WAL state',x.actors[1].user_id));db.commit()
+        assert (x.root/(candidate.DB+'-wal')).stat().st_size>0
+        backup=take(x)
+        with sqlite3.connect(backup/candidate.DB) as copied:
+            assert copied.execute('SELECT display_name FROM users WHERE id=?',(x.actors[1].user_id,)).fetchone()[0]=='CI committed WAL state'
+    finally:db.close()

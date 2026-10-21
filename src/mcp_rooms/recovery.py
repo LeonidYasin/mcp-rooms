@@ -284,6 +284,7 @@ def _report(m):
 def snapshot(source, destination, resource):
     resource=resource_url(resource); source=_root(source); destination=_root(destination)
     _separate(source,destination)
+    if os.path.lexists(destination): raise FileExistsError('recovery_destination_exists')
     with _frozen(source,resource):
         before=_audit(source,resource,already_locked=True)
         schema_hash=_database(source/DB)
@@ -346,6 +347,7 @@ def restore(backup, current, destination, resource):
     resource=resource_url(resource)
     backup,current,destination=(_root(p) for p in (backup,current,destination))
     _separate(backup,current,destination)
+    if os.path.lexists(destination): raise FileExistsError('recovery_destination_exists')
     with _frozen(current,resource) as authority, _lock(backup):
         m=_verify(backup,resource,kind='snapshot')
         if m['origin']!=_origin(current) or m['schema_hash']!=_database(current/DB):

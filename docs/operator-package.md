@@ -1,6 +1,7 @@
 # F3c.1 — закреплённый офлайн wheelhouse
 
-**SOURCE, runtime hash-lock принят отдельным commit; ожидает locked Actions. Не VPS installer.**
+**CI: runtime hash-lock, offline install и native smoke приняты. Не VPS installer.**
+[Exact-source evidence](ci-f3c1.md).
 [Контракт этапа F3c](test-candidate.md), [F3b recovery limits](recovery-candidate.md).
 
 ## Назначение

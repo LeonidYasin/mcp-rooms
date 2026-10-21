@@ -331,7 +331,7 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 - [x] SOURCE: fixed unprivileged Landlock ABI≥3 + seccomp x86_64 before Pillow/input; candidate preflight, no bare fallback.
 - [x] Prepare synthetic file/key/DB read, metadata mutation, network/process denial, unavailable/timeout/reap and installed-wheel integration tests.
 - [x] Exact-SHA `948b4b7a`: Python3.12 709 passed/2 warnings;3.10 648 passed/42 skipped/2 warnings; matrix/native installed smoke/docs green. [Evidence](docs/ci-f3a.md). No VPS/kernel availability claim.
-- [ ] F3b DB+photos restore/current security-state reconciliation, then F3c dependency/capacity/operator package.
+- [x] F3b DB+photos restore/current security-state reconciliation accepted in CI; F3c capacity/operator work remains.
 
 [Threat model / prerequisites / limitations](docs/media-sandbox.md).
 
@@ -349,7 +349,7 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 ## F3c.1 — locked offline wheelhouse
 
 - [x] SOURCE: binary-only dependency discovery, explicit lock adoption, expected-source/hash verifier and allowlisted public archive.
-- [ ] Commit proposed Linux x86_64 CPython3.12 runtime lock after Actions discovery; verify locked download, fresh offline venv and native candidate/recovery smoke.
+- [x] Runtime lock adopted separately; exact-source `fc96fe64` locked download, new offline venv, pip check/native candidate/recovery smoke;789 tests on3.12. [Evidence](docs/ci-f3c1.md).
 - [ ] F3c.2 fresh-only operator install/dry-run/stop/rollback and resource/disk gates remain; this artifact is not a VPS installer.
 
 [Contract and limits](docs/operator-package.md). No remote execution authorized.

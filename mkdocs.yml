@@ -118,6 +118,7 @@ nav:
     - CI TEST candidate F2: docs/ci-f2.md
     - CI native sandbox F3a: docs/ci-f3a.md
     - CI recovery F3b: docs/ci-f3b.md
+    - CI offline wheelhouse F3c.1: docs/ci-f3c1.md
     - CI сайта и публикация: docs/ci-pages.md
     - Итоги исследования: docs/marketplace-research-final.md
     - Проверка кандидатов: docs/candidate-source-checks.md

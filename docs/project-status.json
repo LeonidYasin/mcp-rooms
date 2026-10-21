@@ -347,11 +347,11 @@
     {
       "id": "operator_bundle",
       "title": "Офлайн hash-pinned wheelhouse",
-      "stage": "SOURCE",
-      "summary": "Actions-only discovery → reviewed runtime hash-lock → binary-only offline bundle/install/native smoke; source/hash verifier. Не VPS installer; operator/resources F3c.2 отдельно.",
+      "stage": "CI",
+      "summary": "30 versioned runtime hash pins;31-wheel exact-source public bundle; fresh offline venv/pip check/native candidate+recovery smoke accepted in Actions. Не VPS installer; F3c.2 operator/resources отдельно.",
       "doc": "docs/operator-package.md",
       "source": "tools/operator_bundle.py",
-      "evidence": null,
+      "evidence": "docs/ci-f3c1.md",
       "depends_on": [
         "test_candidate",
         "native_sandbox",

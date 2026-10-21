@@ -195,3 +195,16 @@ First fresh-only TEST не означает независимый production di
 Только после кодовой/CI приёмки пакета — отдельные разрешения на свежий read-only
 VPS preflight, отдельный loopback install и затем HTTPS/external acceptance. Каждое
 удалённое исполнение требует отдельного подтверждения и специального пароля.
+
+
+## F3c.1 принят; F3c.2 — следующий bounded срез
+
+[Dependency hash-lock / offline bundle](operator-package.md) [принят в CI](ci-f3c1.md).
+Следующий срез не меняет бизнес-функции: fresh-only plan/install/health/stop/rollback,
+источник exact-source wheelhouse, отказ от discovery/online fallback, отдельные
+user/unit/paths/port. Только заготовка и тестирование в Actions, не выполнение VPS.
+Проверить interrupted install, existing-target refusal, stale/wrong service identity,
+сохранение БД при stop/rollback, отсутствие воздействия на иные сервисы и секретов
+в выводе. Измерить parent+child и timeout/concurrent/disk fixtures; не выдавать
+RLIMIT_AS child за измеренный RSS/общий MemoryMax. Хостовые лимиты ещё потребуют
+свежего отдельно разрешённого preflight. Не включать auto-promotion recovery copies.

@@ -32,8 +32,8 @@ M3b.3 session binding **не отменён**: paused до возвращени�
 DDL и один worker/upload. F3a [Landlock/seccomp](media-sandbox.md) [принят в exact-SHA CI](ci-f3a.md):709 tests на3.12.
 Candidate обязан отказать до app startup без рабочей политики. F3b [offline recovery quarantine](recovery-candidate.md) [принят в CI](ci-f3b.md):761 tests на3.12.
 Original current authority обязателен; output не compose-ready, все publications withdrawn.
-F3c.1 [offline wheelhouse](operator-package.md) подготовлен (SOURCE); discovery lock
-ещё должен быть принят отдельным commit после Actions. Следующий F3c.2 —
+F3c.1 [offline wheelhouse](operator-package.md) [принят в CI](ci-f3c1.md):789 tests;
+30 runtime hash pins, offline clean venv/native+recovery smoke. Следующий F3c.2 —
 operator install/stop/rollback/resources, без promotion обхода.
 F3c.2 — next_task; recovery promotion/missing-current disaster policy сохранены в
 paused_tasks (RECOVERY-CUTOVER). Ни один из них не означает самовольный deploy.
@@ -61,6 +61,7 @@ framework без измеренного blocker. Исследование кан
 - `test_candidate.py`: отдельный fresh-only операторский профиль и process lock; не VPS installer.
 - `recovery.py`: offline snapshot/restore/verify, оригинальная current authority обязательна,
   output quarantine без profile marker; не autonomous DR/promotion и не MCP endpoint.
+- `tools/operator_bundle.py`: versioned runtime hash-lock, source/hash verifier, public-only offline wheelhouse; не VPS installer.
 - `public_web.py`: explicit opt-in anonymous read-only card/photo; нет feed, формы или cookie writes.
 - `browser_sessions.py`: отдельный bounded session core, browser schema1.
 - `browser_http.py`: opt-in session login/bootstrap/logout bridge; статус в work-state.

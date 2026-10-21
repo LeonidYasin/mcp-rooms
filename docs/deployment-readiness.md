@@ -111,3 +111,14 @@ VPS TEST остаётся подготовительный блок F3c: pinned 
 loopback → HTTPS/external проверки. Один блок может потребовать нескольких срезов/
 коммитов; это не обещание установки за один шаг. F3b требует доступного original
 current security authority; независимый disaster recovery/promotion не закрыт.
+
+
+## Актуализация после F3c.1
+
+[Locked offline wheelhouse принят в CI](ci-f3c1.md): versioned hashes, чистый venv
+без index, native candidate/recovery smoke. Это сокращает остаток F3c до F3c.2:
+reviewed fresh-only operator plan/install/health/stop/rollback и ресурсные/disk
+бюджеты. Затем три отдельно разрешаемых инфраструктурных шага: свежий read-only
+preflight VPS → loopback TEST → HTTPS/external acceptance. Не обещание четырёх
+команд: возможны исправления совместимости. Browser/search/replies не блокируют
+этот узкий TEST, но обязательны для полного marketplace. Production не принят.

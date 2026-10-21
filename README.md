@@ -59,14 +59,13 @@ is not yet accepted.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [F3b](docs/ci-f3b.md), application source
-`6820fc513a34c1d129ca9843f6cc04cbb357a0f2`: Python3.12 **761 passed**.
-Offline DB+photos snapshot/recovery rehearsal: current-auth narrowing, revoke/disable
-checks, no overwrite and no resurrection of published cards; restored copies stay
-quarantined and require the original current authority. Installed-wheel native
-photo + recovery smoke verified. [F3a child isolation](docs/ci-f3a.md) and
-[F2 fresh-only candidate](docs/ci-f2.md) remain. **Not independent disaster recovery,
-a VPS installer or deployment.**
+**Latest accepted checkpoint:** [F3c.1](docs/ci-f3c1.md), source
+`fc96fe641092b1cfc07c6fa25cc2d3a65d0a88ac`: Python3.12 **789 passed**.
+Versioned exact hashes for30 runtime dependencies;31-wheel public offline bundle.
+Fresh venv installation with no index and required hashes, dependency check and
+installed native candidate/recovery smoke verified. [F3b quarantine recovery](docs/ci-f3b.md),
+[F3a child isolation](docs/ci-f3a.md) and [F2 fresh candidate](docs/ci-f2.md) remain.
+**Not a VPS installer, complete F3c or deployment.**
 
 Built on [F1 read-only card](docs/ci-f1.md), [session bridge](docs/ci-m3b2.md),
 [private photo HTTP](docs/ci-m3a2.md) and12 scoped listing tools on top of8 rooms.
@@ -76,7 +75,7 @@ Browser M3b.3 remains mandatory before cookie writes; paused, not dropped.
 [Machine-readable continuation state](docs/work-state.json).
 [Shorter three-gate TEST track](docs/owner-first-test.md) · [candidate contract](docs/test-candidate.md).
 [F3a policy](docs/media-sandbox.md) and [F3b recovery limits](docs/recovery-candidate.md)
-are accepted in CI. Current [F3c.1 offline wheelhouse](docs/operator-package.md) is SOURCE pending lock adoption/CI.
+are accepted in CI. [F3c.1 offline wheelhouse](docs/operator-package.md) is accepted in CI with a versioned runtime hash lock.
 Next F3c.2: fresh-only operator install/stop/rollback and resource acceptance, before
 separately approved VPS checks.
 

@@ -329,6 +329,7 @@ def _cleanup_failed_start(i,receipt):
                     raise ControlError('control_start_recovery_required')
             except FileNotFoundError:continue
     _run(['/usr/bin/systemctl','stop',NAME],25)
+    _run(['/usr/bin/systemctl','reset-failed',NAME],10)
     _,after=_wait_inactive(i)
     return after
 

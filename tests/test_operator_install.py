@@ -145,3 +145,12 @@ def test_exclusive_new_explicit_mode_survives_private_umask(tmp_path):
     assert path.stat().st_mode & 0o777 == 0o644
     with pytest.raises(FileExistsError):m['_new'](path,b'replacement',0o644)
     assert path.read_bytes()==b'fixture'
+
+
+def test_new_directory_explicit_mode_and_existing_refusal(tmp_path):
+    path=tmp_path/'release'
+    old=os.umask(0o077)
+    try:m['_directory'](path,0o755)
+    finally:os.umask(old)
+    assert path.stat().st_mode & 0o777 == 0o755
+    with pytest.raises(FileExistsError):m['_directory'](path,0o755)

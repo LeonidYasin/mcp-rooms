@@ -249,7 +249,9 @@ def main(bundle,source):
         private_bundle=TRUSTED/'bundle';shutil.copytree(bundle,private_bundle)
         installer=runpy.run_path(str(TRUSTED/'tools/operator_install.py'))
         lock=sha256((TRUSTED/'operator/runtime-linux-x86_64-py312.lock').read_bytes()).hexdigest()
-        installed=installer['install'](private_bundle,source,lock,RESOURCE)
+        old_umask=os.umask(0o077)
+        try:installed=installer['install'](private_bundle,source,lock,RESOURCE)
+        finally:os.umask(old_umask)
         created_user=created_base=created_state=created_unit=loaded=True
         assert installed['installed'] and not installed['start_authorized']
         assert installer['inspect']()['checked'] and not (PROFILE).exists()

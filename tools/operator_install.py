@@ -169,6 +169,13 @@ def _lock():
     finally:os.close(fd)
 
 
+def _directory(path,mode):
+    path.mkdir(mode=mode)  # Exclusive creation, never adopt an existing path.
+    fd=os.open(path,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC)
+    try:os.fchmod(fd,mode)
+    finally:os.close(fd)
+
+
 def _new(path,data,mode=0o600):
     fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW|os.O_CLOEXEC,mode)
     # On error preserve the partial new file as a blocked target, never unlink it.
@@ -267,11 +274,11 @@ def install(bundle,source,lock_hash,resource):
         _run(['/usr/sbin/useradd','--system','--user-group','--no-create-home','--home-dir',str(STATE),'--shell','/usr/sbin/nologin',USER])
         identity=_account()
         _absent_unit(NAME);_capacity()
-        BASE.mkdir(mode=0o755);(BASE/'releases').mkdir(mode=0o755)
-        release=BASE/'releases'/source;release.mkdir(mode=0o755)
+        _directory(BASE,0o755);_directory(BASE/'releases',0o755)
+        release=BASE/'releases'/source;_directory(release,0o755)
         STATE.mkdir(mode=0o700);os.chown(STATE,identity['uid'],identity['gid'])
         venv=release/'venv';venv.mkdir(mode=0o700);os.chown(venv,identity['uid'],identity['gid'])
-        wheels=BASE/'wheelhouse';wheels.mkdir(mode=0o755);(wheels/'wheels').mkdir(mode=0o755)
+        wheels=BASE/'wheelhouse';_directory(wheels,0o755);_directory(wheels/'wheels',0o755)
         # Copy only already verified bounded wheel/lock bytes, no archive extraction.
         import shutil
         for original in sorted((Path(bundle)/'wheels').iterdir()):

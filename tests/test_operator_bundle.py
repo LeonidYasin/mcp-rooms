@@ -110,3 +110,18 @@ def test_target_mismatch_refused_before_filesystem(monkeypatch):
     from types import SimpleNamespace
     monkeypatch.setitem(m['_target'].__globals__,'sys',SimpleNamespace(version_info=(3,11)))
     with pytest.raises(Error,match='operator_target_unsupported'):m['_target']()
+
+
+@pytest.mark.parametrize('padding,accepted',[(133006,True),(256*1024,False)])
+def test_wheel_metadata_has_separate_bounded_readme_budget(tmp_path,padding,accepted):
+    # Real pydantic2.14.1 METADATA is133006 bytes; manifest/lock cap stays128KiB.
+    path=wheel(tmp_path,'dependency')
+    with zipfile.ZipFile(path,'w') as z:
+        z.writestr('dependency-1.0.dist-info/METADATA',
+                   'Metadata-Version: 2.1\nName: dependency\nVersion: 1.0\n\n'+'x'*padding)
+    if accepted:
+        assert m['_wheel'](path)['name']=='dependency'
+    else:
+        with pytest.raises(Error,match='operator_invalid_wheel_metadata'):
+            m['_wheel'](path)
+    assert m['MAX_META']==128*1024 and m['MAX_WHEEL_META']==256*1024

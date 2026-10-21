@@ -26,6 +26,7 @@ MAX_FILES=80
 MAX_FILE=48*1024*1024
 MAX_TOTAL=192*1024*1024
 MAX_META=128*1024
+MAX_WHEEL_META=256*1024
 ROOT=Path(__file__).resolve().parents[1]
 
 
@@ -76,7 +77,7 @@ def _wheel(path):
     info=_file(path)
     with zipfile.ZipFile(path) as z:
         names=[i for i in z.infolist() if i.filename.endswith('.dist-info/METADATA')]
-        if len(names)!=1 or names[0].file_size>MAX_META:
+        if len(names)!=1 or names[0].file_size>MAX_WHEEL_META:
             raise BundleError(f'operator_invalid_wheel_metadata:{path.name}:entries={len(names)}:bytes={names[0].file_size if len(names)==1 else -1}')
         # No extracting wheels here. pip performs its own wheel compatibility check.
         msg=BytesParser().parsebytes(z.read(names[0]))

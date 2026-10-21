@@ -21,7 +21,7 @@ operator artifact намеренно проверяется для одного 
 4. Включаются только wheels/runtime.lock/install.lock/manifest.json/OPERATOR.md.
    Запрещены extra files, aliases, unsafe modes/names/target, duplicate dists,
    corrupted bytes/metadata/lock, source/hash mismatch. Bounded80 wheels,48MiB/file,
-   192MiB суммарно, metadata128KiB. Никаких DB, env, real keys/photos/logs.
+   192MiB суммарно, manifest/lock128KiB, wheel METADATA256KiB. Никаких DB, env, real keys/photos/logs.
 5. Новое venv в Actions устанавливается с --no-index --find-links --require-hashes
    --only-binary; pip check и native candidate+recovery smoke из установленного
    wheel. Ни Qwen requirements, ни pytest/dev deps для этого не устанавливаются.

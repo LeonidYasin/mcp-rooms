@@ -59,12 +59,12 @@ is not yet accepted.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [F3c.2b](docs/ci-f3c2b.md), source
-`a51d306e3ca5ca0b664a17494dfe606b379b9558`: Python3.12 **864 passed**.
-Real offline fresh install, authenticated synthetic loopback MCP, occupied-port
-preservation, interrupted-start cleanup, stop/restart with listing/key preservation
-and stop-only rollback accepted in Actions. This is an **unprivileged rehearsal**,
-not root-owned/systemd supervision or VPS deployment. Prior [read-only proposal](docs/ci-f3c2a.md),
+**Latest accepted checkpoint:** [F3c.2c.1](docs/ci-f3c2c1.md), source
+`8b7ef9611973ed615f9b59955cfe493659bd8d81`: Python3.12 **903 passed**.
+Fixed unit review renderer and real isolated systemd/cgroup fixture accepted in
+Actions: parent and TERM-resistant child stopped, aggregate fixture counters read.
+This is **not the real candidate-in-unit test, root installer or VPS capacity acceptance**.
+[Prior offline lifecycle](docs/ci-f3c2b.md), [read-only proposal](docs/ci-f3c2a.md),
 [offline bundle](docs/ci-f3c1.md), [quarantine recovery](docs/ci-f3b.md) and
 [native sandbox](docs/ci-f3a.md) evidence remain separately versioned.
 
@@ -79,7 +79,7 @@ Browser M3b.3 remains mandatory before cookie writes; paused, not dropped.
 are accepted in CI. [F3c.1 offline wheelhouse](docs/operator-package.md) is accepted in CI with a versioned runtime hash lock.
 [F3c.2a operator proposal](docs/operator-plan.md) is accepted in CI: fixed isolated targets and full bundle verification; not host attestation/install.
 Current [F3c.2b unprivileged lifecycle](docs/operator-lifecycle.md): [accepted in CI](docs/ci-f3c2b.md); real offline installation/start/stop/restart, not a systemd installer.
-Current [F3c.2c.1](docs/operator-supervision.md): SOURCE fixed unit renderer and real isolated systemd/cgroup fixture, awaiting Actions.
+Current [F3c.2c.1](docs/operator-supervision.md): [accepted in CI](docs/ci-f3c2c1.md): fixed unit renderer and real isolated systemd/cgroup fixture; not actual candidate-in-unit.
 Remaining F3c.2c.2: root-owned installer and actual candidate aggregate resource tests before separately approved VPS checks.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).

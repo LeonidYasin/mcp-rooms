@@ -1,6 +1,6 @@
 # F3c.2c.1 — fixed unit and cgroup supervision proof
 
-**SOURCE pending exact-source Actions. Not an installer or VPS deployment.**
+**CI: [exact-source evidence](ci-f3c2c1.md). Not an installer or VPS deployment.**
 Part of F3c.2c, not completion of that gate. [Previous lifecycle](operator-lifecycle.md).
 
 ## Fixed candidate unit
@@ -27,7 +27,9 @@ Renderer alone does none of those checks and grants no root operation capability
 
 Dedicated secret-free GitHub-hosted ubuntu24.04 job runs a root-owned ephemeral
 fixture under a different fixed `/run` unit. Non-root DynamicUser process spawns a
-TERM-resistant child; both allocate bounded synthetic memory. Cgroup v2 accounts
+TERM-resistant child; both allocate bounded synthetic memory. A private systemd
+runtime marker signals readiness only after child allocation/TERM handler setup;
+readiness is not inferred from an RSS floor. Cgroup v2 accounts
 memory.current/peak, pids.current and cpu.stat across the group. Stop must remove
 both parent and child despite ignored TERM, respect a bounded stop duration and
 leave no runnable fixture process. Existing fixture paths/loaded units are refused.

@@ -379,7 +379,7 @@ pinning, resource/capacity gates и reviewed operator install/stop/rollback pack
 
 - [x] SOURCE: read-only fixed unit renderer; no autostart/install, provisional review resource ceilings.
 - [x] SOURCE: isolated Actions fixture verifies real cgroup accounting and cleanup of TERM-resistant child.
-- [ ] Exact-source CI acceptance.
+- [x] Exact-source `8b7ef961`:903 tests3.12; isolated systemd cgroup parent/TERM-resistant child stop and accounting. [Evidence](docs/ci-f3c2c1.md).
 - [ ] F3c.2c.2 root-owned installer and real candidate/native resource/timeout/disk acceptance remain.
 
 [Contract](docs/operator-supervision.md). No VPS or main changes authorized.

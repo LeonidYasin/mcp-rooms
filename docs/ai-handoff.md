@@ -36,7 +36,7 @@ F3c.1 [offline wheelhouse](operator-package.md) [принят в CI](ci-f3c1.md)
 30 runtime hash pins, offline clean venv/native+recovery smoke. F3c.2a [read-only proposal](operator-plan.md) [принят в CI](ci-f3c2a.md):826 tests;
 unattested observations, fixed isolated targets, no host probe/effects.
 Current F3c.2b [unprivileged lifecycle rehearsal](operator-lifecycle.md) — [принят в CI](ci-f3c2b.md):864 tests3.12; real offline install/loopback MCP/stop/restart, occupied-port preservation и interrupted-start cleanup. Не root/systemd supervisor.
-Current F3c.2c.1 [unit/cgroup proof](operator-supervision.md) — SOURCE pending Actions.
+Current F3c.2c.1 [unit/cgroup proof](operator-supervision.md) — [accepted in CI](ci-f3c2c1.md):903 tests3.12; real synthetic descendant cleanup/accounting, not actual candidate-in-unit or capacity acceptance.
 F3c.2c.2 root installer/actual candidate resources — next_task; recovery promotion/missing-current disaster policy сохранены в
 paused_tasks (RECOVERY-CUTOVER). Ни один из них не означает самовольный deploy.
 

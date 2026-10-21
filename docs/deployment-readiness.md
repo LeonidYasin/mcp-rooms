@@ -145,3 +145,15 @@ root-owned/systemd installer: F3c.2c должен обеспечить неиз�
 Нет обещания фиксированного числа команд или готового production. Browser writes,
 публичная регистрация/search/replies и disaster-recovery cutover не включены в
 сокращённый TEST и не считаются выполненными.
+
+
+## Актуализация после F3c.2c.1
+
+[Fixed unit renderer и cgroup fixture приняты в CI](ci-f3c2c1.md). Реальный systemd
+на одноразовом Actions runner остановил parent и TERM-resistant child; counters
+сняты для группы. Это не запуск нашего candidate под этим unit и не доказательство
+достаточности VPS. Остаток F3c.2c.2: fresh root-owned installer/pre-effect checks,
+реальный candidate/native photo под unit, aggregate resources/timeout/admission/
+disk и interruption/state preservation. Затем отдельно разрешённые preflight →
+loopback → HTTPS. Не увеличивает продуктовый MVP: browser/search/replies/admin
+по-прежнему не включены в сокращённый owner-first TEST.

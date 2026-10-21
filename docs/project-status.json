@@ -387,11 +387,11 @@
     {
       "id": "operator_supervision",
       "title": "Fixed unit and cgroup supervision proof",
-      "stage": "SOURCE",
-      "summary": "Read-only fixed unit renderer and isolated real systemd/cgroup fixture; no candidate installation or capacity acceptance. Pending Actions.",
+      "stage": "CI",
+      "summary": "Fixed review unit renderer; real isolated systemd/cgroup accounting and TERM-resistant descendant cleanup accepted in Actions. Not actual candidate-in-unit, installer or VPS capacity acceptance.",
       "doc": "docs/operator-supervision.md",
       "source": "tools/operator_unit.py",
-      "evidence": null,
+      "evidence": "docs/ci-f3c2c1.md",
       "depends_on": [
         "operator_lifecycle",
         "operator_plan"

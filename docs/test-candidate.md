@@ -5,6 +5,9 @@
 **Код и CI-кандидат, не разрешение на серверную операцию.** Сейчас никакие реальные
 пользователи/ключи не создаются, VPS/Caddy/unit/main не меняются.
 
+[Exact-SHA F2 CI acceptance](ci-f2.md):686 tests на3.12 плюс installed-wheel native smoke.
+Это не серверная установка или OS sandbox.
+
 ## Отдельный профиль вместо старого installer
 
 Entrypoint `mcp-rooms-test-candidate`; исходник `src/mcp_rooms/test_candidate.py`.
@@ -116,9 +119,11 @@ retention14days. Нет key/DB/photos/state/logs в uploaded paths. Это integ
 зависимостей. Установочный dependency lock/offline wheelhouse, provenance проверка
 на стороне оператора и reviewed install/stop/rollback script ещё не закрыты.
 
-## Следующий bounded gate F3
+## Следующий bounded gate F3a и оставшиеся F3b/F3c
 
-Пока **нельзя называть этот кандидат готовым к VPS TEST**. Нужны:
+Пока **нельзя называть этот кандидат готовым к VPS TEST**. Следующий отдельный
+кодовый срез — только F3a (пункт1 ниже). Остальные пункты остаются F3b/F3c, не
+должны теряться или запускаться на VPS автоматически. Нужны:
 
 1. Реальная OS filesystem/network sandbox native child: отдельно проверить, что он
    не читает parent state/owner.key/БД и не имеет network. RLIMIT/isolated Python —

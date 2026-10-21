@@ -59,20 +59,21 @@ is not yet accepted.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [F1](docs/ci-f1.md), application source
-`c086805e79a788e63c8df9093c9a0bf50c95b479`: Python3.12 **645 passed**.
-Explicit opt-in anonymous read-only published card/photo transport, escaped HTML,
-version-bound photo URLs and withdrawal checks. No external deployment, feed,
-browser editing, in-app replies or automatic marketplace onboarding yet.
+**Latest accepted checkpoint:** [F2](docs/ci-f2.md), application source
+`86e5a3dccfc2637f6a97c0f5f7dcd60f646fc433`: Python3.12 **686 passed**.
+Separate fresh-only TEST profile/bootstrap, no-DDL existing-profile startup, one
+process/decoder/upload, installed-wheel native HTTP/MCP/public/withdraw smoke and
+source-pinned wheel/sdist/checksum artifact. **Not an OS sandbox, VPS installer or deployment.**
 
-Built on [M3b.2 session bridge](docs/ci-m3b2.md), [private photo HTTP](docs/ci-m3a2.md)
-and12 scoped listing MCP tools on top of8 rooms. Cookie authority is NOT forwarded
-to listing/media writes until M3b.3 transaction-time session binding passes;
-that track is paused, not dropped. Default CLI stays rooms-only; signup does not
-grant listing scopes. [Machine-readable continuation state](docs/work-state.json).
-[Shorter owner-first TEST: three major gates, not the full six-stage pilot](docs/owner-first-test.md).
-[F2 candidate](docs/test-candidate.md) adds explicit fresh-only bootstrap and no-DDL
-existing-profile startup; candidate package/CI smoke, not VPS installation or OS sandbox.
+Built on [F1 read-only card](docs/ci-f1.md), [session bridge](docs/ci-m3b2.md),
+[private photo HTTP](docs/ci-m3a2.md) and12 scoped listing tools on top of8 rooms.
+Default CLI stays rooms-only; the explicit candidate has signup/cookie editing off
+and uses a listings-only key. No public registration, feed/search or private replies.
+Browser M3b.3 remains mandatory before cookie writes; paused, not dropped.
+[Machine-readable continuation state](docs/work-state.json).
+[Shorter three-gate TEST track](docs/owner-first-test.md) · [candidate contract](docs/test-candidate.md).
+Next F3a: native child OS filesystem/network isolation, then restore/security state
+and dependency-pinned operator/rollback package before separately approved VPS checks.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).

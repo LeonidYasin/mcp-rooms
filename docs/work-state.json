@@ -4,29 +4,29 @@
   "branch": "feat/standalone-identity",
   "pull_request": 1,
   "accepted": {
-    "source_sha": "c086805e79a788e63c8df9093c9a0bf50c95b479",
-    "evidence": "docs/ci-f1.md",
-    "python312_passed": 645,
+    "source_sha": "86e5a3dccfc2637f6a97c0f5f7dcd60f646fc433",
+    "evidence": "docs/ci-f2.md",
+    "python312_passed": 686,
     "kind": "CI_NOT_DEPLOYMENT"
   },
   "current_slice": {
     "id": "F2",
-    "stage": "SOURCE",
+    "stage": "CI",
     "contract": "docs/test-candidate.md",
     "source": "src/mcp_rooms/test_candidate.py",
     "tests": "tests/test_test_candidate.py",
-    "evidence": null
+    "evidence": "docs/ci-f2.md"
   },
   "next_task": {
-    "id": "F3",
-    "title": "OS decoder isolation, resource budgets and DB+files security-state recovery before VPS TEST",
+    "id": "F3a",
+    "title": "Fail-closed OS filesystem/network isolation for native photo child",
     "contract": "docs/test-candidate.md",
     "acceptance": [
-      "Design and prove native child filesystem/network isolation that denies state/owner key/database access; do not claim RLIMIT is a full sandbox.",
-      "Prepare candidate-specific one-process resource/load/kill acceptance and MemoryMax/CPU/Tasks/disk budgets, without assuming old VPS memory reports are current.",
-      "Prepare a consistent DB+photo snapshot and isolated restore with revoked/disabled security state reconciliation; never expose restored copy publicly.",
-      "Prepare pinned dependency/install manifest and reviewed fresh-target dry-run/install/health/stop/rollback package; do not run remote commands or issue real credentials.",
-      "Require separate owner approval and special password for fresh VPS preflight, then loopback install, then external HTTPS; do not alter main or production."
+      "Choose a minimal reviewed Linux isolation mechanism; prove the child cannot read synthetic parent state/key/database and cannot access network, while parent services still function.",
+      "Prepare a fixed trusted launcher with no client-selected paths/commands, preserve one slot/RLIMIT/kill-reap and deny processing when isolation is unsupported; no silent fallback to plain native child.",
+      "Verify installed-wheel valid native normalization, sandbox-denied file/network probes, unavailable-policy and timeout/child cleanup fixtures in GitHub Actions only.",
+      "Document exact kernel/binary/runtime prerequisites and scope limits without assuming availability on VPS; installing/probing remote software remains separately owner-approved with special password.",
+      "Keep F3b restore/security-state and F3c dependency/operator package/capacity gates visible; no real credentials, main merge, VPS deployment or enabled public registration."
     ]
   },
   "runtime_last_known": {
@@ -68,6 +68,18 @@
         "After this gate, finish automatic onboarding/recovery/retention and typed browser actions, then draft/photo form and real-browser QA."
       ],
       "reason": "Required before browser writes; deferred from MCP-managed read-only first TEST."
+    }
+  ],
+  "queued_tasks": [
+    {
+      "id": "F3b",
+      "title": "Consistent DB+photos isolated restore and revoked/disabled security-state reconciliation",
+      "contract": "docs/test-candidate.md"
+    },
+    {
+      "id": "F3c",
+      "title": "Dependency-pinned reviewed operator package, capacity/rollback acceptance, then separately approved VPS gates",
+      "contract": "docs/test-candidate.md"
     }
   ]
 }

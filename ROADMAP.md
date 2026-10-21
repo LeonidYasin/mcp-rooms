@@ -298,7 +298,7 @@ No main, VPS, public upload/publication or new real scope issuance changed.
 - [x] Подготовить explicit opt-in read-only карточку/фото с повторной public availability проверкой.
 - [x] Подготовить synthetic integration/negative tests и обновлённое consent notice v2.
 - [x] Exact-SHA CI `c086805e`: Python3.12 645 passed/2 warnings; Python3.10 595 passed/31 skipped/2 warnings; matrix/package/docs green. [Evidence](docs/ci-f1.md). CI не считать опубликованным сайтом.
-- [ ] F2 strict fresh composition/bootstrap/package, один worker, без startup DDL.
+- [x] F2 fresh candidate/installed-package smoke, один worker, без startup DDL. Dependency-pinned operator installer remains F3c.
 - [ ] OS/resource isolation, DB+files security-state restore и reviewed rollback.
 - [ ] Отдельно одобренный preflight/изолированный loopback, затем HTTPS TEST.
 
@@ -312,8 +312,15 @@ private replies/admin MVP не объявлен выполненным или о
 - [x] Подготовить schema/fingerprint/permissions check и existing-only no-DDL startup.
 - [x] Один process lock, decoder/upload slot; регистрация/cookie editing off.
 - [x] Подготовить synthetic failure/negative tests, installed-wheel native HTTP/MCP/public smoke и checksum artifact.
-- [ ] Принять exact-SHA CI; не считать кандидата OS-sandboxed VPS install.
+- [x] Exact-SHA CI `86e5a3dc`: Python3.12 686 passed/2 warnings; Python3.10 633 passed/34 skipped/2 warnings; matrix/package/native smoke/artifact/docs green. [Evidence](docs/ci-f2.md). Не OS-sandboxed VPS install.
 - [ ] F3 OS filesystem/network isolation, resource/load budgets, DB+files security-state restore, dependency/operator package.
 - [ ] Только затем отдельно одобренные VPS preflight/loopback/HTTPS gates.
 
 [Контракт и ограничения](docs/test-candidate.md). Никаких real keys, live migration, main или VPS изменений.
+
+### Следующая bounded задача
+
+F3a — только fail-closed filesystem/network изоляция native child с CI proofs.
+F3b — consistent DB+files restore/security-state reconciliation. F3c — dependency
+pinning, resource/capacity gates и reviewed operator install/stop/rollback package.
+Только затем отдельно одобренные VPS действия. Не объединять эти задачи в скрытый rollout.

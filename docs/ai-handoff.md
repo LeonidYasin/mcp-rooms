@@ -27,10 +27,11 @@ MCP Rooms / «Хочу — Предлагаю»: рынок возможност
 Нет browser editing/onboarding/search/replies/admin MCP; это меньший результат.
 M3b.3 session binding **не отменён**: paused до возвращения browser writes.
 [F1 принят в exact-SHA CI](ci-f1.md):645 tests на Python3.12.
-F2 composition/bootstrap/package подготовлен; смотрите work-state для CI acceptance.
+[F2 принят в exact-SHA CI](ci-f2.md):686 tests на3.12 плюс installed-wheel native smoke.
 [Контракт TEST-кандидата](test-candidate.md) описывает fresh-only bootstrap, startup без
-DDL и один worker/upload. Следующий gate F3 — OS isolation/resources/restore/operator
-package, не самовольный deploy.
+DDL и один worker/upload. Следующая bounded задача F3a — только OS filesystem/network isolation child.
+F3b restore/security-state и F3c resources/dependency/operator package остаются
+явно в queued_tasks, не самовольный deploy.
 
 ## Архитектура уже выбрана
 

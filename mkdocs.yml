@@ -112,6 +112,7 @@ nav:
     - CI browser sessions: docs/ci-m3b1.md
     - CI browser HTTP: docs/ci-m3b2.md
     - CI public card F1: docs/ci-f1.md
+    - CI TEST candidate F2: docs/ci-f2.md
     - CI сайта и публикация: docs/ci-pages.md
     - Итоги исследования: docs/marketplace-research-final.md
     - Проверка кандидатов: docs/candidate-source-checks.md

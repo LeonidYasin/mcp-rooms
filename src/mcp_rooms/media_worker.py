@@ -161,7 +161,8 @@ class PhotoWorker:
             except (ValueError,UnicodeError,RecursionError):raise DomainError('media_worker_protocol') from None
             fields={'v','policy','abi','state_denied','db_denied','key_denied_or_absent',
                     'marker_denied','inet_denied','inet6_denied','unix_denied'}
-            if type(result) is dict and set(result)=={'v','error'} and result.get('error') in ERRORS:
+            if (type(result) is dict and set(result)=={'v','error'} and type(result.get('v')) is int
+                    and result['v']==1 and type(result.get('error')) is str and result['error'] in ERRORS):
                 raise DomainError(result['error'])
             if (type(result) is not dict or set(result)!=fields or type(result['v']) is not int
                     or result['v']!=1 or result['policy']!=POLICY or type(result['abi']) is not int

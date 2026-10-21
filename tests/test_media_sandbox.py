@@ -111,7 +111,7 @@ result['socketpair']=blocked(socket.socketpair)
 result['fork']=blocked(os.fork)
 result['signal']=blocked(lambda:os.kill(os.getppid(),0))
 libc=c.CDLL(None,use_errno=True);libc.syscall.restype=c.c_long
-for n in (16,72,73,91,93,189,190,198,199,235,260,261,268,280,129,297,310,311,322,425,426,427,438,450,452,463,466):
+for n in (16,72,73,91,93,189,190,198,199,235,260,261,268,280,129,297,310,311,322,425,426,427,438,141,142,144,203,302,314,448,450,452,463,466):
     c.set_errno(0);rc=libc.syscall(c.c_long(n),0,0,0,0,0,0)
     result['sys'+str(n)]=rc==-1 and c.get_errno()==errno.EPERM
 print(json.dumps(result))
@@ -169,3 +169,23 @@ def test_policy_precedes_decoder_and_input():
     from mcp_rooms import media_worker_child
     source=inspect.getsource(media_worker_child.main)
     assert source.index('abi=enforce(policy)')<source.index('from .media_image import normalize_photo')<source.index('sys.stdin.buffer.readline')
+
+
+@pytest.mark.parametrize('wire',[b'{}',b'[]',b'{"v":1,"error":[]}',
+    b'{"v":true,"error":"media_sandbox_unavailable"}',
+    b'{"v":1,"v":1,"error":"media_sandbox_unavailable"}',b'x'*2049])
+def test_health_protocol_malformed_fails_closed_and_slot_released(state,monkeypatch,wire):
+    child=object();terminated=[]
+    monkeypatch.setattr(m,'_launch_sandbox',lambda *a,**kw:child)
+    monkeypatch.setattr(m,'_exchange',lambda *a:wire)
+    class Pipe:
+        closed=True
+        def close(self):pass
+    class Child:
+        stdin=Pipe();stdout=Pipe()
+    child=Child()
+    monkeypatch.setattr(m,'_terminate',lambda p:terminated.append(p))
+    worker=m.PhotoWorker(max_parallel=1,sandbox=s.NativeSandbox(state))
+    with pytest.raises(DomainError,match='media_worker_protocol'):worker.check_sandbox()
+    assert terminated==[child]
+    assert worker._slots.acquire(False);worker._slots.release()

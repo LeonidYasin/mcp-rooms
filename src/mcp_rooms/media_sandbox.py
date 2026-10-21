@@ -30,7 +30,7 @@ DENIED_SYSCALLS = frozenset({
     16,72,73,90,91,92,93,94,132,188,189,190,197,198,199,235,260,261,268,280,
     # ABI3 does not mediate chmod/chown/xattr/utime/ioctl/fcntl/flock; seccomp must.
     41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,  # all classic socket operations
-    56,57,58,59,62,101,129,155,161,165,166,200,234,297,     # process, ptrace, mount, signal
+    56,57,58,59,62,101,129,141,142,144,155,161,165,166,200,203,234,297,302,314,448,     # process, ptrace, mount, signal
     105,106,113,114,116,117,119,122,123,126,169,175,176,246,
     272,288,299,303,304,307,308,310,311,312,313,320,            # namespaces, socket variants, handles, process_vm
     321,322,323,424,425,426,427,434,435,438,440,    # bpf, execat, uffd, io_uring, pidfd, clone3

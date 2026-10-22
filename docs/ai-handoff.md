@@ -27,12 +27,14 @@ core существует, но M3b.3 transaction-time authority остаётс�
 - Branch: `feat/standalone-identity`; PRs #1–#3 merged into `main` by separate owner
   approvals (2026-10-22). `main` is at the PR #3 merge commit
   `4f08f0ab5fd9efd1363a8639e4031a0420ac1f27`; no tag/release/production attached.
-- Accepted application source SHA: `01d2a93821639efa1a4ad3ab0ca14a2483e4821c`.
-- Evidence: `docs/ci-f3c2d.md`.
+- Accepted application source SHA: `e6116aeff40d0128de90e36ab1b4045d2f8082e1`.
+- Evidence: `docs/ci-f3c2d1.md`.
 - Python 3.10–3.13 CI, build/install smoke и operator systemd supervision successful.
 - Guarded lifecycle controller реализован; это CI, не VPS TEST.
-- Fresh read-only preflight tool принят в CI (990 tests на Python3.12); на VPS он
-  не запускался, PASS preflight не разрешает install/loopback/HTTPS.
+- Preflight-инструмент принят с исправленной seccomp-пробой (991 tests на
+  Python3.12). Первый прогон на VPS 2026-10-22 — STOP по памяти
+  ([отчёт](preflight-vps-2026-10-22.md)): 1.18 GiB available < 2 GiB floor;
+  установка не выполнялась. Нужен хост ≥4 GiB или отдельное решение владельца.
 - Новые изменения идут через `feat/standalone-identity` и отдельные owner-approved
   PR в `main`; merge требует отдельного решения владельца.
 - Старый Rooms TEST остановлен; production MCP Rooms отсутствует.

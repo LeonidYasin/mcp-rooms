@@ -47,7 +47,7 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю». Ос
 
 ## Что подтверждено
 
-На SHA `01d2a93821639efa1a4ad3ab0ca14a2483e4821c` успешно завершены:
+На SHA `e6116aeff40d0128de90e36ab1b4045d2f8082e1` успешно завершены:
 
 - CI на Python 3.10, 3.11, 3.12 и 3.13;
 - build wheel/sdist и import установленного wheel вне checkout;
@@ -72,12 +72,14 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю». Ос
 
 ## Текущая граница
 
-Код F3c.2d — read-only preflight (root-only, без записи, установки и запуска
-сервисов) — присутствует в HEAD и прошёл Actions: Python3.12 **990 passed**.
-Инструмент ни разу не запускался на VPS. Принятый source SHA — `01d2a93…`;
-docs-коммит сверху не меняет принятый source SHA. Gate B по-прежнему требует
-отдельного разрешения владельца и спецпароля; PASS preflight не разрешает install,
-loopback или HTTPS.
+Код F3c.2d.1 — read-only preflight (root-only, без записи, установки и запуска
+сервисов) с исправленной seccomp-пробой — присутствует в HEAD и прошёл Actions:
+Python3.12 **991 passed**. Принятый source SHA — `e6116ae…`; docs-коммит сверху не
+меняет принятый source SHA. Первый прогон на реальном VPS 2026-10-22 завершился
+STOP по памяти: MemAvailable ≈1.18 GiB < 2 GiB floor
+([отчёт](preflight-vps-2026-10-22.md)); установка не выполнялась. Gate B требует
+хост ≥4 GiB и отдельного разрешения владельца со спецпаролем; PASS preflight не
+разрешает install, loopback или HTTPS.
 
 ### Запись мержа (2026-10-22)
 

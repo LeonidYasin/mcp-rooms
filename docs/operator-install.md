@@ -65,10 +65,12 @@ empty trust inputs/receipts remain rejected. See evidence for failures and fixes
 
 ## Next gate checklist — fresh owner-first VPS preflight (prepared, not authorized)
 
-Status: PREPARED tool plus checklist; tool CI-accepted ([F3c.2d](ci-f3c2d.md)),
-never executed on a VPS. No VPS execution is authorized by this document, by that
-tool or by the owner-approved `main` baseline merge. Every list item below still
-requires its own separate owner approval.
+Status: PREPARED tool plus checklist; tool CI-accepted ([F3c.2d.1](ci-f3c2d1.md)).
+The first real run on 2026-10-22 stopped on the memory floor (≈1.18 GiB available
+< 2 GiB) and did not attempt install ([report](preflight-vps-2026-10-22.md)). No VPS
+execution is authorized by this document, by that tool or by the owner-approved
+`main` baseline merge. Every list item below still requires its own separate owner
+approval.
 
 1. Fresh preflight tool: `tools/operator_preflight.py` (CI-accepted). The pinned
    `deploy/vps_preflight.py` targets the historical

@@ -42,9 +42,11 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 - Root-trusted fresh-only install/inspect без запуска.
 - Fixed systemd unit/cgroup и реальный candidate/native fixture в Actions.
 - Guarded capacity/bootstrap/start/stop controller.
-- Read-only fresh VPS preflight tool (`tools/operator_preflight.py`; на VPS не запускался).
-- Accepted source SHA: `01d2a93821639efa1a4ad3ab0ca14a2483e4821c`.
-- Evidence: [F3c.2d](docs/ci-f3c2d.md).
+- Read-only fresh VPS preflight tool (`tools/operator_preflight.py`; один read-only прогон на VPS, без установки).
+- Accepted source SHA: `e6116aeff40d0128de90e36ab1b4045d2f8082e1`.
+- Evidence: [F3c.2d.1](docs/ci-f3c2d1.md).
+- 2026-10-22: первый read-only preflight на VPS — STOP по памяти
+  ([отчёт](docs/preflight-vps-2026-10-22.md)); seccomp-проверка исправлена в CI.
 - 2026-10-22: базовая alpha принята владельцем и объединена в `main` (линейная история,
   SHA `7c1bd3b9…`); тег/релиз/production не созданы.
 - 2026-10-22: F3c.2d принят владельцем и смержен в `main`
@@ -64,7 +66,8 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 
 Требует отдельного разрешения и специального пароля.
 
-- [x] Read-only инструмент `tools/operator_preflight.py` принят в CI ([F3c.2d](docs/ci-f3c2d.md)); на VPS не запускался.
+- [x] Read-only инструмент `tools/operator_preflight.py` принят в CI ([F3c.2d.1](docs/ci-f3c2d1.md)); на VPS не запускался.
+- [x] Первый прогон на VPS выполнен ([отчёт](docs/preflight-vps-2026-10-22.md)): STOP по памяти (1.18 GiB < 2 GiB floor); установка не выполнялась.
 - [ ] Проверить trusted `/usr/bin/python3.12`, Linux x86_64, cgroup v2 и Landlock/seccomp.
 - [ ] Проверить свободные новые user/group/unit/paths/port без изменения хоста.
 - [ ] Проверить RAM, disk, inode и filesystem ancestor safety.

@@ -8,10 +8,10 @@ for the owner-first phase is an anonymous **read-only storefront** for explicitl
 cards and photos; browser marketplace writes, feed/search, private responses and admin MCP
 remain later gates.
 
-Accepted application source: `01d2a93821639efa1a4ad3ab0ca14a2483e4821c`
-([F3c.2d evidence](docs/ci-f3c2d.md)): read-only VPS preflight tool accepted in CI.
-The later documentation commit does not change that accepted checkpoint. No production
-deployment is implied.
+Accepted application source: `e6116aeff40d0128de90e36ab1b4045d2f8082e1`
+([F3c.2d.1 evidence](docs/ci-f3c2d1.md)): read-only VPS preflight with corrected
+seccomp validation. The later documentation commit does not change that accepted
+checkpoint. No production deployment is implied.
 
 **MCP-first marketplace for people and AI agents — built on shared rooms and SQLite.** MIT.
 
@@ -104,7 +104,7 @@ Current [F3c.2c.1](docs/operator-supervision.md): [accepted in CI](docs/ci-f3c2c
 Current [F3c.2c.2](docs/candidate-unit-ci.md): [accepted in CI](docs/ci-f3c2c2.md): real installed candidate under exact unit, native photo/body admission/timeouts and aggregate fixture measurements.
 Current [F3c.2c.3a install/inspect](docs/operator-install.md): [accepted in CI](docs/ci-f3c2c3a.md); actual fresh-only installer, no bootstrap/start.
 Previous [F3c.2c.3b guarded controller](docs/operator-install.md): [accepted in CI](docs/ci-f3c2c3b.md); separately authorized capacity/bootstrap/start/stop, never run on a VPS.
-Current [F3c.2d read-only VPS preflight](tools/operator_preflight.py): [accepted in CI](docs/ci-f3c2d.md); root-console read-only checks, never executed on a VPS. Next: the separately approved host preflight itself.
+Current [F3c.2d.1 read-only VPS preflight](tools/operator_preflight.py): [accepted in CI](docs/ci-f3c2d1.md) with a live seccomp filter probe; the first VPS run on 2026-10-22 [stopped on the memory floor](docs/preflight-vps-2026-10-22.md) (1.18 GiB available < 2 GiB), and no install was attempted.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).

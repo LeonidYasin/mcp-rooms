@@ -41,6 +41,7 @@ SECCOMP_ACTIONS=frozenset({'kill_process','errno'})
 SECCOMP_SYSCALL=317
 SECCOMP_SET_MODE_FILTER=1
 SECCOMP_RET_ALLOW=0x7fff0000
+PR_SET_NO_NEW_PRIVS=38
 BPF_RET_K=0x06
 ENV={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','PYTHONUTF8':'1'}
 
@@ -128,9 +129,11 @@ def _seccomp_filter():
         raise PreflightError('preflight_seccomp_unavailable') from None
     if pid==0:
         try:
+            libc=_libc()
+            if libc.prctl(PR_SET_NO_NEW_PRIVS,1,0,0,0)!=0:os._exit(1)
             flt=(_SockFilter*1)(_SockFilter(BPF_RET_K,0,0,SECCOMP_RET_ALLOW))
             prog=_SockFprog(1,flt)
-            result=_libc().syscall(c.c_long(SECCOMP_SYSCALL),c.c_uint(SECCOMP_SET_MODE_FILTER),
+            result=libc.syscall(c.c_long(SECCOMP_SYSCALL),c.c_uint(SECCOMP_SET_MODE_FILTER),
                 c.c_size_t(0),c.c_void_p(c.addressof(prog)))
             os._exit(0 if result==0 else 1)
         except BaseException:

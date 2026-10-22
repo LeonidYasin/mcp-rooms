@@ -181,8 +181,14 @@ def test_capacity_refuses_each_floor(capacity,monkeypatch,kind,code):
     with pytest.raises(Error,match=code):m['_capacity']()
 
 
-def test_capacity_observation_failure_is_typed(capacity,monkeypatch,tmp_path):
+def test_memory_observation_failure_is_typed(monkeypatch,tmp_path):
     monkeypatch.setitem(g,'MEMINFO',tmp_path/'missing')
+    with pytest.raises(Error,match='preflight_capacity_observation_failed'):m['_available_memory']()
+
+
+def test_capacity_statvfs_failure_is_typed(capacity,monkeypatch):
+    def refused(path):raise OSError('private detail')
+    monkeypatch.setattr(g['os'],'statvfs',refused)
     with pytest.raises(Error,match='preflight_capacity_observation_failed'):m['_capacity']()
 
 

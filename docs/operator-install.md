@@ -65,10 +65,12 @@ empty trust inputs/receipts remain rejected. See evidence for failures and fixes
 
 ## Next gate checklist — fresh owner-first VPS preflight (prepared, not authorized)
 
-Status: PREPARED tool plus checklist; tool CI-accepted ([F3c.2d](ci-f3c2d.md)),
-never executed on a VPS. No VPS execution is authorized by this document, by that
-tool or by the owner-approved `main` baseline merge. Every list item below still
-requires its own separate owner approval.
+Status: PREPARED tool plus checklist; tool CI-accepted ([F3c.2d.1](ci-f3c2d1.md)).
+The first real run on 2026-10-22 stopped on the memory floor (≈1.18 GiB available
+< 2 GiB) and did not attempt install ([report](preflight-vps-2026-10-22.md)). No VPS
+execution is authorized by this document, by that tool or by the owner-approved
+`main` baseline merge. Every list item below still requires its own separate owner
+approval.
 
 1. Fresh preflight tool: `tools/operator_preflight.py` (CI-accepted). The pinned
    `deploy/vps_preflight.py` targets the historical
@@ -76,7 +78,9 @@ requires its own separate owner approval.
    The new tool is root-only operator-console, read-only, checksum-pinnable and
    emits sanitized JSON only. It verifies: trusted canonical `/usr/bin/python3.12`
    with root-owned stdlib and a 3.12 version probe; Linux x86_64; cgroup v2;
-   Landlock ABI>=3 via the version syscall; required seccomp filter actions;
+   Landlock ABI>=3 via the version syscall; seccomp action availability
+   (`kill_process`, `errno`) plus a live allow-all filter-install probe in a
+   forked child (the string `filter` is a mode, not an action);
    absence of the planned fresh account/group, candidate and build units, release/
    state paths and control-lock directory; candidate loopback port 8766 not
    listening (parsed from `/proc/net/tcp{,6}`, no connect probe); safe

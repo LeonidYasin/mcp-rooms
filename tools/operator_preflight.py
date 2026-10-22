@@ -37,8 +37,21 @@ BASE_FREE_FLOOR=2*1024**3
 STATE_FREE_FLOOR=4*1024**3
 INODE_FREE_FLOOR=65536
 LANDLOCK_ABI_FLOOR=3
-SECCOMP_REQUIRED=frozenset({'filter','kill_process','errno'})
+SECCOMP_ACTIONS=frozenset({'kill_process','errno'})
+SECCOMP_SYSCALL=317
+SECCOMP_SET_MODE_FILTER=1
+SECCOMP_RET_ALLOW=0x7fff0000
+PR_SET_NO_NEW_PRIVS=38
+BPF_RET_K=0x06
 ENV={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','PYTHONUTF8':'1'}
+
+
+class _SockFilter(c.Structure):
+    _fields_=(('code',c.c_ushort),('jt',c.c_ubyte),('jf',c.c_ubyte),('k',c.c_uint32))
+
+
+class _SockFprog(c.Structure):
+    _fields_=(('len',c.c_ushort),('filter',c.POINTER(_SockFilter)))
 
 
 class PreflightError(Exception):pass
@@ -110,12 +123,36 @@ def _landlock():
     return {'abi':abi,'floor':LANDLOCK_ABI_FLOOR}
 
 
+def _seccomp_filter():
+    try:pid=os.fork()
+    except (AttributeError,OSError):
+        raise PreflightError('preflight_seccomp_unavailable') from None
+    if pid==0:
+        try:
+            libc=_libc()
+            if libc.prctl(PR_SET_NO_NEW_PRIVS,1,0,0,0)!=0:os._exit(1)
+            flt=(_SockFilter*1)(_SockFilter(BPF_RET_K,0,0,SECCOMP_RET_ALLOW))
+            prog=_SockFprog(1,flt)
+            result=libc.syscall(c.c_long(SECCOMP_SYSCALL),c.c_uint(SECCOMP_SET_MODE_FILTER),
+                c.c_size_t(0),c.c_void_p(c.addressof(prog)))
+            os._exit(0 if result==0 else 1)
+        except BaseException:
+            os._exit(2)
+    try:_,status=os.waitpid(pid,0)
+    except (AttributeError,OSError):
+        raise PreflightError('preflight_seccomp_unavailable') from None
+    if not os.WIFEXITED(status) or os.WEXITSTATUS(status)!=0:
+        raise PreflightError('preflight_seccomp_unavailable')
+    return True
+
+
 def _seccomp():
     try:actions=frozenset(SECCOMP.read_text().split())
     except (OSError,UnicodeError):
         raise PreflightError('preflight_seccomp_unavailable') from None
-    if not SECCOMP_REQUIRED<=actions:raise PreflightError('preflight_seccomp_unavailable')
-    return {'filter_supported':True,'required_actions':sorted(SECCOMP_REQUIRED)}
+    if not SECCOMP_ACTIONS<=actions:raise PreflightError('preflight_seccomp_unavailable')
+    _seccomp_filter()
+    return {'filter_supported':True,'required_actions':sorted(SECCOMP_ACTIONS)}
 
 
 def _identity():

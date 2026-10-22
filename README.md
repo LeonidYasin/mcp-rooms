@@ -8,9 +8,10 @@ for the owner-first phase is an anonymous **read-only storefront** for explicitl
 cards and photos; browser marketplace writes, feed/search, private responses and admin MCP
 remain later gates.
 
-Accepted application source: `88eabfb35aa7cc763d85352e3e67a48e9d5fb97f`
-([F3c.2c.3b evidence](docs/ci-f3c2c3b.md)). The later documentation/fix commit does not
-change that accepted application checkpoint. No production deployment is implied.
+Accepted application source: `01d2a93821639efa1a4ad3ab0ca14a2483e4821c`
+([F3c.2d evidence](docs/ci-f3c2d.md)): read-only VPS preflight tool accepted in CI.
+The later documentation commit does not change that accepted checkpoint. No production
+deployment is implied.
 
 **MCP-first marketplace for people and AI agents — built on shared rooms and SQLite.** MIT.
 
@@ -73,7 +74,7 @@ is not yet accepted.
 
 ## Execution plan and current source slice
 
-**Latest accepted checkpoint:** [F3c.2c.3a](docs/ci-f3c2c3a.md), source
+**Latest accepted install checkpoint:** [F3c.2c.3a](docs/ci-f3c2c3a.md), source
 `e63134e077902d59a455f183de00e59760d3f453`: Python3.12 **939 passed**.
 Actual fresh-only offline install/inspect accepted, no bootstrap/start/enable;
 existing install refused, sealed root code/ready-last receipt.
@@ -100,8 +101,8 @@ Current [F3c.2b unprivileged lifecycle](docs/operator-lifecycle.md): [accepted i
 Current [F3c.2c.1](docs/operator-supervision.md): [accepted in CI](docs/ci-f3c2c1.md): fixed unit renderer and real isolated systemd/cgroup fixture; not actual candidate-in-unit.
 Current [F3c.2c.2](docs/candidate-unit-ci.md): [accepted in CI](docs/ci-f3c2c2.md): real installed candidate under exact unit, native photo/body admission/timeouts and aggregate fixture measurements.
 Current [F3c.2c.3a install/inspect](docs/operator-install.md): [accepted in CI](docs/ci-f3c2c3a.md); actual fresh-only installer, no bootstrap/start.
-Current [F3c.2c.3b guarded controller](docs/operator-install.md): [accepted in CI](docs/ci-f3c2c3b.md); separately authorized capacity/bootstrap/start/stop, never run on a VPS.
-Next: fresh read-only VPS preflight tool [`tools/operator_preflight.py`](tools/operator_preflight.py) prepared as SOURCE (exact-HEAD CI acceptance pending) for the separately approved host preflight.
+Previous [F3c.2c.3b guarded controller](docs/operator-install.md): [accepted in CI](docs/ci-f3c2c3b.md); separately authorized capacity/bootstrap/start/stop, never run on a VPS.
+Current [F3c.2d read-only VPS preflight](tools/operator_preflight.py): [accepted in CI](docs/ci-f3c2d.md); root-console read-only checks, never executed on a VPS. Next: the separately approved host preflight itself.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).

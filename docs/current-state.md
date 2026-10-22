@@ -47,12 +47,13 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю». Ос
 
 ## Что подтверждено
 
-На SHA `88eabfb35aa7cc763d85352e3e67a48e9d5fb97f` успешно завершены:
+На SHA `01d2a93821639efa1a4ad3ab0ca14a2483e4821c` успешно завершены:
 
 - CI на Python 3.10, 3.11, 3.12 и 3.13;
 - build wheel/sdist и import установленного wheel вне checkout;
 - installed owner-first candidate smoke на поддерживаемых версиях;
 - operator systemd supervision proof с реальным disposable systemd/cgroup fixture;
+- тесты нового read-only preflight-инструмента;
 - GitHub Pages/documentation workflows.
 
 Это подтверждает код и синтетический Actions-сценарий. Это **не** подтверждает ёмкость
@@ -71,11 +72,12 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю». Ос
 
 ## Текущая граница
 
-Код F3c.2c.3b — guarded bootstrap/start-stop controller и принятые runtime/disk
-критерии — присутствует в HEAD и прошёл Actions. Предыдущий `work-state.json` отставал
-и всё ещё называл этот срез следующим. Данное обновление закрывает расхождение:
-принятый application source SHA становится `88eabfb…`; docs-коммит сверху не меняет
-принятый source SHA.
+Код F3c.2d — read-only preflight (root-only, без записи, установки и запуска
+сервисов) — присутствует в HEAD и прошёл Actions: Python3.12 **990 passed**.
+Инструмент ни разу не запускался на VPS. Принятый source SHA — `01d2a93…`;
+docs-коммит сверху не меняет принятый source SHA. Gate B по-прежнему требует
+отдельного разрешения владельца и спецпароля; PASS preflight не разрешает install,
+loopback или HTTPS.
 
 ### Запись мержа (2026-10-22)
 

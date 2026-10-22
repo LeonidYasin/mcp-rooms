@@ -23,20 +23,20 @@
     ]
   },
   "accepted": {
-    "source_sha": "88eabfb35aa7cc763d85352e3e67a48e9d5fb97f",
-    "evidence": "docs/ci-f3c2c3b.md",
-    "ci": "Python 3.10-3.13 success; build/install smoke success; operator systemd supervision success",
+    "source_sha": "01d2a93821639efa1a4ad3ab0ca14a2483e4821c",
+    "evidence": "docs/ci-f3c2d.md",
+    "ci": "Python 3.10-3.13 success; build/install smoke success; operator systemd supervision success; read-only preflight tests",
     "kind": "CI_NOT_DEPLOYMENT",
-    "python312_passed": 960
+    "python312_passed": 990
   },
   "current_slice": {
-    "id": "F3c.2c.3b",
+    "id": "F3c.2d",
     "stage": "CI",
     "contract": "docs/operator-install.md",
-    "source": "tools/operator_control.py",
-    "tests": "tests/test_operator_control.py",
-    "evidence": "docs/ci-f3c2c3b.md",
-    "summary": "Guarded capacity/bootstrap/start/stop controller over the accepted fresh installer and actual-unit harness."
+    "source": "tools/operator_preflight.py",
+    "tests": "tests/test_operator_preflight.py",
+    "evidence": "docs/ci-f3c2d.md",
+    "summary": "Root-console read-only fresh VPS preflight: trusted python3.12, host/cgroup/Landlock/seccomp, candidate absence/port, ancestors, capacity floors, protected units; sanitized JSON. Never executed on a VPS."
   },
   "next_task": {
     "id": "OWNER-FIRST-VPS-PREFLIGHT",
@@ -101,11 +101,5 @@
       "reason": "Required before broader public onboarding, not part of the owner-first TEST."
     }
   ],
-  "queued_tasks": [
-    {
-      "id": "F3c.2d-PREFLIGHT-TOOL",
-      "title": "Fresh read-only VPS preflight tool prepared as SOURCE",
-      "reason": "tools/operator_preflight.py implements the separately approved OWNER-FIRST-VPS-PREFLIGHT checks without executing them; CI acceptance on the exact commit is pending and must be recorded before any host use."
-    }
-  ]
+  "queued_tasks": []
 }

@@ -65,14 +65,13 @@ empty trust inputs/receipts remain rejected. See evidence for failures and fixes
 
 ## Next gate checklist — fresh owner-first VPS preflight (prepared, not authorized)
 
-Status: PREPARED tool plus checklist. `tools/operator_preflight.py` implements the
-read-only checks below as SOURCE; exact-HEAD Actions acceptance is still pending.
-No VPS execution is authorized by this document, by that tool or by the
-owner-approved `main` baseline merge. Every list item below still requires its own
-separate owner approval.
+Status: PREPARED tool plus checklist; tool CI-accepted ([F3c.2d](ci-f3c2d.md)),
+never executed on a VPS. No VPS execution is authorized by this document, by that
+tool or by the owner-approved `main` baseline merge. Every list item below still
+requires its own separate owner approval.
 
-1. Fresh preflight tool: `tools/operator_preflight.py` (SOURCE, not yet
-   CI-accepted). The pinned `deploy/vps_preflight.py` targets the historical
+1. Fresh preflight tool: `tools/operator_preflight.py` (CI-accepted). The pinned
+   `deploy/vps_preflight.py` targets the historical
    rooms-only TEST wiring; do NOT reuse it as the marketplace-candidate preflight.
    The new tool is root-only operator-console, read-only, checksum-pinnable and
    emits sanitized JSON only. It verifies: trusted canonical `/usr/bin/python3.12`

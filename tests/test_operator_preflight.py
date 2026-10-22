@@ -221,6 +221,10 @@ def test_protected_services_must_stay_active(monkeypatch):
     with pytest.raises(Error,match='preflight_protected_service_not_active'):m['_protected'](('dead.service',))
 
 
+def test_default_protected_set_includes_vpn_panel():
+    assert m['PROTECTED']==('mcp-server.service','mcp-test.service','caddy.service','x-ui.service')
+
+
 def happy(monkeypatch):
     calls=[]
     monkeypatch.setitem(g,'_host',lambda:(calls.append('host') or {'root_console':True}))

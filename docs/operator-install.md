@@ -66,11 +66,11 @@ empty trust inputs/receipts remain rejected. See evidence for failures and fixes
 ## Next gate checklist — fresh owner-first VPS preflight (prepared, not authorized)
 
 Status: PREPARED tool plus checklist; tool CI-accepted ([F3c.2d.1](ci-f3c2d1.md)).
-The first real run on 2026-10-22 stopped on the memory floor (≈1.18 GiB available
-< 2 GiB) and did not attempt install ([report](preflight-vps-2026-10-22.md)). No VPS
-execution is authorized by this document, by that tool or by the owner-approved
-`main` baseline merge. Every list item below still requires its own separate owner
-approval.
+The first real run on 2026-10-22 stopped on the memory floor and did not attempt
+install; after a RAM upgrade to 4 GiB the rerun passed
+([report](preflight-vps-2026-10-22-4gb.md)). No install execution is authorized by
+this document, by that tool or by the owner-approved `main` baseline merge. Every
+list item below still requires its own separate owner approval.
 
 1. Fresh preflight tool: `tools/operator_preflight.py` (CI-accepted). The pinned
    `deploy/vps_preflight.py` targets the historical
@@ -87,7 +87,10 @@ approval.
    non-writable canonical ancestors (`/opt`, `/var/lib`, unit dir, run dir);
    MemAvailable >=2GiB, install FS free >=2GiB, state FS free >=4GiB and
    >=65536 free inodes; LoadState/ActiveState/SubState/MainPID only of the
-   protected selected units. It never reads Caddy configuration, databases,
+   protected selected units. Default protected units are `mcp-server.service`,
+   `mcp-test.service`, `caddy.service` and `x-ui.service`; `x-ui` hosts the 3x-ui
+   panel and its managed Xray VPN, so a separate VPN unit (if present) must be
+   added explicitly. It never reads Caddy configuration, databases,
    keys or private logs, and it never writes, installs, starts or restarts.
    STOP exits with specific safe codes (for example
    `preflight_candidate_identity_exists`, `preflight_candidate_port_in_use`,
@@ -108,6 +111,7 @@ approval.
    capacity: it must not claim VPS capacity acceptance, DoS resistance or SLA.
    A PASS is not install/bootstrap/start authorization.
 
-Landlock has not yet been checked on the real VPS; previously supplied reserves
-(≈15GiB disk, ≈1.1GiB available RAM) are historical preflight data, not a current
-probe and not the fresh-candidate preflight record.
+Landlock and seccomp were checked on the real VPS on 2026-10-22 (ABI 4 and a live
+filter install, respectively) in the [4 GiB rerun](preflight-vps-2026-10-22-4gb.md).
+Previously supplied reserves (≈15GiB disk, ≈1.1GiB available RAM) are historical
+preflight data, not a current probe and not the fresh-candidate preflight record.

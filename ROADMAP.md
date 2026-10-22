@@ -47,6 +47,10 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 - Evidence: [F3c.2d.1](docs/ci-f3c2d1.md).
 - 2026-10-22: первый read-only preflight на VPS — STOP по памяти
   ([отчёт](docs/preflight-vps-2026-10-22.md)); seccomp-проверка исправлена в CI.
+- 2026-10-22: после апгрейда до 4 GiB повторный preflight — PASS
+  ([отчёт](docs/preflight-vps-2026-10-22-4gb.md)); установка не выполнялась.
+- 2026-10-22: `x-ui.service` (3x-ui-панель и managed Xray VPN) добавлен в
+  дефолтный protected-набор preflight; установка не выполнялась.
 - 2026-10-22: базовая alpha принята владельцем и объединена в `main` (линейная история,
   SHA `7c1bd3b9…`); тег/релиз/production не созданы.
 - 2026-10-22: F3c.2d принят владельцем и смержен в `main`
@@ -68,6 +72,7 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 
 - [x] Read-only инструмент `tools/operator_preflight.py` принят в CI ([F3c.2d.1](docs/ci-f3c2d1.md)); на VPS не запускался.
 - [x] Первый прогон на VPS выполнен ([отчёт](docs/preflight-vps-2026-10-22.md)): STOP по памяти (1.18 GiB < 2 GiB floor); установка не выполнялась.
+- [x] Повторный прогон после апгрейда до 4 GiB — PASS ([отчёт](docs/preflight-vps-2026-10-22-4gb.md)); установка не выполнялась.
 - [ ] Проверить trusted `/usr/bin/python3.12`, Linux x86_64, cgroup v2 и Landlock/seccomp.
 - [ ] Проверить свободные новые user/group/unit/paths/port без изменения хоста.
 - [ ] Проверить RAM, disk, inode и filesystem ancestor safety.

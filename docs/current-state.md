@@ -54,6 +54,7 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю». Ос
 - installed owner-first candidate smoke на поддерживаемых версиях;
 - operator systemd supervision proof с реальным disposable systemd/cgroup fixture;
 - тесты нового read-only preflight-инструмента;
+- повторный read-only preflight после апгрейда до 4 GiB — PASS; установка не выполнялась;
 - GitHub Pages/documentation workflows.
 
 Это подтверждает код и синтетический Actions-сценарий. Это **не** подтверждает ёмкость
@@ -76,10 +77,12 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю». Ос
 сервисов) с исправленной seccomp-пробой — присутствует в HEAD и прошёл Actions:
 Python3.12 **991 passed**. Принятый source SHA — `e6116ae…`; docs-коммит сверху не
 меняет принятый source SHA. Первый прогон на реальном VPS 2026-10-22 завершился
-STOP по памяти: MemAvailable ≈1.18 GiB < 2 GiB floor
-([отчёт](preflight-vps-2026-10-22.md)); установка не выполнялась. Gate B требует
-хост ≥4 GiB и отдельного разрешения владельца со спецпаролем; PASS preflight не
-разрешает install, loopback или HTTPS.
+STOP по памяти ([отчёт](preflight-vps-2026-10-22.md)); после апгрейда до 4 GiB
+повторный прогон — PASS, MemAvailable ≈3.07 GiB
+([отчёт](preflight-vps-2026-10-22-4gb.md)); `x-ui.service` (3x-ui/VPN) добавлен
+в дефолтный protected-набор. PR #4 смержен (`main` = `fd2f616`). Установка не
+выполнялась и требует отдельного разрешения владельца со спецпаролем; PASS
+preflight не разрешает install, loopback или HTTPS.
 
 ### Запись мержа (2026-10-22)
 

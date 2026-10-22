@@ -33,8 +33,12 @@ core существует, но M3b.3 transaction-time authority остаётс�
 - Guarded lifecycle controller реализован; это CI, не VPS TEST.
 - Preflight-инструмент принят с исправленной seccomp-пробой (991 tests на
   Python3.12). Первый прогон на VPS 2026-10-22 — STOP по памяти
-  ([отчёт](preflight-vps-2026-10-22.md)): 1.18 GiB available < 2 GiB floor;
-  установка не выполнялась. Нужен хост ≥4 GiB или отдельное решение владельца.
+  ([отчёт](preflight-vps-2026-10-22.md)); после апгрейда до 4 GiB повторный
+  прогон — PASS ([отчёт](preflight-vps-2026-10-22-4gb.md)), 3.07 GiB available.
+  Установка не выполнялась.
+- PR #4 смержен владельцем; `main` = `fd2f616`. PASS-отчёт и `x-ui.service`
+  (3x-ui-панель и managed Xray VPN) в дефолтном protected-наборе идут отдельным
+  PR; установка по-прежнему требует отдельного разрешения.
 - Новые изменения идут через `feat/standalone-identity` и отдельные owner-approved
   PR в `main`; merge требует отдельного решения владельца.
 - Старый Rooms TEST остановлен; production MCP Rooms отсутствует.
@@ -43,7 +47,8 @@ core существует, но M3b.3 transaction-time authority остаётс�
 
 Fresh isolated owner-first TEST:
 
-1. отдельно разрешённый read-only VPS preflight;
+1. read-only VPS preflight выполнен (PASS 2026-10-22;
+   [отчёт](preflight-vps-2026-10-22-4gb.md));
 2. отдельно разрешённая fresh loopback install/bootstrap/start/synthetic acceptance;
 3. отдельно разрешённый временный HTTPS и external MCP acceptance;
 4. одна реальная карточка с реальными фото и явным согласием;

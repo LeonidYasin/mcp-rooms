@@ -104,7 +104,7 @@ Current [F3c.2c.1](docs/operator-supervision.md): [accepted in CI](docs/ci-f3c2c
 Current [F3c.2c.2](docs/candidate-unit-ci.md): [accepted in CI](docs/ci-f3c2c2.md): real installed candidate under exact unit, native photo/body admission/timeouts and aggregate fixture measurements.
 Current [F3c.2c.3a install/inspect](docs/operator-install.md): [accepted in CI](docs/ci-f3c2c3a.md); actual fresh-only installer, no bootstrap/start.
 Previous [F3c.2c.3b guarded controller](docs/operator-install.md): [accepted in CI](docs/ci-f3c2c3b.md); separately authorized capacity/bootstrap/start/stop, never run on a VPS.
-Current [F3c.2d.1 read-only VPS preflight](tools/operator_preflight.py): [accepted in CI](docs/ci-f3c2d1.md) with a live seccomp filter probe; the first VPS run on 2026-10-22 [stopped on the memory floor](docs/preflight-vps-2026-10-22.md) (1.18 GiB available < 2 GiB), and no install was attempted.
+Current [F3c.2d.1 read-only VPS preflight](tools/operator_preflight.py): [accepted in CI](docs/ci-f3c2d1.md) with a live seccomp filter probe; after a RAM upgrade to 4 GiB the rerun [passed](docs/preflight-vps-2026-10-22-4gb.md) (3.07 GiB available), and the default protected set now includes `x-ui.service` (3x-ui/VPN). No install was attempted; install requires separate owner approval.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).

@@ -445,7 +445,7 @@
       "summary": "Root-console read-only checks для fresh-кандидата: trusted python3.12, Linux x86_64, cgroup v2, Landlock ABI≥3, seccomp actions + живая allow-all filter-проба, absence кандидатных account/unit/path/port, ancestor modes, capacity floors и состояние защищённых units; только sanitized JSON. Дефолтный protected-набор включает caddy, mcp-server, mcp-test и x-ui (3x-ui/VPN). Первый прогон — STOP по памяти, после апгрейда до 4 GiB повторный — PASS; установка не выполнялась.",
       "doc": "docs/operator-install.md",
       "source": "tools/operator_preflight.py",
-      "evidence": "docs/ci-f3c2d1.md",
+      "evidence": "docs/ci-f3c2d2.md",
       "depends_on": [
         "operator_control"
       ]

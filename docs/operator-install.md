@@ -65,7 +65,7 @@ empty trust inputs/receipts remain rejected. See evidence for failures and fixes
 
 ## Next gate checklist — fresh owner-first VPS preflight (prepared, not authorized)
 
-Status: PREPARED tool plus checklist; tool CI-accepted ([F3c.2d.1](ci-f3c2d1.md)).
+Status: PREPARED tool plus checklist; tool CI-accepted ([F3c.2d.2](ci-f3c2d2.md)).
 The first real run on 2026-10-22 stopped on the memory floor and did not attempt
 install; after a RAM upgrade to 4 GiB the rerun passed
 ([report](preflight-vps-2026-10-22-4gb.md)). No install execution is authorized by

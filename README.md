@@ -8,10 +8,11 @@ for the owner-first phase is an anonymous **read-only storefront** for explicitl
 cards and photos; browser marketplace writes, feed/search, private responses and admin MCP
 remain later gates.
 
-Accepted application source: `e6116aeff40d0128de90e36ab1b4045d2f8082e1`
-([F3c.2d.1 evidence](docs/ci-f3c2d1.md)): read-only VPS preflight with corrected
-seccomp validation. The later documentation commit does not change that accepted
-checkpoint. No production deployment is implied.
+Accepted application source: `db32c6ddf8f3b57874180dce81908e0d43aaa2f0`
+([F3c.2d.2 evidence](docs/ci-f3c2d2.md)): read-only VPS preflight with corrected
+seccomp validation and `x-ui.service` in the default protected set. The later
+documentation commit does not change that accepted checkpoint. No production
+deployment is implied.
 
 **MCP-first marketplace for people and AI agents — built on shared rooms and SQLite.** MIT.
 
@@ -49,8 +50,10 @@ was merged, and the intermediate squash merge was force-removed with the same
 owner approval so that exact commit SHAs referenced by evidence documents remain
 reachable from `main`. Later owner-approved PRs [#2](https://github.com/LeonidYasin/mcp-rooms/pull/2)
 (docs baseline, `bd0643f`) and [#3](https://github.com/LeonidYasin/mcp-rooms/pull/3)
-(F3c.2d preflight, merge commit `4f08f0ab5fd9efd1363a8639e4031a0420ac1f27`) are merged
-as well; `main` is at the PR #3 merge commit. No tag, release, credential
+(F3c.2d preflight, merge commit `4f08f0ab5fd9efd1363a8639e4031a0420ac1f27`)
+and [#4](https://github.com/LeonidYasin/mcp-rooms/pull/4) (seccomp fix and first
+VPS preflight report, merge commit `fd2f61650bd3977947ea3679cd677dbc77bc8692`)
+are merged as well; `main` is at the PR #4 merge commit. No tag, release, credential
 issuance or production deployment is attached to those merges. The existing
 production `mcp-server` is a DIFFERENT repository/service, not MCP Rooms production.
 Only isolated Rooms TEST was deployed, then stopped; retained DB is not a running
@@ -104,7 +107,7 @@ Current [F3c.2c.1](docs/operator-supervision.md): [accepted in CI](docs/ci-f3c2c
 Current [F3c.2c.2](docs/candidate-unit-ci.md): [accepted in CI](docs/ci-f3c2c2.md): real installed candidate under exact unit, native photo/body admission/timeouts and aggregate fixture measurements.
 Current [F3c.2c.3a install/inspect](docs/operator-install.md): [accepted in CI](docs/ci-f3c2c3a.md); actual fresh-only installer, no bootstrap/start.
 Previous [F3c.2c.3b guarded controller](docs/operator-install.md): [accepted in CI](docs/ci-f3c2c3b.md); separately authorized capacity/bootstrap/start/stop, never run on a VPS.
-Current [F3c.2d.1 read-only VPS preflight](tools/operator_preflight.py): [accepted in CI](docs/ci-f3c2d1.md) with a live seccomp filter probe; after a RAM upgrade to 4 GiB the rerun [passed](docs/preflight-vps-2026-10-22-4gb.md) (3.07 GiB available), and the default protected set now includes `x-ui.service` (3x-ui/VPN). No install was attempted; install requires separate owner approval.
+Current [F3c.2d.2 read-only VPS preflight](tools/operator_preflight.py): [accepted in CI](docs/ci-f3c2d2.md) with a live seccomp filter probe and `x-ui.service` in the default protected set; after a RAM upgrade to 4 GiB the rerun [passed](docs/preflight-vps-2026-10-22-4gb.md) (3.07 GiB available). No install was attempted; install requires separate owner approval.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).
 - [Private draft storage schema and transaction flow](docs/draft-storage-design.md).

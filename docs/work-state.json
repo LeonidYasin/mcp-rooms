@@ -23,20 +23,20 @@
     ]
   },
   "accepted": {
-    "source_sha": "e6116aeff40d0128de90e36ab1b4045d2f8082e1",
-    "evidence": "docs/ci-f3c2d1.md",
-    "ci": "Python 3.10-3.13 success; build/install smoke success; operator systemd supervision success; corrected seccomp probe",
+    "source_sha": "db32c6ddf8f3b57874180dce81908e0d43aaa2f0",
+    "evidence": "docs/ci-f3c2d2.md",
+    "ci": "Python 3.10-3.13 success (992 passed on 3.11-3.13; 931+42 skipped on 3.10); build/install smoke success; operator systemd supervision success; offline package success; Documentation Pages success",
     "kind": "CI_NOT_DEPLOYMENT",
-    "python312_passed": 991
+    "python312_passed": 992
   },
   "current_slice": {
-    "id": "F3c.2d.1",
+    "id": "F3c.2d.2",
     "stage": "CI",
     "contract": "docs/operator-install.md",
     "source": "tools/operator_preflight.py",
     "tests": "tests/test_operator_preflight.py",
-    "evidence": "docs/ci-f3c2d1.md",
-    "summary": "Read-only fresh VPS preflight with corrected seccomp validation (actions_avail + live allow-all filter probe). First run stopped on the 2GiB memory floor; after a RAM upgrade the 4GiB rerun passed. No install, bootstrap or start."
+    "evidence": "docs/ci-f3c2d2.md",
+    "summary": "Default preflight protected set now includes x-ui.service (3x-ui panel and managed Xray VPN), with a regression test; the post-upgrade 4GiB VPS PASS report is recorded. No install, bootstrap or start."
   },
   "next_task": {
     "id": "OWNER-FIRST-VPS-INSTALL",

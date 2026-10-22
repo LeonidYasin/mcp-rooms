@@ -85,9 +85,12 @@ loopback или HTTPS.
 мержится, после чего история `main` по одобрению владельца восстановлена в линейном
 виде на `7c1bd3b9b8dbbe45e4197b2cacce5a2a7a74bf08` (промежуточный squash-коммит
 удалён, чтобы evidence-документы ссылались на достижимые из `main` точные SHA).
-Тег, релиз и production-деплой не созданы. Принятый application source SHA
-остаётся `88eabfb35aa7cc763d85352e3e67a48e9d5fb97f`; новые изменения идут через
-особые owner-approved PR в `main`.
+Затем владелец смержил [PR #2](https://github.com/LeonidYasin/mcp-rooms/pull/2)
+(docs baseline, `bd0643f`) и [PR #3](https://github.com/LeonidYasin/mcp-rooms/pull/3)
+(F3c.2d read-only preflight, merge commit `4f08f0ab5fd9efd1363a8639e4031a0420ac1f27`);
+текущий `main` — `4f08f0a…`. Тег, релиз и production-деплой не созданы. Принятый
+application source SHA — `01d2a93…`; новые изменения идут через особые
+owner-approved PR в `main`.
 
 ## Следующий шаг
 

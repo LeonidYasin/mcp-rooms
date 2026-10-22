@@ -7,7 +7,7 @@
   "main_merge": {
     "approved_by_owner": true,
     "date": "2026-10-22",
-    "main_head_after_merge": "7c1bd3b9b8dbbe45e4197b2cacce5a2a7a74bf08",
+    "main_head_after_merge": "4f08f0ab5fd9efd1363a8639e4031a0420ac1f27",
     "release_or_tag": null,
     "production_deployed": false
   },
@@ -55,7 +55,7 @@
     "not_a_current_probe": true,
     "rooms_test": "stopped; temporary HTTPS route removed by owner report",
     "rooms_production": "not accepted or deployed by this project",
-    "main_last_recorded_sha": "7c1bd3b9b8dbbe45e4197b2cacce5a2a7a74bf08",
+    "main_last_recorded_sha": "4f08f0ab5fd9efd1363a8639e4031a0420ac1f27",
     "pages": "documentation only; not the marketplace runtime"
   },
   "permission_gates": [

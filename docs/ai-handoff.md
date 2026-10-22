@@ -24,9 +24,9 @@ core существует, но M3b.3 transaction-time authority остаётс�
 
 ## Принятое состояние
 
-- Branch: `feat/standalone-identity`; PR #1 merged into `main` by separate owner
-  approval (2026-10-22). `main` carries the linear branch history at
-  `7c1bd3b9b8dbbe45e4197b2cacce5a2a7a74bf08`; no tag/release/production attached.
+- Branch: `feat/standalone-identity`; PRs #1–#3 merged into `main` by separate owner
+  approvals (2026-10-22). `main` is at the PR #3 merge commit
+  `4f08f0ab5fd9efd1363a8639e4031a0420ac1f27`; no tag/release/production attached.
 - Accepted application source SHA: `01d2a93821639efa1a4ad3ab0ca14a2483e4821c`.
 - Evidence: `docs/ci-f3c2d.md`.
 - Python 3.10–3.13 CI, build/install smoke и operator systemd supervision successful.

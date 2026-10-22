@@ -47,6 +47,9 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 - Evidence: [F3c.2d](docs/ci-f3c2d.md).
 - 2026-10-22: базовая alpha принята владельцем и объединена в `main` (линейная история,
   SHA `7c1bd3b9…`); тег/релиз/production не созданы.
+- 2026-10-22: F3c.2d принят владельцем и смержен в `main`
+  ([PR #3](https://github.com/LeonidYasin/mcp-rooms/pull/3), merge commit `4f08f0ab…`);
+  тег/релиз/production не созданы.
 
 ## Сейчас: первый fresh owner-first TEST
 

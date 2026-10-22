@@ -45,11 +45,13 @@ HEAD/CI before changing anything.
 ## Repository / main / deployment status
 
 On 2026-10-22 the owner separately approved the baseline-alpha merge: [PR #1](https://github.com/LeonidYasin/mcp-rooms/pull/1)
-was merged, and `main` now carries the full linear `feat/standalone-identity`
-history at `7c1bd3b9b8dbbe45e4197b2cacce5a2a7a74bf08`. The intermediate squash merge
-was force-removed with the same owner approval so that exact commit SHAs referenced
-by evidence documents remain reachable from `main`. No tag, release, credential
-issuance or production deployment is attached to that merge. The existing
+was merged, and the intermediate squash merge was force-removed with the same
+owner approval so that exact commit SHAs referenced by evidence documents remain
+reachable from `main`. Later owner-approved PRs [#2](https://github.com/LeonidYasin/mcp-rooms/pull/2)
+(docs baseline, `bd0643f`) and [#3](https://github.com/LeonidYasin/mcp-rooms/pull/3)
+(F3c.2d preflight, merge commit `4f08f0ab5fd9efd1363a8639e4031a0420ac1f27`) are merged
+as well; `main` is at the PR #3 merge commit. No tag, release, credential
+issuance or production deployment is attached to those merges. The existing
 production `mcp-server` is a DIFFERENT repository/service, not MCP Rooms production.
 Only isolated Rooms TEST was deployed, then stopped; retained DB is not a running
 service. No merge/tag/release/production deploy is implied by a branch push.

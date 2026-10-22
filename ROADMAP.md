@@ -60,6 +60,7 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 
 Требует отдельного разрешения и специального пароля.
 
+- [x] Подготовлен read-only инструмент `tools/operator_preflight.py` (SOURCE; CI-приёмка pending).
 - [ ] Проверить trusted `/usr/bin/python3.12`, Linux x86_64, cgroup v2 и Landlock/seccomp.
 - [ ] Проверить свободные новые user/group/unit/paths/port без изменения хоста.
 - [ ] Проверить RAM, disk, inode и filesystem ancestor safety.

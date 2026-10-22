@@ -65,22 +65,31 @@ empty trust inputs/receipts remain rejected. See evidence for failures and fixes
 
 ## Next gate checklist — fresh owner-first VPS preflight (prepared, not authorized)
 
-Status: PREPARED text only. No VPS execution is authorized by this document or by
-the owner-approved `main` baseline merge. Every list item below still requires its
-own separate owner approval.
+Status: PREPARED tool plus checklist. `tools/operator_preflight.py` implements the
+read-only checks below as SOURCE; exact-HEAD Actions acceptance is still pending.
+No VPS execution is authorized by this document, by that tool or by the
+owner-approved `main` baseline merge. Every list item below still requires its own
+separate owner approval.
 
-1. Author and CI-accept a FRESH preflight script for this candidate composition
-   before any execution. The pinned `deploy/vps_preflight.py` targets the
-   historical rooms-only TEST wiring; do NOT reuse it as the marketplace-candidate
-   preflight. The new script must be root-only operator-console, read-only,
-   checksum-pinned and must verify: trusted canonical `/usr/bin/python3.12` with
-   root-owned OS stdlib; Linux x86_64; cgroup v2; Landlock ABI and seccomp
-   availability; absence of the planned fresh account/group/unit/release/state
-   paths and candidate loopback port; occupied-port detection; safe non-writable
-   canonical ancestors; release-FS/state-FS free space and inode reserve;
-   MemAvailable against the accepted build floor; selected properties/PIDs of
-   protected existing services. It must never read Caddy configuration contents,
-   databases or credentials, write service config, create users or alter flags.
+1. Fresh preflight tool: `tools/operator_preflight.py` (SOURCE, not yet
+   CI-accepted). The pinned `deploy/vps_preflight.py` targets the historical
+   rooms-only TEST wiring; do NOT reuse it as the marketplace-candidate preflight.
+   The new tool is root-only operator-console, read-only, checksum-pinnable and
+   emits sanitized JSON only. It verifies: trusted canonical `/usr/bin/python3.12`
+   with root-owned stdlib and a 3.12 version probe; Linux x86_64; cgroup v2;
+   Landlock ABI>=3 via the version syscall; required seccomp filter actions;
+   absence of the planned fresh account/group, candidate and build units, release/
+   state paths and control-lock directory; candidate loopback port 8766 not
+   listening (parsed from `/proc/net/tcp{,6}`, no connect probe); safe
+   non-writable canonical ancestors (`/opt`, `/var/lib`, unit dir, run dir);
+   MemAvailable >=2GiB, install FS free >=2GiB, state FS free >=4GiB and
+   >=65536 free inodes; LoadState/ActiveState/SubState/MainPID only of the
+   protected selected units. It never reads Caddy configuration, databases,
+   keys or private logs, and it never writes, installs, starts or restarts.
+   STOP exits with specific safe codes (for example
+   `preflight_candidate_identity_exists`, `preflight_candidate_port_in_use`,
+   `preflight_landlock_abi_insufficient`, `preflight_memory_floor`) and never
+   prints exception details.
 2. Permissions stay split: (a) owner approval of THIS exact read-only preflight,
    (b) the special password delivered through an approved channel and never stored
    in Git/chat/logs, (c) a separately approved fresh install. Loopback TEST and

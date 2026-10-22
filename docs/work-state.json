@@ -101,5 +101,11 @@
       "reason": "Required before broader public onboarding, not part of the owner-first TEST."
     }
   ],
-  "queued_tasks": []
+  "queued_tasks": [
+    {
+      "id": "F3c.2d-PREFLIGHT-TOOL",
+      "title": "Fresh read-only VPS preflight tool prepared as SOURCE",
+      "reason": "tools/operator_preflight.py implements the separately approved OWNER-FIRST-VPS-PREFLIGHT checks without executing them; CI acceptance on the exact commit is pending and must be recorded before any host use."
+    }
+  ]
 }

@@ -44,6 +44,8 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 - Guarded capacity/bootstrap/start/stop controller.
 - Accepted source SHA: `88eabfb35aa7cc763d85352e3e67a48e9d5fb97f`.
 - Evidence: [F3c.2c.3b](docs/ci-f3c2c3b.md).
+- 2026-10-22: базовая alpha принята владельцем и объединена в `main` (линейная история,
+  SHA `7c1bd3b9…`); тег/релиз/production не созданы.
 
 ## Сейчас: первый fresh owner-first TEST
 

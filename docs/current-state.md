@@ -77,6 +77,16 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю». Ос
 принятый application source SHA становится `88eabfb…`; docs-коммит сверху не меняет
 принятый source SHA.
 
+### Запись мержа (2026-10-22)
+
+Владелец отдельно одобрил объединение базовой alpha: [PR #1](https://github.com/LeonidYasin/mcp-rooms/pull/1)
+мержится, после чего история `main` по одобрению владельца восстановлена в линейном
+виде на `7c1bd3b9b8dbbe45e4197b2cacce5a2a7a74bf08` (промежуточный squash-коммит
+удалён, чтобы evidence-документы ссылались на достижимые из `main` точные SHA).
+Тег, релиз и production-деплой не созданы. Принятый application source SHA
+остаётся `88eabfb35aa7cc763d85352e3e67a48e9d5fb97f`; новые изменения идут через
+особые owner-approved PR в `main`.
+
 ## Следующий шаг
 
 Следующая крупная точка — **fresh isolated owner-first TEST**:

@@ -3,6 +3,14 @@
   "repository": "LeonidYasin/mcp-rooms",
   "branch": "feat/standalone-identity",
   "pull_request": 1,
+  "pull_request_state": "merged",
+  "main_merge": {
+    "approved_by_owner": true,
+    "date": "2026-10-22",
+    "main_head_after_merge": "7c1bd3b9b8dbbe45e4197b2cacce5a2a7a74bf08",
+    "release_or_tag": null,
+    "production_deployed": false
+  },
   "product_focus": {
     "primary_interface": "User chats with their own AI agent; the agent uses scoped MCP tools.",
     "web_now": "Anonymous read-only storefront for explicitly published cards and photos.",
@@ -47,7 +55,7 @@
     "not_a_current_probe": true,
     "rooms_test": "stopped; temporary HTTPS route removed by owner report",
     "rooms_production": "not accepted or deployed by this project",
-    "main_last_recorded_sha": "96247414c03469ade2f9fdc96047e5f3d2d39f71",
+    "main_last_recorded_sha": "7c1bd3b9b8dbbe45e4197b2cacce5a2a7a74bf08",
     "pages": "documentation only; not the marketplace runtime"
   },
   "permission_gates": [

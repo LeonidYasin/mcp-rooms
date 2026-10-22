@@ -33,7 +33,8 @@ are not part of this server. GitHub is only the source hosting / CI platform.
 
 ## Continue development — for a new AI chat
 
-**Use branch `feat/standalone-identity`, not the old default main scaffold.**
+**Development continues on `feat/standalone-identity`; the baseline alpha was merged
+into `main` with separate owner approval.**
 Start with [AGENTS.md](AGENTS.md), [AI handoff](docs/ai-handoff.md) and
 [machine-readable work state](docs/work-state.json). They identify the accepted code
 SHA, evidence, current slice, next task and owner permission gates. No past chat required.
@@ -42,15 +43,16 @@ HEAD/CI before changing anything.
 
 ## Repository / main / deployment status
 
-As checked on 2026-10-19, `main` still points to the initial scaffold commit
-`96247414c03469ade2f9fdc96047e5f3d2d39f71` (short README; no pyproject.toml).
-Implementation, acceptance records and these client utilities are in
-`feat/standalone-identity`, [PR #1](https://github.com/LeonidYasin/mcp-rooms/pull/1).
-No merge/tag/release/production deploy is implied by a branch push. The existing
+On 2026-10-22 the owner separately approved the baseline-alpha merge: [PR #1](https://github.com/LeonidYasin/mcp-rooms/pull/1)
+was merged, and `main` now carries the full linear `feat/standalone-identity`
+history at `7c1bd3b9b8dbbe45e4197b2cacce5a2a7a74bf08`. The intermediate squash merge
+was force-removed with the same owner approval so that exact commit SHAs referenced
+by evidence documents remain reachable from `main`. No tag, release, credential
+issuance or production deployment is attached to that merge. The existing
 production `mcp-server` is a DIFFERENT repository/service, not MCP Rooms production.
 Only isolated Rooms TEST was deployed, then stopped; retained DB is not a running
-service. A reviewed merge of the baseline alpha and a production deployment are
-separate decisions. CI tests/builds but does not deploy the VPS.
+service. No merge/tag/release/production deploy is implied by a branch push.
+CI tests/builds but does not deploy the VPS.
 
 ## Project documentation website
 

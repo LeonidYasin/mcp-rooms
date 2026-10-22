@@ -24,12 +24,15 @@ core существует, но M3b.3 transaction-time authority остаётс�
 
 ## Принятое состояние
 
-- Branch: `feat/standalone-identity`, PR #1 draft.
+- Branch: `feat/standalone-identity`; PR #1 merged into `main` by separate owner
+  approval (2026-10-22). `main` carries the linear branch history at
+  `7c1bd3b9b8dbbe45e4197b2cacce5a2a7a74bf08`; no tag/release/production attached.
 - Accepted application source SHA: `88eabfb35aa7cc763d85352e3e67a48e9d5fb97f`.
 - Evidence: `docs/ci-f3c2c3b.md`.
 - Python 3.10–3.13 CI, build/install smoke и operator systemd supervision successful.
 - Guarded lifecycle controller реализован; это CI, не VPS TEST.
-- `main` остаётся scaffold до отдельного merge-решения.
+- Новые изменения идут через `feat/standalone-identity` и отдельные owner-approved
+  PR в `main`; merge требует отдельного решения владельца.
 - Старый Rooms TEST остановлен; production MCP Rooms отсутствует.
 
 ## Следующий gate

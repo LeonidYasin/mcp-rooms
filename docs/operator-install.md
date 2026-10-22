@@ -62,3 +62,40 @@ hardens that ancestor and restores it on safe teardown. This is **not** an insta
 feature or permission to change VPS ancestor modes. Installer still refuses unsafe
 existing ancestors. Legitimate empty package files are hashed in code inventory;
 empty trust inputs/receipts remain rejected. See evidence for failures and fixes.
+
+## Next gate checklist — fresh owner-first VPS preflight (prepared, not authorized)
+
+Status: PREPARED text only. No VPS execution is authorized by this document or by
+the owner-approved `main` baseline merge. Every list item below still requires its
+own separate owner approval.
+
+1. Author and CI-accept a FRESH preflight script for this candidate composition
+   before any execution. The pinned `deploy/vps_preflight.py` targets the
+   historical rooms-only TEST wiring; do NOT reuse it as the marketplace-candidate
+   preflight. The new script must be root-only operator-console, read-only,
+   checksum-pinned and must verify: trusted canonical `/usr/bin/python3.12` with
+   root-owned OS stdlib; Linux x86_64; cgroup v2; Landlock ABI and seccomp
+   availability; absence of the planned fresh account/group/unit/release/state
+   paths and candidate loopback port; occupied-port detection; safe non-writable
+   canonical ancestors; release-FS/state-FS free space and inode reserve;
+   MemAvailable against the accepted build floor; selected properties/PIDs of
+   protected existing services. It must never read Caddy configuration contents,
+   databases or credentials, write service config, create users or alter flags.
+2. Permissions stay split: (a) owner approval of THIS exact read-only preflight,
+   (b) the special password delivered through an approved channel and never stored
+   in Git/chat/logs, (c) a separately approved fresh install. Loopback TEST and
+   external HTTPS remain further separate gates; approvals are never combined.
+3. Execution flow: review the pinned script SHA → operator root console → capture
+   a sanitized JSON report → STOP. The report itself changes nothing and implies
+   no install, bootstrap, start or route approval.
+4. Refusals stop permanently: occupied port, existing candidate account/unit/path,
+   unsafe or writable ancestor modes, reserve deficits, unexpected drift of
+   protected services, unexpected cgroup/Landlock/seccomp absence. Each STOP is
+   evidence for review, never a reason to weaken a check or retry automatically.
+5. The sanitized report measures candidate BUILD floors only, not production
+   capacity: it must not claim VPS capacity acceptance, DoS resistance or SLA.
+   A PASS is not install/bootstrap/start authorization.
+
+Landlock has not yet been checked on the real VPS; previously supplied reserves
+(≈15GiB disk, ≈1.1GiB available RAM) are historical preflight data, not a current
+probe and not the fresh-candidate preflight record.

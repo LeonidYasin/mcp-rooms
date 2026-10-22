@@ -43,14 +43,21 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 - Fixed systemd unit/cgroup и реальный candidate/native fixture в Actions.
 - Guarded capacity/bootstrap/start/stop controller.
 - Read-only fresh VPS preflight tool (`tools/operator_preflight.py`; один read-only прогон на VPS, без установки).
-- Accepted source SHA: `e6116aeff40d0128de90e36ab1b4045d2f8082e1`.
-- Evidence: [F3c.2d.1](docs/ci-f3c2d1.md).
+- Accepted source SHA: `db32c6ddf8f3b57874180dce81908e0d43aaa2f0`.
+- Evidence: [F3c.2d.2](docs/ci-f3c2d2.md).
 - 2026-10-22: первый read-only preflight на VPS — STOP по памяти
   ([отчёт](docs/preflight-vps-2026-10-22.md)); seccomp-проверка исправлена в CI.
+- 2026-10-22: после апгрейда до 4 GiB повторный preflight — PASS
+  ([отчёт](docs/preflight-vps-2026-10-22-4gb.md)); установка не выполнялась.
+- 2026-10-22: `x-ui.service` (3x-ui-панель и managed Xray VPN) добавлен в
+  дефолтный protected-набор preflight; установка не выполнялась.
 - 2026-10-22: базовая alpha принята владельцем и объединена в `main` (линейная история,
   SHA `7c1bd3b9…`); тег/релиз/production не созданы.
 - 2026-10-22: F3c.2d принят владельцем и смержен в `main`
   ([PR #3](https://github.com/LeonidYasin/mcp-rooms/pull/3), merge commit `4f08f0ab…`);
+  тег/релиз/production не созданы.
+- 2026-10-22: seccomp-исправление и первый VPS preflight смержены
+  ([PR #4](https://github.com/LeonidYasin/mcp-rooms/pull/4), merge commit `fd2f616…`);
   тег/релиз/production не созданы.
 
 ## Сейчас: первый fresh owner-first TEST
@@ -66,13 +73,14 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 
 Требует отдельного разрешения и специального пароля.
 
-- [x] Read-only инструмент `tools/operator_preflight.py` принят в CI ([F3c.2d.1](docs/ci-f3c2d1.md)); на VPS не запускался.
+- [x] Read-only инструмент `tools/operator_preflight.py` принят в CI ([F3c.2d.1](docs/ci-f3c2d1.md), [F3c.2d.2](docs/ci-f3c2d2.md)); `x-ui.service` входит в defaults.
 - [x] Первый прогон на VPS выполнен ([отчёт](docs/preflight-vps-2026-10-22.md)): STOP по памяти (1.18 GiB < 2 GiB floor); установка не выполнялась.
-- [ ] Проверить trusted `/usr/bin/python3.12`, Linux x86_64, cgroup v2 и Landlock/seccomp.
-- [ ] Проверить свободные новые user/group/unit/paths/port без изменения хоста.
-- [ ] Проверить RAM, disk, inode и filesystem ancestor safety.
-- [ ] Проверить отсутствие конфликта с существующими MCP/Caddy/services.
-- [ ] Сохранить только sanitized result; никаких ключей/config snapshots в Git.
+- [x] Повторный прогон после апгрейда до 4 GiB — PASS ([отчёт](docs/preflight-vps-2026-10-22-4gb.md)); установка не выполнялась.
+- [x] Проверить trusted `/usr/bin/python3.12`, Linux x86_64, cgroup v2 и Landlock/seccomp — подтверждено PASS-прогоном.
+- [x] Проверить свободные новые user/group/unit/paths/port без изменения хоста — подтверждено PASS-прогоном.
+- [x] Проверить RAM, disk, inode и filesystem ancestor safety — подтверждено PASS-прогоном.
+- [x] Проверить отсутствие конфликта с существующими MCP/Caddy/services — подтверждено PASS-прогоном.
+- [x] Сохранить только sanitized result; никаких ключей/config snapshots в Git — `docs/preflight-vps-2026-10-22-4gb.md`.
 
 ### Gate C — isolated loopback TEST
 

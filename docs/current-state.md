@@ -47,13 +47,14 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю». Ос
 
 ## Что подтверждено
 
-На SHA `e6116aeff40d0128de90e36ab1b4045d2f8082e1` успешно завершены:
+На SHA `db32c6ddf8f3b57874180dce81908e0d43aaa2f0` успешно завершены:
 
 - CI на Python 3.10, 3.11, 3.12 и 3.13;
 - build wheel/sdist и import установленного wheel вне checkout;
 - installed owner-first candidate smoke на поддерживаемых версиях;
 - operator systemd supervision proof с реальным disposable systemd/cgroup fixture;
 - тесты нового read-only preflight-инструмента;
+- повторный read-only preflight после апгрейда до 4 GiB — PASS; установка не выполнялась;
 - GitHub Pages/documentation workflows.
 
 Это подтверждает код и синтетический Actions-сценарий. Это **не** подтверждает ёмкость
@@ -72,14 +73,17 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю». Ос
 
 ## Текущая граница
 
-Код F3c.2d.1 — read-only preflight (root-only, без записи, установки и запуска
-сервисов) с исправленной seccomp-пробой — присутствует в HEAD и прошёл Actions:
-Python3.12 **991 passed**. Принятый source SHA — `e6116ae…`; docs-коммит сверху не
+Код F3c.2d.2 — read-only preflight (root-only, без записи, установки и запуска
+сервисов) с исправленной seccomp-пробой и `x-ui.service` в дефолтном
+protected-наборе — присутствует в HEAD и прошёл Actions:
+Python3.12 **992 passed**. Принятый source SHA — `db32c6d…`; docs-коммит сверху не
 меняет принятый source SHA. Первый прогон на реальном VPS 2026-10-22 завершился
-STOP по памяти: MemAvailable ≈1.18 GiB < 2 GiB floor
-([отчёт](preflight-vps-2026-10-22.md)); установка не выполнялась. Gate B требует
-хост ≥4 GiB и отдельного разрешения владельца со спецпаролем; PASS preflight не
-разрешает install, loopback или HTTPS.
+STOP по памяти ([отчёт](preflight-vps-2026-10-22.md)); после апгрейда до 4 GiB
+повторный прогон — PASS, MemAvailable ≈3.07 GiB
+([отчёт](preflight-vps-2026-10-22-4gb.md)); `x-ui.service` (3x-ui/VPN) добавлен
+в дефолтный protected-набор. PR #4 смержен (`main` = `fd2f616`). Установка не
+выполнялась и требует отдельного разрешения владельца со спецпаролем; PASS
+preflight не разрешает install, loopback или HTTPS.
 
 ### Запись мержа (2026-10-22)
 
@@ -89,9 +93,11 @@ STOP по памяти: MemAvailable ≈1.18 GiB < 2 GiB floor
 удалён, чтобы evidence-документы ссылались на достижимые из `main` точные SHA).
 Затем владелец смержил [PR #2](https://github.com/LeonidYasin/mcp-rooms/pull/2)
 (docs baseline, `bd0643f`) и [PR #3](https://github.com/LeonidYasin/mcp-rooms/pull/3)
-(F3c.2d read-only preflight, merge commit `4f08f0ab5fd9efd1363a8639e4031a0420ac1f27`);
-текущий `main` — `4f08f0a…`. Тег, релиз и production-деплой не созданы. Принятый
-application source SHA — `01d2a93…`; новые изменения идут через особые
+(F3c.2d read-only preflight, merge commit `4f08f0ab5fd9efd1363a8639e4031a0420ac1f27`)
+и [PR #4](https://github.com/LeonidYasin/mcp-rooms/pull/4) (seccomp-исправление и
+первый VPS-отчёт, merge commit `fd2f61650bd3977947ea3679cd677dbc77bc8692`);
+текущий `main` — `fd2f616…`. Тег, релиз и production-деплой не созданы. Принятый
+application source SHA — `db32c6d…`; новые изменения идут через особые
 owner-approved PR в `main`.
 
 ## Следующий шаг

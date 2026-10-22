@@ -39,12 +39,14 @@
 
 ## Что это не доказывает
 
-- Исправленная проба не запускалась на VPS.
-- Memory floor 2 GiB остаётся непреодолённым на текущем хосте.
+- На момент CI-приёмки исправленная проба на VPS не запускалась; последующий
+  прогон после апгрейда RAM — PASS
+  ([отчёт](preflight-vps-2026-10-22-4gb.md)).
+- Реальная runtime capacity, native-нагрузка и HTTPS этим не подтверждены.
 - Нет разрешения на install/bootstrap/loopback/HTTPS, merge/release/production.
 
 ## Следующий gate
 
-`OWNER-FIRST-VPS-PREFLIGHT` на хосте с ≥4 GiB RAM (чтобы MemAvailable был
-≥2 GiB при работающих сервисах), после отдельного разрешения владельца и
-специального пароля. PASS не разрешает установку.
+`OWNER-FIRST-VPS-PREFLIGHT` завершён (STOP на 2 GiB, затем PASS на 4 GiB).
+Далее — отдельно разрешённая fresh install/bootstrap/start и loopback acceptance.
+PASS preflight не разрешает установку.

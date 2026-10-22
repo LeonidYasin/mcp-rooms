@@ -7,7 +7,7 @@
   "main_merge": {
     "approved_by_owner": true,
     "date": "2026-10-22",
-    "main_head_after_merge": "4f08f0ab5fd9efd1363a8639e4031a0420ac1f27",
+    "main_head_after_merge": "fd2f61650bd3977947ea3679cd677dbc77bc8692",
     "release_or_tag": null,
     "production_deployed": false
   },
@@ -23,31 +23,31 @@
     ]
   },
   "accepted": {
-    "source_sha": "e6116aeff40d0128de90e36ab1b4045d2f8082e1",
-    "evidence": "docs/ci-f3c2d1.md",
-    "ci": "Python 3.10-3.13 success; build/install smoke success; operator systemd supervision success; corrected seccomp probe",
+    "source_sha": "db32c6ddf8f3b57874180dce81908e0d43aaa2f0",
+    "evidence": "docs/ci-f3c2d2.md",
+    "ci": "Python 3.10-3.13 success (992 passed on 3.11-3.13; 931+42 skipped on 3.10); build/install smoke success; operator systemd supervision success; offline package success; Documentation Pages success",
     "kind": "CI_NOT_DEPLOYMENT",
-    "python312_passed": 991
+    "python312_passed": 992
   },
   "current_slice": {
-    "id": "F3c.2d.1",
+    "id": "F3c.2d.2",
     "stage": "CI",
     "contract": "docs/operator-install.md",
     "source": "tools/operator_preflight.py",
     "tests": "tests/test_operator_preflight.py",
-    "evidence": "docs/ci-f3c2d1.md",
-    "summary": "Read-only fresh VPS preflight with corrected seccomp validation (actions_avail + live allow-all filter probe). First VPS run stopped on the 2GiB memory floor; no install, bootstrap or start."
+    "evidence": "docs/ci-f3c2d2.md",
+    "summary": "Default preflight protected set now includes x-ui.service (3x-ui panel and managed Xray VPN), with a regression test; the post-upgrade 4GiB VPS PASS report is recorded. No install, bootstrap or start."
   },
   "next_task": {
-    "id": "OWNER-FIRST-VPS-PREFLIGHT",
-    "title": "Separately authorized fresh read-only VPS preflight before isolated loopback TEST",
+    "id": "OWNER-FIRST-VPS-INSTALL",
+    "title": "Separately authorized fresh install/bootstrap/start and loopback acceptance on the 4GiB host",
     "stage": "PERMISSION_GATE",
     "acceptance": [
-      "Do not execute remotely until the owner explicitly approves this exact preflight and supplies the special password through an approved secure mechanism.",
-      "Read-only check trusted OS Python, Linux x86_64, cgroup v2, Landlock/seccomp availability, new fixed account/unit/path/port absence and safe ancestors.",
-      "Measure available memory, disk and inodes against the accepted controller criteria without claiming production capacity.",
-      "Verify existing MCP/Caddy/services remain untouched; emit only a sanitized report and never upload host config, credentials, database or private logs.",
-      "If preflight passes, stop and request separate approval for fresh install/bootstrap/loopback acceptance. Do not combine permission gates."
+      "Do not execute any install, bootstrap, start or loopback probe until the owner explicitly approves the exact pinned source and supplies the special password; preflight PASS is not install authorization.",
+      "Use only the accepted installer/controller at the accepted source SHA, verify checksums before execution, and never reuse the stopped Rooms TEST database or the old rooms-only preflight.",
+      "Install fresh candidate paths/account/unit only; existing host services that remain enabled (mcp-server if kept, mcp-test, caddy, x-ui and other host services) must remain untouched.",
+      "Collect sanitized install/bootstrap/loopback evidence; STOP permanently on drift, occupied port, unexpected identity/path or capacity failure; no automatic retry.",
+      "Do not publish, enable HTTPS, issue real credentials or merge/release without further separate owner approvals."
     ],
     "contract": "docs/operator-install.md"
   },
@@ -55,7 +55,7 @@
     "not_a_current_probe": true,
     "rooms_test": "stopped; temporary HTTPS route removed by owner report",
     "rooms_production": "not accepted or deployed by this project",
-    "main_last_recorded_sha": "4f08f0ab5fd9efd1363a8639e4031a0420ac1f27",
+    "main_last_recorded_sha": "fd2f61650bd3977947ea3679cd677dbc77bc8692",
     "pages": "documentation only; not the marketplace runtime"
   },
   "permission_gates": [
@@ -101,11 +101,5 @@
       "reason": "Required before broader public onboarding, not part of the owner-first TEST."
     }
   ],
-  "queued_tasks": [
-    {
-      "id": "F3c.2d-HOST-CAPACITY",
-      "title": "Fresh VPS with >=4GiB RAM for Gate B",
-      "reason": "Preflight on 2026-10-22 measured MemTotal 1.92GiB and MemAvailable 1.18GiB; the accepted 2GiB memory floor failed. No host change or install was attempted; a larger fresh host is needed, or an explicit owner decision to change the accepted floor."
-    }
-  ]
+  "queued_tasks": []
 }

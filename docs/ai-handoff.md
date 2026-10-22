@@ -24,17 +24,22 @@ core существует, но M3b.3 transaction-time authority остаётс�
 
 ## Принятое состояние
 
-- Branch: `feat/standalone-identity`; PRs #1–#3 merged into `main` by separate owner
-  approvals (2026-10-22). `main` is at the PR #3 merge commit
-  `4f08f0ab5fd9efd1363a8639e4031a0420ac1f27`; no tag/release/production attached.
-- Accepted application source SHA: `e6116aeff40d0128de90e36ab1b4045d2f8082e1`.
-- Evidence: `docs/ci-f3c2d1.md`.
+- Branch: `feat/standalone-identity`; PRs #1–#4 merged into `main` by separate owner
+  approvals (2026-10-22). `main` is at the PR #4 merge commit
+  `fd2f61650bd3977947ea3679cd677dbc77bc8692`; no tag/release/production attached.
+- Accepted application source SHA: `db32c6ddf8f3b57874180dce81908e0d43aaa2f0`.
+- Evidence: `docs/ci-f3c2d2.md`.
 - Python 3.10–3.13 CI, build/install smoke и operator systemd supervision successful.
 - Guarded lifecycle controller реализован; это CI, не VPS TEST.
-- Preflight-инструмент принят с исправленной seccomp-пробой (991 tests на
-  Python3.12). Первый прогон на VPS 2026-10-22 — STOP по памяти
-  ([отчёт](preflight-vps-2026-10-22.md)): 1.18 GiB available < 2 GiB floor;
-  установка не выполнялась. Нужен хост ≥4 GiB или отдельное решение владельца.
+- Preflight-инструмент принят с исправленной seccomp-пробой и `x-ui.service` в
+  дефолтном protected-наборе (992 tests на Python3.12). Первый прогон на VPS
+  2026-10-22 — STOP по памяти ([отчёт](preflight-vps-2026-10-22.md)); после
+  апгрейда до 4 GiB повторный прогон — PASS
+  ([отчёт](preflight-vps-2026-10-22-4gb.md)), 3.07 GiB available. Установка не
+  выполнялась.
+- PR #4 смержен владельцем; `main` = `fd2f616`. PASS-отчёт и `x-ui.service`
+  (3x-ui-панель и managed Xray VPN) в дефолтном protected-наборе идут отдельным
+  PR; установка по-прежнему требует отдельного разрешения.
 - Новые изменения идут через `feat/standalone-identity` и отдельные owner-approved
   PR в `main`; merge требует отдельного решения владельца.
 - Старый Rooms TEST остановлен; production MCP Rooms отсутствует.
@@ -43,7 +48,8 @@ core существует, но M3b.3 transaction-time authority остаётс�
 
 Fresh isolated owner-first TEST:
 
-1. отдельно разрешённый read-only VPS preflight;
+1. read-only VPS preflight выполнен (PASS 2026-10-22;
+   [отчёт](preflight-vps-2026-10-22-4gb.md));
 2. отдельно разрешённая fresh loopback install/bootstrap/start/synthetic acceptance;
 3. отдельно разрешённый временный HTTPS и external MCP acceptance;
 4. одна реальная карточка с реальными фото и явным согласием;

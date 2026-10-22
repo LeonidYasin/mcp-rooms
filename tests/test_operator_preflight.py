@@ -19,6 +19,15 @@ class FakeLibc:
         return self.value
 
 
+class FakeOs:
+    def __init__(self,status):self.status=status
+    def fork(self):return 4242
+    def waitpid(self,pid,options):return pid,self.status
+    def WIFEXITED(self,status):return True
+    def WEXITSTATUS(self,status):return status>>8
+    def _exit(self,code):raise SystemExit(code)
+
+
 def fakefs(free=8*1024**3,inodes=100000):
     return SimpleNamespace(f_bavail=free//4096,f_frsize=4096,f_favail=inodes)
 
@@ -74,14 +83,24 @@ def test_landlock_abi_probe(monkeypatch,value,code):
         with pytest.raises(Error,match=code):m['_landlock']()
 
 
-def test_seccomp_requires_filter_actions(monkeypatch,tmp_path):
+def test_seccomp_requires_real_actions_and_filter_probe(monkeypatch,tmp_path):
     actions=tmp_path/'actions';monkeypatch.setitem(g,'SECCOMP',actions)
-    actions.write_text('kill_process kill_thread trap errno user_notif trace log allow filter\n')
+    monkeypatch.setitem(g,'os',FakeOs(0))
+    actions.write_text('kill_process kill_thread trap errno user_notif trace log allow\n')
     assert m['_seccomp']()['filter_supported'] is True
-    actions.write_text('filter errno\n')
+    actions.write_text('kill_process\n')
+    with pytest.raises(Error,match='preflight_seccomp_unavailable'):m['_seccomp']()
+    actions.write_text('kill_process kill_thread trap errno user_notif trace log allow\n')
+    monkeypatch.setitem(g,'os',FakeOs(256))
     with pytest.raises(Error,match='preflight_seccomp_unavailable'):m['_seccomp']()
     actions.unlink()
     with pytest.raises(Error,match='preflight_seccomp_unavailable'):m['_seccomp']()
+
+
+def test_seccomp_filter_probe_really_installs_allow_filter():
+    if not os.uname().sysname=='Linux' or os.uname().machine!='x86_64':
+        pytest.skip('x86_64 Linux only')
+    assert m['_seccomp_filter']() is True
 
 
 def test_candidate_identity_must_be_absent(monkeypatch):

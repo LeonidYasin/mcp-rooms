@@ -76,7 +76,9 @@ requires its own separate owner approval.
    The new tool is root-only operator-console, read-only, checksum-pinnable and
    emits sanitized JSON only. It verifies: trusted canonical `/usr/bin/python3.12`
    with root-owned stdlib and a 3.12 version probe; Linux x86_64; cgroup v2;
-   Landlock ABI>=3 via the version syscall; required seccomp filter actions;
+   Landlock ABI>=3 via the version syscall; seccomp action availability
+   (`kill_process`, `errno`) plus a live allow-all filter-install probe in a
+   forked child (the string `filter` is a mode, not an action);
    absence of the planned fresh account/group, candidate and build units, release/
    state paths and control-lock directory; candidate loopback port 8766 not
    listening (parsed from `/proc/net/tcp{,6}`, no connect probe); safe

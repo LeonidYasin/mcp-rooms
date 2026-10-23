@@ -29,11 +29,11 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 | Пользовательский marketplace MCP | CI | 12 opt-in listing tools вызывают те же services |
 | Web-витрина | CI | Анонимная карточка/фото только для чтения, без feed и форм |
 | Browser sessions | CI, paused | Login/logout bridge есть; cookie пока не даёт права записывать объявления |
-| Operator package | CI | Offline bundle, fresh install, systemd/cgroup и guarded lifecycle проверены |
-| Fresh VPS TEST | не выполнен | Нужны отдельные разрешения на preflight, loopback и HTTPS |
+| Operator package | TEST | Offline pre-release, fresh install, systemd/cgroup и guarded lifecycle проверены на VPS loopback |
+| Fresh VPS TEST | loopback PASS | Install/bootstrap/start, synthetic MCP flow, stop/restart preservation PASS; HTTPS/external ещё не принят |
 | Приватные отклики | SPEC | Нужна отдельная participant ACL модель; shared Rooms не подходят |
 | Admin MCP | SPEC | Отдельная audience/credentials и typed moderation, без shell/SQL |
-| Production | отсутствует | Нет release, merge в main и production rollout |
+| Production | отсутствует | Есть только pre-release и изолированный loopback TEST; production rollout не выполнялся |
 
 ## Основной пользовательский путь
 

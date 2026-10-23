@@ -292,11 +292,11 @@
     {
       "id": "public_card",
       "title": "Read-only карточка по ссылке",
-      "stage": "CI",
-      "summary": "Explicit opt-in anonymous GET опубликованной карточки/фото, escaped HTML и withdrawal checks. Не feed, форма или VPS deploy.",
+      "stage": "TEST",
+      "summary": "Anonymous card/photo read и withdrawal 404 проверены в loopback synthetic flow; внешний HTTPS/Caddy и реальная карточка ещё не приняты.",
       "doc": "docs/owner-first-test.md",
       "source": "src/mcp_rooms/public_web.py",
-      "evidence": "docs/ci-f1.md",
+      "evidence": "docs/owner-first-vps-test-2026-10-23.md",
       "depends_on": [
         "user_market_mcp",
         "publish"
@@ -305,11 +305,11 @@
     {
       "id": "test_candidate",
       "title": "Fresh owner-first TEST candidate",
-      "stage": "CI",
-      "summary": "Fresh bootstrap, existing-only startup, один worker/upload/process, обязательная child OS policy и installed-wheel native smoke. Не VPS installer/deploy.",
+      "stage": "TEST",
+      "summary": "Fresh bootstrap/startup composition проверен в Actions и в isolated VPS loopback: install/bootstrap/start, native photo, synthetic publication, restart и stop-only rollback. HTTPS/external не принят.",
       "doc": "docs/test-candidate.md",
       "source": "src/mcp_rooms/test_candidate.py",
-      "evidence": "docs/ci-f3a.md",
+      "evidence": "docs/owner-first-vps-test-2026-10-23.md",
       "depends_on": [
         "public_card",
         "media_http",
@@ -347,8 +347,8 @@
     {
       "id": "operator_bundle",
       "title": "Офлайн hash-pinned wheelhouse",
-      "stage": "CI",
-      "summary": "30 versioned runtime hash pins;31-wheel exact-source public bundle; fresh offline venv/pip check/native candidate+recovery smoke accepted in Actions. Не VPS installer; F3c.2 operator/resources отдельно.",
+      "stage": "TEST",
+      "summary": "Pinned offline pre-release bundle скачан и проверен на VPS; install использует локальный wheelhouse. Артефакт не является production release.",
       "doc": "docs/operator-package.md",
       "source": "tools/operator_bundle.py",
       "evidence": "docs/ci-f3c1.md",
@@ -414,11 +414,11 @@
     {
       "id": "operator_install",
       "title": "Fresh-only root-trusted offline install",
-      "stage": "CI",
-      "summary": "Exact-source Actions: actual fresh-only install/inspect,939 tests3.12; transient nonroot offline build, sealed code and ready-last receipt, repeat refused. No profile/bootstrap/start/enable; lifecycle/capacity still gated.",
+      "stage": "TEST",
+      "summary": "Fresh-only offline install/inspect выполнен на VPS из pinned pre-release; installer не создавал профиль и не запускал сервис. Bootstrap/start — отдельный controller PASS.",
       "doc": "docs/operator-install.md",
       "source": "tools/operator_install.py",
-      "evidence": "docs/ci-f3c2c3a.md",
+      "evidence": "docs/owner-first-vps-test-2026-10-23.md",
       "depends_on": [
         "candidate_unit_ci",
         "operator_bundle",
@@ -428,11 +428,11 @@
     {
       "id": "operator_control",
       "title": "Guarded lifecycle controller",
-      "stage": "CI",
-      "summary": "Отдельно авторизованные capacity/bootstrap/start/stop; перепроверка install/unit/drop-ins/process, безопасная очистка failed start и сохранение state. Принято в Actions, не выполнено на VPS.",
+      "stage": "TEST",
+      "summary": "Guarded capacity/bootstrap/start/stop выполнен на VPS: loopback synthetic MCP PASS, stop сохранил state, restart и повторный flow PASS. HTTPS/Caddy не менялись.",
       "doc": "docs/operator-install.md",
       "source": "tools/operator_control.py",
-      "evidence": "docs/ci-f3c2c3b.md",
+      "evidence": "docs/owner-first-vps-test-2026-10-23.md",
       "depends_on": [
         "operator_install",
         "candidate_unit_ci"
@@ -441,8 +441,8 @@
     {
       "id": "operator_preflight",
       "title": "Read-only VPS preflight (CI-accepted)",
-      "stage": "CI",
-      "summary": "Root-console read-only checks для fresh-кандидата: trusted python3.12, Linux x86_64, cgroup v2, Landlock ABI≥3, seccomp actions + живая allow-all filter-проба, absence кандидатных account/unit/path/port, ancestor modes, capacity floors и состояние защищённых units; только sanitized JSON. Дефолтный protected-набор включает caddy, mcp-server, mcp-test и x-ui (3x-ui/VPN). Первый прогон — STOP по памяти, после апгрейда до 4 GiB повторный — PASS; установка не выполнялась.",
+      "stage": "TEST",
+      "summary": "Root-console read-only checks для fresh-кандидата: trusted python3.12, Linux x86_64, cgroup v2, Landlock ABI≥3, seccomp actions + живая allow-all filter-проба, absence кандидатных account/unit/path/port, ancestor modes, capacity floors и состояние защищённых units; только sanitized JSON. Дефолтный protected-набор включает caddy, mcp-server, mcp-test и x-ui (3x-ui/VPN). Первый прогон — STOP по памяти, после апгрейда до 4 GiB повторный — PASS; на тот момент установка не выполнялась. Позже отдельным gate выполнен fresh loopback install/start.",
       "doc": "docs/operator-install.md",
       "source": "tools/operator_preflight.py",
       "evidence": "docs/ci-f3c2d2.md",

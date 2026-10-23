@@ -77,7 +77,8 @@ projection. Это internal CI, а не публичный web или завер
 
 ## Разрешения и отсутствие скрытого запуска
 
-Сейчас VPS и production не изменяются. Любая серверная операция — отдельное явное
+VPS loopback TEST выполнен 2026-10-23; production не изменяется, внешний
+HTTPS/Caddy ещё не принят. Любая новая серверная операция — отдельное явное
 разрешение владельца; remote run_python/обход через shell/SSH не используются без
 его специального подтверждения/пароля. Подготовить проверяемый скрипт для ручного
 запуска — не то же самое, что выполнить его. main/merge/release также отдельно.
@@ -187,3 +188,17 @@ Remaining coarse gates (not a promise of three commands/turns):
 
 Browser writes/onboarding/search/replies/admin and full production remain outside
 this shortened TEST scope. Existing retained TEST DB is never a fresh install target.
+
+## Actual loopback TEST — 2026-10-23
+
+Fresh isolated candidate installed from the pinned pre-release and started on
+loopback only. Authless MCP returned 401, web root 404. A synthetic MCP flow
+(create → PNG upload → preview → consent → publish → anonymous card/photo →
+withdraw → 404) passed, stop preserved state, restart produced a new PID, and the
+same flow passed again. See
+[owner-first-vps-test-2026-10-23.md](owner-first-vps-test-2026-10-23.md).
+
+Still open: a narrow Caddy/HTTPS route, external MCP/web acceptance, a real card
+with real photos and explicit consent, cleanup/evidence, and production decisions.
+The loopback synthetic key had a one-hour TTL; external authenticated testing needs
+a separately approved test credential/profile gate, not silent reuse or issuance.

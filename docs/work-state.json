@@ -6,9 +6,9 @@
   "pull_request_state": "merged",
   "main_merge": {
     "approved_by_owner": true,
-    "date": "2026-10-22",
-    "main_head_after_merge": "fd2f61650bd3977947ea3679cd677dbc77bc8692",
-    "release_or_tag": null,
+    "date": "2026-10-23",
+    "main_head_after_merge": "258684311d2f4bb009e339f007978634211da8eb",
+    "release_or_tag": "operator-wheelhouse-db32c6d (pre-release; not production)",
     "production_deployed": false
   },
   "product_focus": {
@@ -26,51 +26,56 @@
     "source_sha": "db32c6ddf8f3b57874180dce81908e0d43aaa2f0",
     "evidence": "docs/ci-f3c2d2.md",
     "ci": "Python 3.10-3.13 success (992 passed on 3.11-3.13; 931+42 skipped on 3.10); build/install smoke success; operator systemd supervision success; offline package success; Documentation Pages success",
-    "kind": "CI_NOT_DEPLOYMENT",
-    "python312_passed": 992
+    "kind": "CI_ACCEPTED_AND_VPS_LOOPBACK_TESTED",
+    "python312_passed": 992,
+    "vps_test_evidence": "docs/owner-first-vps-test-2026-10-23.md"
   },
   "current_slice": {
-    "id": "F3c.2d.2",
-    "stage": "CI",
-    "contract": "docs/operator-install.md",
-    "source": "tools/operator_preflight.py",
-    "tests": "tests/test_operator_preflight.py",
-    "evidence": "docs/ci-f3c2d2.md",
-    "summary": "Default preflight protected set now includes x-ui.service (3x-ui panel and managed Xray VPN), with a regression test; the post-upgrade 4GiB VPS PASS report is recorded. No install, bootstrap or start."
+    "id": "OWNER-FIRST-VPS-LOOPBACK",
+    "stage": "VPS_TEST_PASS",
+    "contract": "docs/owner-first-vps-test-2026-10-23.md",
+    "source": "tools/operator_control.py",
+    "tests": "docs/owner-first-vps-test-2026-10-23.md",
+    "evidence": "docs/owner-first-vps-test-2026-10-23.md",
+    "summary": "Fresh isolated candidate installed from the public pre-release, bootstrapped, started on loopback, passed synthetic MCP publish/read/withdraw, then stop/start preserved state and the flow passed again. HTTPS/Caddy, real credentials, real listing and production are not accepted. Synthetic owner key has a 3600s TTL."
   },
   "next_task": {
-    "id": "OWNER-FIRST-VPS-INSTALL",
-    "title": "Separately authorized fresh install/bootstrap/start and loopback acceptance on the 4GiB host",
+    "id": "OWNER-FIRST-HTTPS-EXTERNAL",
+    "title": "Separately authorized narrow HTTPS/Caddy route and external MCP/web acceptance",
     "stage": "PERMISSION_GATE",
     "acceptance": [
-      "Do not execute any install, bootstrap, start or loopback probe until the owner explicitly approves the exact pinned source and supplies the special password; preflight PASS is not install authorization.",
-      "Use only the accepted installer/controller at the accepted source SHA, verify checksums before execution, and never reuse the stopped Rooms TEST database or the old rooms-only preflight.",
-      "Install fresh candidate paths/account/unit only; existing host services that remain enabled (mcp-server if kept, mcp-test, caddy, x-ui and other host services) must remain untouched.",
-      "Collect sanitized install/bootstrap/loopback evidence; STOP permanently on drift, occupied port, unexpected identity/path or capacity failure; no automatic retry.",
-      "Do not publish, enable HTTPS, issue real credentials or merge/release without further separate owner approvals."
+      "Do not change Caddy, HTTPS, systemd or host services until the owner explicitly approves the exact narrow route and supplies the special password.",
+      "Use a temporary route that preserves Host and strips only the /rooms prefix; do not bypass global auth broadly or expose unrelated services.",
+      "The bootstrap synthetic key has a one-hour TTL and is not a reusable production credential. Do not silently issue, delegate or reuse credentials; a separately approved listing-scoped test credential or fresh profile/key gate is required.",
+      "Check external MCP without a token returns candidate 401, then perform an authenticated external flow only with the approved test credential; publish a real card only with explicit owner consent for exact content and photos.",
+      "Collect sanitized evidence, remove the temporary route, stop the candidate, and preserve state. No production rollout or real user onboarding."
     ],
-    "contract": "docs/operator-install.md"
+    "contract": "docs/owner-first-vps-test-2026-10-23.md"
   },
   "runtime_last_known": {
     "not_a_current_probe": true,
     "rooms_test": "stopped; temporary HTTPS route removed by owner report",
     "rooms_production": "not accepted or deployed by this project",
-    "main_last_recorded_sha": "fd2f61650bd3977947ea3679cd677dbc77bc8692",
-    "pages": "documentation only; not the marketplace runtime"
+    "main_last_recorded_sha": "258684311d2f4bb009e339f007978634211da8eb",
+    "pages": "documentation only; not the marketplace runtime",
+    "owner_first_candidate": "loopback PASS 2026-10-23; active after restart (PID 4222); synthetic key TTL 1h; no HTTPS/Caddy change"
   },
   "permission_gates": [
     "Each remote execution requires separate owner approval AND special password.",
-    "Preflight, loopback install and HTTPS acceptance are three separate approvals.",
+    "Preflight, loopback install, and HTTPS/external acceptance are separate approvals.",
+    "The loopback synthetic key is one-hour and is not a reusable credential; external authenticated acceptance needs a separately approved credential/profile gate.",
     "No main merge/release/VPS or live database changes/real credential issuance without separate approval."
   ],
   "verification": {
     "local": "static preparation and AST only; no project execution",
-    "runtime": "GitHub Actions only",
+    "runtime": "GitHub Actions plus separately authorized VPS loopback TEST; no HTTPS or production",
     "commit_policy": "read remote HEAD and use expected_head_sha CAS; never force push"
   },
   "read_next": [
     "AGENTS.md",
     "docs/current-state.md",
+    "docs/owner-first-vps-test-2026-10-23.md",
+    "docs/work-state.json",
     "docs/project-map.md",
     "docs/architecture-graph.md",
     "ROADMAP.md",

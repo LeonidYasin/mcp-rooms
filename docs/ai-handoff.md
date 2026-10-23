@@ -24,36 +24,37 @@ core существует, но M3b.3 transaction-time authority остаётс�
 
 ## Принятое состояние
 
-- Branch: `feat/standalone-identity`; PRs #1–#4 merged into `main` by separate owner
-  approvals (2026-10-22). `main` is at the PR #4 merge commit
-  `fd2f61650bd3977947ea3679cd677dbc77bc8692`; no tag/release/production attached.
+- Branch: `feat/standalone-identity`; PRs #1–#5 merged into `main` by separate owner
+  approvals (2026-10-22/23). `main` is at
+  `258684311d2f4bb009e339f007978634211da8eb`; pre-release
+  `operator-wheelhouse-db32c6d` exists, but there is no production deploy.
 - Accepted application source SHA: `db32c6ddf8f3b57874180dce81908e0d43aaa2f0`.
-- Evidence: `docs/ci-f3c2d2.md`.
-- Python 3.10–3.13 CI, build/install smoke и operator systemd supervision successful.
-- Guarded lifecycle controller реализован; это CI, не VPS TEST.
-- Preflight-инструмент принят с исправленной seccomp-пробой и `x-ui.service` в
-  дефолтном protected-наборе (992 tests на Python3.12). Первый прогон на VPS
-  2026-10-22 — STOP по памяти ([отчёт](preflight-vps-2026-10-22.md)); после
-  апгрейда до 4 GiB повторный прогон — PASS
-  ([отчёт](preflight-vps-2026-10-22-4gb.md)), 3.07 GiB available. Установка не
-  выполнялась.
-- PR #4 смержен владельцем; `main` = `fd2f616`. PASS-отчёт и `x-ui.service`
-  (3x-ui-панель и managed Xray VPN) в дефолтном protected-наборе идут отдельным
-  PR; установка по-прежнему требует отдельного разрешения.
+- Evidence: `docs/ci-f3c2d2.md` and
+  `docs/owner-first-vps-test-2026-10-23.md`.
+- Python 3.10–3.13 CI, build/install smoke, operator systemd supervision and
+  installed-wheel native smoke successful.
+- Fresh isolated owner-first VPS TEST 2026-10-23: public pre-release bundle verified;
+  install/inspect, separate bootstrap, loopback start, synthetic MCP
+  publish/read/withdraw, stop-only rollback and restart + second synthetic flow all
+  PASS. MCP without token `401`, web root `404`; only `127.0.0.1:8766`.
+- No Caddy/HTTPS change, no real listing/photo, no real credential, no production.
+  The synthetic owner key had a 3600s TTL and is not reusable.
 - Новые изменения идут через `feat/standalone-identity` и отдельные owner-approved
   PR в `main`; merge требует отдельного решения владельца.
 - Старый Rooms TEST остановлен; production MCP Rooms отсутствует.
 
 ## Следующий gate
 
-Fresh isolated owner-first TEST:
+HTTPS/external acceptance — только после нового отдельного разрешения:
 
-1. read-only VPS preflight выполнен (PASS 2026-10-22;
-   [отчёт](preflight-vps-2026-10-22-4gb.md));
-2. отдельно разрешённая fresh loopback install/bootstrap/start/synthetic acceptance;
-3. отдельно разрешённый временный HTTPS и external MCP acceptance;
-4. одна реальная карточка с реальными фото и явным согласием;
-5. withdraw, cleanup и evidence.
+1. узкий временный Caddy route: preserve Host, strip only `/rooms`, no broad auth bypass;
+2. external MCP without token must return candidate `401`;
+3. authenticated external flow requires a separately approved listing-scoped test
+   credential or fresh profile/key gate. The loopback synthetic key had a one-hour
+   TTL and must not be silently reused or reissued;
+4. one real card with real photos and explicit owner consent for exact content;
+5. external read-only web check without an agent; withdraw, route cleanup, stop and
+   sanitized evidence.
 
 До разрешения можно только проверить документацию/скрипты статически и подготовить
 точный checklist. Нельзя самостоятельно выполнять remote probe.

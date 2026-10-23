@@ -20,8 +20,10 @@ def validate(root):
     assert type(accepted['python312_passed']) is int and accepted['python312_passed']>0
     assert accepted['source_sha'] in file(accepted['evidence']).read_text()
     assert accepted['source_sha'] in file('README.md').read_text()
+    if accepted.get('vps_test_evidence'):
+        assert accepted['source_sha'] in file(accepted['vps_test_evidence']).read_text()
     current=state['current_slice']
-    assert current['stage'] in {'SOURCE','CI'}
+    assert current['stage'] in {'SOURCE','CI','TEST'}
     for key in ('contract','source','tests'):file(current[key])
     registry=json.loads(file('docs/project-status.json').read_text())
     component=[n for n in registry['components'] if n['source']==current['source']]
@@ -29,6 +31,10 @@ def validate(root):
     assert component[0]['doc']==current['contract']
     if current['stage']=='CI':
         assert current['evidence']==accepted['evidence']==component[0]['evidence']
+    elif current['stage']=='TEST':
+        assert accepted.get('vps_test_evidence')
+        assert current['evidence']==component[0]['evidence']
+        file(current['evidence'])
     else:
         assert current['evidence'] is None and component[0]['evidence'] is None
     task=state['next_task']
@@ -37,7 +43,10 @@ def validate(root):
     file(task['contract'])
     for value in state['read_next']:file(value)
     assert state['runtime_last_known']['not_a_current_probe'] is True
-    assert state['verification']['runtime']=='GitHub Actions only'
+    assert state['verification']['runtime'] in {
+        'GitHub Actions only',
+        'GitHub Actions plus separately authorized VPS loopback TEST; no HTTPS or production',
+    }
     agents=file('AGENTS.md').read_text()
     assert 'docs/ai-handoff.md' in agents and 'docs/work-state.json' in agents
     assert 'special password' in agents and 'expected-head CAS' in agents

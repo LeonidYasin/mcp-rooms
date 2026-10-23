@@ -26,14 +26,14 @@
     "source_sha": "db32c6ddf8f3b57874180dce81908e0d43aaa2f0",
     "evidence": "docs/ci-f3c2d2.md",
     "ci": "Python 3.10-3.13 success (992 passed on 3.11-3.13; 931+42 skipped on 3.10); build/install smoke success; operator systemd supervision success; offline package success; Documentation Pages success",
-    "kind": "CI_ACCEPTED_AND_VPS_LOOPBACK_TESTED",
+    "kind": "CI_NOT_DEPLOYMENT",
     "python312_passed": 992,
     "vps_test_evidence": "docs/owner-first-vps-test-2026-10-23.md"
   },
   "current_slice": {
     "id": "OWNER-FIRST-VPS-LOOPBACK",
-    "stage": "VPS_TEST_PASS",
-    "contract": "docs/owner-first-vps-test-2026-10-23.md",
+    "stage": "TEST",
+    "contract": "docs/operator-install.md",
     "source": "tools/operator_control.py",
     "tests": "docs/owner-first-vps-test-2026-10-23.md",
     "evidence": "docs/owner-first-vps-test-2026-10-23.md",

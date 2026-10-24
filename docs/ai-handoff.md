@@ -48,7 +48,7 @@ core существует, но M3b.3 transaction-time authority остаётс�
 
 Проверено в CI: **F3c.2c.3c real systemd proof персистентного unit** (PR #12) и **F3c.2c.3c aggregate capacity measurement** (docs/ci-f3c2c3c.md): no OOM kill, peak < 1 GiB, tasks <= 64, cpu > 0; `fixture_capacity_bounds_only=true`, `vps_capacity_accepted=false`.
 
-Далее — только отдельным owner-разрешением: persistent install/enable персистентного unit на VPS и HTTPS/external acceptance.
+Далее — только отдельным owner-разрешением: persistent install/enable персистентного unit на VPS и HTTPS/external acceptance. Точный пакет owner-шагов и открытые блокеры — в [docs/production-readiness.md](production-readiness.md).
 
 HTTPS/external acceptance — только после нового отдельного разрешения:
 

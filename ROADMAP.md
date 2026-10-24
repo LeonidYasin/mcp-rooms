@@ -166,6 +166,16 @@ fresh profile/key gate. Caddy всё ещё не менялся.
 - [ ] Privacy/prohibited-goods/moderation policy.
 - [ ] Изолированный пилот с независимым участником.
 
+### K. Минимальный production на VPS — подготовка (только owner-шаги)
+
+- [ ] Пакет готовности: [docs/production-readiness.md](docs/production-readiness.md) (G1–G6, 증거, открытые блокеры).
+- [ ] Fresh read-only VPS preflight — `tools/operator_preflight.py` (owner approval + пароль).
+- [ ] Persistent install `operator_install.py install --persistent` из pinned pre-release `db32c6d…` (owner approval + пароль).
+- [ ] `inspect`, `bootstrap` (CREATE-FRESH-OWNER-PROFILE), `start` (START-OWNER-FIRST-CANDIDATE).
+- [ ] `enable` (ENABLE-OWNER-FIRST-CANDIDATE) — boot symlink, без старта; требует `persistent: true`.
+- [ ] HTTPS/external acceptance G3 — узкий `/rooms` route `tools/operator_route.py`, отдельное одобрение + пароль.
+- [ ] Санитизированный отчёт; решение о release/теге/rollout — отдельное решение владельца.
+
 Ориентир до полноценного внешнего marketplace TEST: **10–16 недель** одного основного
 разработчика с AI-поддержкой. До production после пилота: ещё **3–6 недель**, точнее —
 только по фактическим результатам TEST.

@@ -219,3 +219,14 @@ peak < 1 GiB, tasks <= 64, cpu > 0; `fixture_capacity_bounds_only=true`,
 `vps_capacity_accepted=false`. Остаток F3c.2c.3: full install/state disk/retention/
 exhaustion policy; install/enable персистентного unit на VPS — отдельное
 owner-разрешение. Затем: fresh VPS preflight → loopback → HTTPS/external acceptance.
+
+## Production rollout prep — первый минимальный вариант на VPS
+
+Полный пакет готовности: [docs/production-readiness.md](production-readiness.md). Кратко:
+
+- Код персистентного unit, установщика и guarded контроллера принят в CI (PR #8–#12).
+- Aggregate capacity измерены в Actions (peak ~172 MiB < 1 GiB, tasks ≤ 64, OOM 0); это fixture bounds, не VPS acceptance.
+- Остаётся только owner-выполняемая последовательность на VPS: fresh preflight → persistent install --persistent → inspect → bootstrap → start → enable (boot) → узкий HTTPS/external route /rooms → санитизированный отчёт.
+- Production rollout, release/тег и реальный карточный контент — отдельное решение владельца; нет автоматического переключения.
+- Открыто до production: off-host backup/шифрование/retention, алертинг, правила реальных ключей, real card с consent, внешний HTTPS/Caddy.
+

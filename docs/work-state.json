@@ -11,6 +11,12 @@
     "release_or_tag": "operator-wheelhouse-db32c6d (pre-release; not production)",
     "production_deployed": false
   },
+  "docs_merge": {
+    "pull_request": 6,
+    "date": "2026-10-24",
+    "main_head": "06031dbcb1dcb37d7b0b6a700b0924a9ca09f19a",
+    "content": "loopback TEST evidence and handoff state only; no application source change"
+  },
   "product_focus": {
     "primary_interface": "User chats with their own AI agent; the agent uses scoped MCP tools.",
     "web_now": "Anonymous read-only storefront for explicitly published cards and photos.",
@@ -56,7 +62,7 @@
     "not_a_current_probe": true,
     "rooms_test": "stopped; temporary HTTPS route removed by owner report",
     "rooms_production": "not accepted or deployed by this project",
-    "main_last_recorded_sha": "258684311d2f4bb009e339f007978634211da8eb",
+    "main_last_recorded_sha": "06031dbcb1dcb37d7b0b6a700b0924a9ca09f19a",
     "pages": "documentation only; not the marketplace runtime",
     "owner_first_candidate": "loopback PASS 2026-10-23; active after restart (PID 4222); synthetic key TTL 1h; no HTTPS/Caddy change"
   },

@@ -41,7 +41,7 @@ These measurements demonstrate accounting/cleanup for this fixture, not real
 native photo load, candidate admission, disk retention, concurrency or capacity.
 A live candidate-in-unit test and aggregate stress/timeouts/disk measurements remain.
 
-## Opt-in persistent rendering (prepared, not activated)
+## Opt-in persistent unit shape (wired, not activated)
 
 `tools/operator_unit.py` accepts `persistent=True` (CLI `--persistent`). The default
 output is byte-identical to the accepted TEST unit (`Restart=no`, `RuntimeMaxSec=2h`,
@@ -49,11 +49,16 @@ no `[Install]`), so existing receipts and evidence stay valid. The persistent va
 adds `Restart=on-failure`, `RestartSec=5s`, removes `RuntimeMaxSec`, and appends
 `[Install] WantedBy=multi-user.target` while keeping every sandbox/resource directive.
 
-This is rendering only: the installer and controller still render the default unit, no
-receipt carries the mode, and nothing is enabled at boot. Wiring the mode through
-`operator_install.py`/`operator_control.py` (receipt field, validation, refusal of a
-mode/unit mismatch, CI proof under real systemd, rollback) is the next bounded slice.
-A long-lived unit alone is not production capacity, backup, monitoring or approval.
+The mode is now carried end to end for fresh installs:
+`operator_install.py install --persistent` renders the persistent unit and records
+`"persistent": true` in the ready-last receipt; `inspect` and the guarded controller
+re-render with the recorded mode and refuse any receipt/unit mismatch. Receipts written
+before this field exist remain valid and mean `false` (transient), so an already
+installed TEST candidate can still be inspected, started and stopped.
+
+Still not granted: boot enable, restart-policy acceptance under real systemd, runtime
+capacity, backup/monitoring, and any production approval. The persistent shape must be
+proven by a fresh install under the real unit, not by rendering alone.
 
 ## Next implementation and acceptance
 

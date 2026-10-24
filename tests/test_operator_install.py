@@ -162,3 +162,38 @@ def test_empty_package_marker_is_inventoried_not_accepted_as_receipt(fixture):
     assert any(row.get('path')=='py.typed' for row in json.loads(m['_inventory'](release)))
     with pytest.raises(Error,match='install_unsafe_file'):m['_file'](marker)
     assert m['_file'](marker,allow_empty=True)==b''
+
+
+def test_persistent_mode_is_recorded_and_reinspected(fixture):
+    base=fixture[0]
+    m['install'](fixture[3],SHA,HASH,RESOURCE,True)
+    receipt=json.loads((base/'installation.json').read_text())
+    assert receipt['persistent'] is True
+    assert m['inspect']()['start_authorized'] is False
+
+
+def test_legacy_receipt_without_mode_is_transient(fixture):
+    base=fixture[0]
+    install(fixture)
+    receipt=json.loads((base/'installation.json').read_text())
+    assert receipt['persistent'] is False
+    del receipt['persistent']
+    (base/'installation.json').write_text(json.dumps(receipt))
+    assert m['inspect']()['checked'] is True
+
+
+def test_receipt_mode_must_match_the_rendered_unit(fixture,monkeypatch):
+    base=fixture[0]
+    install(fixture)
+    receipt=json.loads((base/'installation.json').read_text())
+    receipt['persistent']=True
+    (base/'installation.json').write_text(json.dumps(receipt))
+    monkeypatch.setattr(g['runpy'],'run_path',lambda p:{'verify':lambda *a:None,
+        'render':lambda *a:'fixture persistent unit' if len(a)>2 and a[2] else 'fixture unit'})
+    with pytest.raises(Error,match='install_code_changed'):m['inspect']()
+
+
+@pytest.mark.parametrize('mode',['yes',1,0,None,[],object()])
+def test_install_requires_strict_bool_mode(fixture,mode):
+    with pytest.raises(Error,match='install_invalid_mode'):m['install'](fixture[3],SHA,HASH,RESOURCE,mode)
+    assert not (fixture[0]/'installation.json').exists()

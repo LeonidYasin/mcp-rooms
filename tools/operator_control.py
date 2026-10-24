@@ -177,14 +177,19 @@ def _validate(i,state):
     receipt=_read_json(i['_file'](BASE/'installation.json',16384))
     keys={'format','source_sha','lock_sha256','resource','tools','python_sha256','identity','base_device','base_inode',
           'inventory_sha256','unit_sha256','profile_created','start_authorized','runtime_capacity_accepted'}
-    if (type(receipt) is not dict or set(receipt)!=keys or receipt['format']!=FORMAT
+    # Receipts written before the opt-in mode existed stay valid and mean transient.
+    shape=set(receipt) if type(receipt) is dict else set()
+    mode=receipt.get('persistent',False) if type(receipt) is dict else None
+    if (type(receipt) is not dict or (shape!=keys|{'persistent'} and shape!=keys) or type(mode) is not bool
+            or receipt['format']!=FORMAT
             or receipt['profile_created'] is not False or receipt['start_authorized'] is not False
             or receipt['runtime_capacity_accepted'] is not False or receipt['tools']!=tools
             or receipt['python_sha256']!=python_hash or receipt['identity']!=i['_account']()
             or receipt['base_device']!=BASE.stat().st_dev or receipt['base_inode']!=BASE.stat().st_ino
             or not re.fullmatch('[0-9a-f]{40}',str(receipt['source_sha']))):
         raise ControlError('control_installation_mismatch')
-    expected=runpy.run_path(str(ROOT/'tools/operator_unit.py'))['render'](receipt['source_sha'],receipt['resource']).encode()
+    expected=runpy.run_path(str(ROOT/'tools/operator_unit.py'))['render'](
+        receipt['source_sha'],receipt['resource'],mode).encode()
     if (sha256(i['_file'](UNIT)).hexdigest()!=receipt['unit_sha256'] or i['_file'](UNIT)!=expected
             or sha256(i['_file'](BASE/'inventory.json',4*1024**2)).hexdigest()!=receipt['inventory_sha256']
             or sha256(i['_inventory'](BASE/'releases'/receipt['source_sha'])).hexdigest()!=receipt['inventory_sha256']):

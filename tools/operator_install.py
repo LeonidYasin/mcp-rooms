@@ -251,20 +251,22 @@ def _build(argv,venv,identity):
         time.sleep(.1)
 
 
-def _inputs(bundle,source,lock_hash,resource):
+def _inputs(bundle,source,lock_hash,resource,persistent=False):
     if not isinstance(source,str) or not re.fullmatch('[0-9a-f]{40}',source):raise InstallError('install_source_required')
     if not isinstance(lock_hash,str) or not re.fullmatch('[0-9a-f]{64}',lock_hash):raise InstallError('install_lock_required')
+    if type(persistent) is not bool:raise InstallError('install_invalid_mode')
     _host();tools=_trusted();python_hash=_python();bundle=Path(bundle)
     _chain(bundle)
     actual=sha256(_file(ROOT/'operator/runtime-linux-x86_64-py312.lock')).hexdigest()
     if actual!=lock_hash:raise InstallError('install_lock_mismatch')
     verified=runpy.run_path(str(ROOT/'tools/operator_bundle.py'))['verify'](bundle,source,lock_hash)
-    rendered=runpy.run_path(str(ROOT/'tools/operator_unit.py'))['render'](source,resource)
+    rendered=runpy.run_path(str(ROOT/'tools/operator_unit.py'))['render'](source,resource,persistent)
     return tools,python_hash,verified,rendered.encode()
 
 
-def install(bundle,source,lock_hash,resource):
-    tools,python_hash,verified,unit=_inputs(bundle,source,lock_hash,resource)
+def install(bundle,source,lock_hash,resource,persistent=False):
+    if type(persistent) is not bool:raise InstallError('install_invalid_mode')
+    tools,python_hash,verified,unit=_inputs(bundle,source,lock_hash,resource,persistent)
     with _lock():
         for p in (BASE.parent,STATE.parent,UNIT.parent):_chain(p)
         _capacity();_absent_account();_absent_unit(NAME);_absent_unit(BUILD)
@@ -305,6 +307,7 @@ def install(bundle,source,lock_hash,resource):
             'tools':tools,'python_sha256':python_hash,'identity':identity,
             'base_device':BASE.stat().st_dev,'base_inode':BASE.stat().st_ino,
             'inventory_sha256':sha256(inventory).hexdigest(),'unit_sha256':sha256(unit).hexdigest(),
+            'persistent':persistent,
             'profile_created':False,'start_authorized':False,'runtime_capacity_accepted':False}
         _new(BASE/'installation.json',_dump(receipt)) # ready-last, no bootstrap/start
         return {'installed':True,'profile_created':False,'started':False,'start_authorized':False,'source_sha':source}
@@ -326,14 +329,19 @@ def inspect():
         except (ValueError,UnicodeError,RecursionError):raise InstallError('install_invalid_receipt') from None
         keys={'format','source_sha','lock_sha256','resource','tools','python_sha256','identity','base_device','base_inode',
               'inventory_sha256','unit_sha256','profile_created','start_authorized','runtime_capacity_accepted'}
-        if (type(receipt) is not dict or set(receipt)!=keys or receipt['format']!=FORMAT
+        # Receipts written before the opt-in mode existed stay valid and mean transient.
+        shape=set(receipt) if type(receipt) is dict else set()
+        mode=receipt.get('persistent',False) if type(receipt) is dict else None
+        if (type(receipt) is not dict or (shape!=keys|{'persistent'} and shape!=keys) or type(mode) is not bool
+                or receipt['format']!=FORMAT
                 or receipt['profile_created'] is not False or receipt['start_authorized'] is not False
                 or receipt['runtime_capacity_accepted'] is not False or receipt['tools']!=tools
                 or receipt['python_sha256']!=python_hash or receipt['identity']!=_account()
                 or receipt['base_device']!=BASE.stat().st_dev or receipt['base_inode']!=BASE.stat().st_ino
                 or not re.fullmatch('[0-9a-f]{40}',str(receipt['source_sha']))):
             raise InstallError('install_receipt_mismatch')
-        expected=runpy.run_path(str(ROOT/'tools/operator_unit.py'))['render'](receipt['source_sha'],receipt['resource']).encode()
+        expected=runpy.run_path(str(ROOT/'tools/operator_unit.py'))['render'](
+            receipt['source_sha'],receipt['resource'],mode).encode()
         if (sha256(_file(UNIT)).hexdigest()!=receipt['unit_sha256'] or _file(UNIT)!=expected
                 or sha256(_file(BASE/'inventory.json',4*1024**2)).hexdigest()!=receipt['inventory_sha256']
                 or sha256(_inventory(BASE/'releases'/receipt['source_sha'])).hexdigest()!=receipt['inventory_sha256']):
@@ -350,11 +358,13 @@ def inspect():
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['install','inspect'])
     for name in ('bundle','source-sha','lock-sha256','resource'):parser.add_argument('--'+name)
+    parser.add_argument('--persistent',action='store_true',
+        help='install the opt-in long-lived unit shape; still not started or enabled')
     a=parser.parse_args();os.umask(0o077)
     try:
         if a.action=='install':
             if not all((a.bundle,a.source_sha,a.lock_sha256,a.resource)):raise InstallError('install_arguments_required')
-            result=install(Path(a.bundle),a.source_sha,a.lock_sha256,a.resource)
+            result=install(Path(a.bundle),a.source_sha,a.lock_sha256,a.resource,a.persistent)
         else:result=inspect()
         print(json.dumps({'ok':True,**result}));return 0
     except InstallError as exc:print(json.dumps({'ok':False,'error':str(exc)}));return 1

@@ -62,7 +62,7 @@
     "not_a_current_probe": true,
     "rooms_test": "stopped; temporary HTTPS route removed by owner report",
     "rooms_production": "not accepted or deployed by this project",
-    "main_last_recorded_sha": "06031dbcb1dcb37d7b0b6a700b0924a9ca09f19a",
+    "main_last_recorded_sha": "0979c34f832e64dcec626f8ec40f24077c243280",
     "pages": "documentation only; not the marketplace runtime",
     "owner_first_candidate": "loopback PASS 2026-10-23; active after restart (PID 4222); synthetic key TTL 1h; no HTTPS/Caddy change"
   },

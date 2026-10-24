@@ -190,7 +190,8 @@ def test_enable_is_idempotent_and_refuses_an_unwanted_start(control,monkeypatch)
     control[2]['persistent']=True
     monkeypatch.setitem(g,'_enabled',lambda:'enabled')
     assert m['enable'](g['ENABLE_AUTH'])=={'enabled':True,'already':True,'started':False}
-    monkeypatch.setitem(g,'_enabled',lambda:'disabled')
+    states=iter(['disabled','enabled'])
+    monkeypatch.setitem(g,'_enabled',lambda:next(states))
     monkeypatch.setitem(g,'_show',lambda:{'ActiveState':'active','MainPID':'123'})
     with pytest.raises(Error,match='control_enable_started_the_unit'):
         m['enable'](g['ENABLE_AUTH'])

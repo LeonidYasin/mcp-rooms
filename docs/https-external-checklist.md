@@ -129,7 +129,7 @@ unit), без ключей, host-секретов, базовой конфигу
 | G1 | Код + CI (принятый source `db32c6d…`) | принято |
 | G2 | Изолированный loopback TEST на VPS | принято 2026-10-23 |
 | G3 | HTTPS/external acceptance (этот документ) | подготовлено, не разрешено |
-| G4 | Персистентный unit + boot-enable + route-helper | не начато (нужен slice) |
+| G4 | Персистентный unit + boot-enable + route-helper | рендер/wiring/enable-контроль и route-helper готовы в коде; реальная проверка под systemd и включение — по разрешению |
 | G5 | Backup/restore, ключи, мониторинг, runbook | не начато |
 | G6 | Release/production rollout по решению владельца | не начато |
 

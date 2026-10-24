@@ -51,7 +51,9 @@
     "stage": "CI",
     "acceptance": [
       "Run the existing candidate-in-unit harness in Actions and record cgroup measurements; no OOM kill, peak < 1 GiB, tasks <= 64, cpu > 0.",
-      "No VPS action; no merge/release/production; HTTPS/external acceptance still requires a new owner approval and special password."
+      "Publish aggregate evidence (memory.peak, sampled tasks/native peak, CPU, state disk) in docs with exact source SHA; fixture_capacity_bounds_only=true, vps_capacity_accepted=false.",
+      "No VPS action; no merge/release/production; HTTPS/external acceptance still requires a new owner approval and special password.",
+      "Persistent install/enable on VPS remains owner-approved only; transient unit (RuntimeMaxSec=2h) stays current until owner decision."
     ],
     "contract": "docs/candidate-unit-ci.md"
   },

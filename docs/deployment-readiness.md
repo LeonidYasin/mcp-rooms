@@ -202,3 +202,18 @@ Still open: a narrow Caddy/HTTPS route, external MCP/web acceptance, a real card
 with real photos and explicit consent, cleanup/evidence, and production decisions.
 The loopback synthetic key had a one-hour TTL; external authenticated testing needs
 a separately approved test credential/profile gate, not silent reuse or issuance.
+
+## Актуализация после F3c.2c.3c — real systemd proof персистентного unit (G4c)
+
+[F3c.2c.3c: real systemd proof персистентного unit policy принят в CI](operator-supervision.md):
+`tools/ci_persistent_unit.py` в workflow `Operator systemd supervision proof` подтвердил на
+disposable GitHub runner под **реальным systemd** рендер персистентного unit: `Restart=on-failure`,
+`RestartSec=5s`, без runtime ceiling и `[Install] WantedBy=multi-user.target`; transient-рендер
+сохраняет `RuntimeMaxSec=2h` и без `[Install]`. При персистентном режиме `RuntimeMaxUSec=infinity`;
+`systemctl enable` создаёт boot symlink без старта, kill -9 ведёт к авто-restart с новым `MainPID`,
+`disable` убирает symlink без stop, stop оставляет unit inactive.
+
+Это policy proof, а не установка на VPS и не capacity/VPS acceptance. Остаток F3c.2c.3: aggregate
+capacity измерения (cgroup memory.peak/RSS, CPU, tasks/native, state disk) и full install/state
+disk/retention/exhaustion policy; install/enable персистентного unit на VPS — отдельное
+owner-разрешение. Затем: fresh VPS preflight → loopback → HTTPS/external acceptance.

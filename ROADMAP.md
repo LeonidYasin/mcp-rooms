@@ -48,9 +48,9 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 - 2026-10-22: первый read-only preflight на VPS — STOP по памяти
   ([отчёт](docs/preflight-vps-2026-10-22.md)); seccomp-проверка исправлена в CI.
 - 2026-10-22: после апгрейда до 4 GiB повторный preflight — PASS
-  ([отчёт](docs/preflight-vps-2026-10-22-4gb.md)); установка не выполнялась.
+  ([отчёт](docs/preflight-vps-2026-10-22-4gb.md)); на тот момент установка не выполнялась.
 - 2026-10-22: `x-ui.service` (3x-ui-панель и managed Xray VPN) добавлен в
-  дефолтный protected-набор preflight; установка не выполнялась.
+  дефолтный protected-набор preflight; на тот момент установка не выполнялась.
 - 2026-10-22: базовая alpha принята владельцем и объединена в `main` (линейная история,
   SHA `7c1bd3b9…`); тег/релиз/production не созданы.
 - 2026-10-22: F3c.2d принят владельцем и смержен в `main`
@@ -59,6 +59,13 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 - 2026-10-22: seccomp-исправление и первый VPS preflight смержены
   ([PR #4](https://github.com/LeonidYasin/mcp-rooms/pull/4), merge commit `fd2f616…`);
   тег/релиз/production не созданы.
+- 2026-10-23: `x-ui` protected default и 4 GiB preflight PASS смержены
+  ([PR #5](https://github.com/LeonidYasin/mcp-rooms/pull/5), `main` = `2586843…`);
+  опубликован offline pre-release `operator-wheelhouse-db32c6d`.
+- 2026-10-23: fresh isolated loopback TEST на VPS — install/bootstrap/start,
+  synthetic MCP publish/read/withdraw, stop-only rollback и restart + повторный
+  flow PASS ([evidence](docs/owner-first-vps-test-2026-10-23.md)). Caddy/HTTPS,
+  реальная карточка и production не принимались.
 
 ## Сейчас: первый fresh owner-first TEST
 
@@ -74,8 +81,8 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 Требует отдельного разрешения и специального пароля.
 
 - [x] Read-only инструмент `tools/operator_preflight.py` принят в CI ([F3c.2d.1](docs/ci-f3c2d1.md), [F3c.2d.2](docs/ci-f3c2d2.md)); `x-ui.service` входит в defaults.
-- [x] Первый прогон на VPS выполнен ([отчёт](docs/preflight-vps-2026-10-22.md)): STOP по памяти (1.18 GiB < 2 GiB floor); установка не выполнялась.
-- [x] Повторный прогон после апгрейда до 4 GiB — PASS ([отчёт](docs/preflight-vps-2026-10-22-4gb.md)); установка не выполнялась.
+- [x] Первый прогон на VPS выполнен ([отчёт](docs/preflight-vps-2026-10-22.md)): STOP по памяти (1.18 GiB < 2 GiB floor); на тот момент установка не выполнялась.
+- [x] Повторный прогон после апгрейда до 4 GiB — PASS ([отчёт](docs/preflight-vps-2026-10-22-4gb.md)); на тот момент установка не выполнялась.
 - [x] Проверить trusted `/usr/bin/python3.12`, Linux x86_64, cgroup v2 и Landlock/seccomp — подтверждено PASS-прогоном.
 - [x] Проверить свободные новые user/group/unit/paths/port без изменения хоста — подтверждено PASS-прогоном.
 - [x] Проверить RAM, disk, inode и filesystem ancestor safety — подтверждено PASS-прогоном.
@@ -84,18 +91,22 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 
 ### Gate C — isolated loopback TEST
 
-Требует отдельного разрешения.
+Выполнено 2026-10-23; evidence:
+[owner-first-vps-test-2026-10-23.md](docs/owner-first-vps-test-2026-10-23.md).
 
-- [ ] Установить exact accepted artifact в новые fixed paths.
-- [ ] Отдельно авторизовать bootstrap disposable owner key.
-- [ ] Запустить только loopback.
-- [ ] Выполнить synthetic MCP draft → upload → preview → consent → publish → GET → withdraw.
-- [ ] Проверить restart/state preservation, resource measurements и stop-only rollback.
-- [ ] Не использовать старую Rooms TEST DB и не менять Caddy.
+- [x] Установить exact accepted artifact в новые fixed paths.
+- [x] Отдельно авторизовать bootstrap disposable owner key.
+- [x] Запустить только loopback.
+- [x] Выполнить synthetic MCP draft → upload → preview → consent → publish → GET → withdraw.
+- [x] Проверить restart/state preservation и stop-only rollback.
+- [ ] Снять runtime resource measurements (RSS/peak cgroup) — отдельный ops/HTTPS gate.
+- [x] Не использовать старую Rooms TEST DB и не менять Caddy.
 
 ### Gate D — temporary HTTPS/external MCP acceptance
 
-Требует нового отдельного разрешения.
+Требует нового отдельного разрешения. Loopback synthetic key имел TTL 1 час;
+после истечения нужен отдельно одобренный listing-scoped test credential или
+fresh profile/key gate. Caddy всё ещё не менялся.
 
 - [ ] Добавить узкий временный route с cleanup/manual fallback.
 - [ ] Проверить реальный внешний MCP-клиент.

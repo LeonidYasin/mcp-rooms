@@ -1,8 +1,18 @@
 # F3c.2c.3a — fresh-only install, never implicit start
 
-**Accepted in [exact-source Actions](ci-f3c2c3a.md),939 tests3.12. No VPS execution authorized.**
+**Accepted in [exact-source Actions](ci-f3c2c3a.md),939 tests3.12.**
 `tools/operator_install.py`: install/inspect only. No bootstrap, key read, enable,
 start, upgrade, deletion or recovery. Presence of an installed unit is not start approval.
+
+## VPS execution — 2026-10-23
+
+A separate owner-approved fresh isolated loopback TEST completed. The public
+pre-release bundle was verified; install/inspect returned `installed:true` and
+`start_authorized:false`; a separately authorized controller run then created the
+disposable profile and started the candidate on `127.0.0.1:8766`. Synthetic MCP
+publish/read/withdraw, stop-only rollback, restart and a second synthetic flow
+passed. Caddy/HTTPS, a real card, real credentials and production were not accepted.
+See [the loopback evidence](owner-first-vps-test-2026-10-23.md).
 
 ## Trust and effects
 
@@ -54,8 +64,9 @@ production installer has no deletion operation.
 
 Next: separately reviewed profile bootstrap and start/stop controller, just-before-
 effect identity and interrupted-start cleanup, adopted runtime/disk safety margins,
-then separately approved fresh VPS preflight → loopback → HTTPS. Every VPS execution
-requires explicit approval AND special password. Do not run CI harness on VPS.
+then separately approved fresh VPS preflight → loopback → HTTPS. The preflight and
+loopback stages are now recorded; HTTPS/external remains a new approval. Every VPS
+execution requires explicit approval AND special password. Do not run CI harness on VPS.
 
 CI prerequisite: hosted Actions `/opt` is0777. The disposable fixture temporarily
 hardens that ancestor and restores it on safe teardown. This is **not** an installer

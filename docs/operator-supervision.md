@@ -80,6 +80,24 @@ backup/restore, monitoring, real credentials, capacity measurement and the owner
 release decision remain open, and every host action still needs separate approval and
 the special password.
 
+## Real systemd proof of the persistent policy (Actions only)
+
+`tools/ci_persistent_unit.py` runs in the `Operator systemd supervision proof` workflow
+on a disposable GitHub runner. It asserts the real rendered unit contains
+`Restart=on-failure`, `RestartSec=5s`, no runtime ceiling and
+`[Install] WantedBy=multi-user.target`, while the default rendering keeps
+`RuntimeMaxSec=2h` and no `[Install]`; then it syntax-checks the real unit with a
+synthetic `ExecStart`.
+
+With a synthetic fixture unit carrying the same policy it proves on real systemd:
+`RuntimeMaxUSec=infinity`; `systemctl enable` creates the boot symlink without starting
+or restarting; killing the main process is followed by an automatic restart with a new
+`MainPID`; `systemctl disable` removes the symlink without stopping the unit; and stop
+leaves the unit inactive. Teardown stops, disables, removes the unit, symlink and work
+directory, then reloads systemd.
+
+This is policy proof, not the application under load and not VPS/production acceptance.
+
 ## Next implementation and acceptance
 
 1. Root-owned fresh-only reviewed installation wrapper; atomic ready-last release

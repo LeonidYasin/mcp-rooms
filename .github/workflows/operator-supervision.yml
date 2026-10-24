@@ -22,3 +22,5 @@ jobs:
           systemd-analyze verify /tmp/mcp-rooms-unit-syntax.service
       - name: Real cgroup fixture on disposable runner only
         run: sudo --non-interactive env -i GITHUB_ACTIONS=true PATH=/usr/bin:/bin /usr/bin/python3 -I "$GITHUB_WORKSPACE/tools/ci_systemd_supervision.py"
+      - name: Real persistent-unit enable and restart proof
+        run: sudo --non-interactive env -i GITHUB_ACTIONS=true PATH=/usr/bin:/bin /usr/bin/python3 -I "$GITHUB_WORKSPACE/tools/ci_persistent_unit.py" "$GITHUB_SHA"

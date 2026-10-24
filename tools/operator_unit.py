@@ -11,13 +11,26 @@ BASE='/opt/'+USER
 STATE='/var/lib/'+USER
 
 
-def render(source,resource):
+def render(source,resource,persistent=False):
     if type(source) is not str or not re.fullmatch('[0-9a-f]{40}',source):
         raise ValueError('unit_invalid_source')
+    if type(persistent) is not bool:
+        raise ValueError('unit_invalid_mode')
     resource=runpy.run_path(str(ROOT/'tools/operator_plan.py'))['_resource'](resource)
     release=BASE+'/releases/'+source
-    # Values are review ceilings, not measured host capacity. No autostart target.
+    if persistent:
+        # Opt-in long-lived rendering: no runtime ceiling and a bounded restart policy.
+        # Rendering still grants no install/enable/start authority.
+        policy='Restart=on-failure\nRestartSec=5s\n'
+        install='\n[Install]\nWantedBy=multi-user.target\n'
+        mode='persistent (requested; enable still requires separate approval)'
+    else:
+        policy='Restart=no\nRuntimeMaxSec=2h\n'
+        install=''
+        mode='transient review unit (accepted TEST shape)'
+    # Values are review ceilings, not measured host capacity.
     return f"""# Review candidate only; no install/enable authorization.
+# Mode: {mode}
 # Source: {source}; capacity acceptance remains pending.
 [Unit]
 Description=MCP Rooms isolated owner-first candidate
@@ -31,13 +44,11 @@ WorkingDirectory={release}
 ExecStart={release}/venv/bin/python -I -m mcp_rooms.test_candidate serve --state {STATE}/owner-first --resource {resource}
 Environment=PATH=/usr/bin:/bin LANG=C.UTF-8 PYTHONUTF8=1 HOME={STATE}
 UMask=0077
-Restart=no
 KillMode=control-group
 SendSIGKILL=yes
 TimeoutStartSec=30s
 TimeoutStopSec=10s
-RuntimeMaxSec=2h
-CPUAccounting=yes
+{policy}CPUAccounting=yes
 MemoryAccounting=yes
 TasksAccounting=yes
 CPUQuota=100%
@@ -64,13 +75,15 @@ RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
 StandardInput=null
 StandardOutput=null
 StandardError=null
-"""
+{install}"""
 
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--source-sha',required=True);p.add_argument('--resource',required=True)
-    a=p.parse_args();print(render(a.source_sha,a.resource),end='')
+    p.add_argument('--persistent',action='store_true',
+        help='render the opt-in long-lived unit; still grants no install/enable/start authority')
+    a=p.parse_args();print(render(a.source_sha,a.resource,a.persistent),end='')
 
 
 if __name__=='__main__':main()

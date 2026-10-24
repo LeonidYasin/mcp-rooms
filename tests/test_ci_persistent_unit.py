@@ -18,7 +18,7 @@ def test_refuses_when_actions_flag_is_not_exactly_true(monkeypatch):
 
 
 def test_fixture_unit_carries_the_same_policy_as_the_real_unit():
-    unit=m['fixture_unit']()
+    unit=m['fixture_unit'](Path('/run/mcp-rooms-ci-persistent/fixture.py'))
     assert 'Restart=on-failure' in unit and 'RestartSec=1s' in unit
     assert 'RuntimeMaxSec' not in unit
     assert '[Install]\nWantedBy=multi-user.target\n' in unit

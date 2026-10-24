@@ -78,10 +78,7 @@ def check_rendering(source):
             'boot_target':'multi-user.target','transient_shape_unchanged':True}
 
 
-def fixture_unit():
-    script=WORK/'fixture.py'
-    script.write_text('import time\ntime.sleep(120)\n')
-    script.chmod(0o644)
+def fixture_unit(script):
     return ('[Unit]\nDescription=Ephemeral MCP Rooms persistent-unit proof\n'
         '[Service]\nType=exec\n'
         'ExecStart=/usr/bin/python3 -I '+str(script)+'\n'
@@ -118,8 +115,11 @@ def main(argv=None):
     unit_created=started=False
     try:
         WORK.mkdir(mode=0o755)
+        script=WORK/'fixture.py'
+        script.write_text('import time\ntime.sleep(120)\n')
+        script.chmod(0o644)
         with UNIT.open('x') as stream:
-            unit_created=True;stream.write(fixture_unit())
+            unit_created=True;stream.write(fixture_unit(script))
         UNIT.chmod(0o644)
         run('/usr/bin/systemd-analyze','verify',str(UNIT))
         run('/usr/bin/systemctl','daemon-reload')

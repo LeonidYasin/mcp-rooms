@@ -46,10 +46,9 @@ core существует, но M3b.3 transaction-time authority остаётс�
 
 ## Следующий gate
 
-После подтверждённого в CI [F3c.2c.3c real systemd proof персистентного unit](../docs/deployment-readiness.md)
-(PR #12, workflow `Operator systemd supervision proof`) следующий шаг — aggregate capacity
-measurement через существующий harness `tools/ci_candidate_unit.py` в Actions; затем отдельное
-owner-разрешение на persistent install/enable и HTTPS/external acceptance.
+Проверено в CI: **F3c.2c.3c real systemd proof персистентного unit** (PR #12) и **F3c.2c.3c aggregate capacity measurement** (docs/ci-f3c2c3c.md): no OOM kill, peak < 1 GiB, tasks <= 64, cpu > 0; `fixture_capacity_bounds_only=true`, `vps_capacity_accepted=false`.
+
+Далее — только отдельным owner-разрешением: persistent install/enable персистентного unit на VPS и HTTPS/external acceptance.
 
 HTTPS/external acceptance — только после нового отдельного разрешения:
 

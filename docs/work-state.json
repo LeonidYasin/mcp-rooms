@@ -46,16 +46,17 @@
     "summary": "Fresh isolated candidate installed from the public pre-release, bootstrapped, started on loopback, passed synthetic MCP publish/read/withdraw, then stop/start preserved state and the flow passed again. HTTPS/Caddy, real credentials, real listing and production are not accepted. Synthetic owner key has a 3600s TTL."
   },
   "next_task": {
-    "id": "F3C-2C-3C-AGGREGATE-CAPACITY",
-    "title": "Aggregate capacity measurement under the exact candidate unit (cgroup memory.peak/RSS, CPU, tasks/native peak, state disk) via tools/ci_candidate_unit.py in Actions; then owner-approved persistent install/enable and HTTPS/external acceptance",
-    "stage": "CI",
+    "id": "G3-G4-VPS-OWNER-GATED",
+    "title": "Persistent install/enable персистентного unit и HTTPS/external acceptance на VPS — только отдельным owner-разрешением",
+    "stage": "PERMISSION_GATE",
     "acceptance": [
-      "Run the existing candidate-in-unit harness in Actions and record cgroup measurements; no OOM kill, peak < 1 GiB, tasks <= 64, cpu > 0.",
-      "Publish aggregate evidence (memory.peak, sampled tasks/native peak, CPU, state disk) in docs with exact source SHA; fixture_capacity_bounds_only=true, vps_capacity_accepted=false.",
-      "No VPS action; no merge/release/production; HTTPS/external acceptance still requires a new owner approval and special password.",
-      "Persistent install/enable on VPS remains owner-approved only; transient unit (RuntimeMaxSec=2h) stays current until owner decision."
+      "Aggregate capacity evidencedocs/ci-f3c2c3c.md опубликована (no OOM kill, peak < 1 GiB, tasks <= 64, cpu > 0); fixture_capacity_bounds_only=true, vps_capacity_accepted=false.",
+      "Persistent install/enable персистентного unit на VPS требует отдельного одобрения владельца и специального пароля; агент не выполняет remote/SSH/VPS.",
+      "HTTPS/external acceptance (G3) требует отдельного одобрения узкого Caddy route /rooms и специального пароля; synthetic key TTL 1h не переиспользуется и не выпускается молча.",
+      "Подготовить статически docs/чеклисты, но не выполнять серверные операции без отдельного согласия владельца и специального пароля.",
+      "Ни main, ни release/tag, ни production не меняются автоматически."
     ],
-    "contract": "docs/candidate-unit-ci.md"
+    "contract": "docs/https-external-checklist.md"
   },
   "runtime_last_known": {
     "not_a_current_probe": true,
@@ -87,7 +88,8 @@
     "docs/project-status.json",
     "docs/deployment-readiness.md",
     "docs/operator-install.md",
-    "docs/ci-f3c2c3b.md"
+    "docs/ci-f3c2c3b.md",
+    "docs/ci-f3c2c3c.md"
   ],
   "paused_tasks": [
     {

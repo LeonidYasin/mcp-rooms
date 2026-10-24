@@ -107,6 +107,7 @@ Current [F3c.2c.1](docs/operator-supervision.md): [accepted in CI](docs/ci-f3c2c
 Current [F3c.2c.2](docs/candidate-unit-ci.md): [accepted in CI](docs/ci-f3c2c2.md): real installed candidate under exact unit, native photo/body admission/timeouts and aggregate fixture measurements.
 Current [F3c.2c.3a install/inspect](docs/operator-install.md): [accepted in CI](docs/ci-f3c2c3a.md); actual fresh-only installer, no bootstrap/start.
 Previous [F3c.2c.3b guarded controller](docs/operator-install.md): [accepted in CI](docs/ci-f3c2c3b.md); separately authorized capacity/bootstrap/start/stop, never run on a VPS.
+Current [F3c.2c.3c aggregate capacity](docs/ci-f3c2c3c.md): [accepted in CI](docs/ci-f3c2c3c.md); cgroup memory.peak ~172 MiB < 1 GiB, tasks <= 64, cpu > 0, no OOM kill under exact candidate unit; fixture_capacity_bounds_only=true, vps_capacity_accepted=false. Persistent install/enable on VPS and HTTPS/external acceptance remain owner-approved only.
 Current [F3c.2d.2 read-only VPS preflight](tools/operator_preflight.py): [accepted in CI](docs/ci-f3c2d2.md) with a live seccomp filter probe and `x-ui.service` in the default protected set; after a RAM upgrade to 4 GiB the rerun [passed](docs/preflight-vps-2026-10-22-4gb.md) (3.07 GiB available). No install was attempted; install requires separate owner approval.
 
 - [Delivery plan / dependencies / risks / acceptance gates](docs/delivery-plan.md).

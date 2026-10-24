@@ -129,6 +129,7 @@ nav:
     - CI fresh install F3c.2c.3a: docs/ci-f3c2c3a.md
     - CI unit/cgroup F3c.2c.1: docs/ci-f3c2c1.md
     - CI real candidate unit F3c.2c.2: docs/ci-f3c2c2.md
+    - CI aggregate capacity F3c.2c.3c: docs/ci-f3c2c3c.md
     - CI сайта и публикация: docs/ci-pages.md
     - Итоги исследования: docs/marketplace-research-final.md
     - Проверка кандидатов: docs/candidate-source-checks.md

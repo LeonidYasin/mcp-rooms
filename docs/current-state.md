@@ -123,13 +123,11 @@ owner-approved PR в `main`.
 
 ## Следующий шаг
 
-Проверено в CI: **F3c.2c.3c real systemd proof персистентного unit** (PR #12 — все чеки
-зелёные, `mergeStateStatus: CLEAN`, `deploy` skipped). Следующее — aggregate capacity
-measurement через `tools/ci_candidate_unit.py` в Actions, затем отдельное owner-разрешение
-на persistent install/enable и HTTPS/external acceptance.
+Проверено в CI: **F3c.2c.3c real systemd proof персистентного unit** (PR #12) и **F3c.2c.3c aggregate capacity measurement** (PR #13/work-state, docs/ci-f3c2c3c.md): no OOM kill, peak ~172 MiB < 1 GiB, tasks <= 64, cpu > 0; `fixture_capacity_bounds_only=true`, `vps_capacity_accepted=false`.
 
-Loopback-часть fresh owner-first TEST завершена. Следующая крупная точка —
-**HTTPS/external acceptance**, только после нового отдельного разрешения:
+Далее — только отдельным owner-разрешением: persistent install/enable персистентного unit на VPS и **HTTPS/external acceptance** (G3). Каждая серверная операция требует отдельного согласия владельца и специального пароля. Агент не выполняет remote/SSH/VPS.
+
+Loopback-часть fresh owner-first TEST завершена. HTTPS/external acceptance — только после нового отдельного разрешения:
 
 1. узкий временный Caddy route с сохранением Host и снятием только `/rooms`;
 2. проверка external MCP без токена (`401`) и с одобренным test credential;

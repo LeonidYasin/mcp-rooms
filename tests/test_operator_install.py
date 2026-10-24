@@ -188,7 +188,7 @@ def test_receipt_mode_must_match_the_rendered_unit(fixture,monkeypatch):
     receipt=json.loads((base/'installation.json').read_text())
     receipt['persistent']=True
     (base/'installation.json').write_text(json.dumps(receipt))
-    monkeypatch.setitem(g['runpy'],'run_path',lambda p:{'verify':lambda *a:None,
+    monkeypatch.setattr(g['runpy'],'run_path',lambda p:{'verify':lambda *a:None,
         'render':lambda *a:'fixture persistent unit' if len(a)>2 and a[2] else 'fixture unit'})
     with pytest.raises(Error,match='install_code_changed'):m['inspect']()
 

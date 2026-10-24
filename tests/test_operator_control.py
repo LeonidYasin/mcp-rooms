@@ -157,3 +157,55 @@ def test_expected_command_is_exact_and_has_no_key_path():
 
 def test_duplicate_receipt_keys_refused():
     with pytest.raises(Error,match='control_invalid_receipt'):m['_pairs']([('a',1),('a',2)])
+
+
+@pytest.mark.parametrize('action,code',[('enable','control_enable_authorization_required'),
+    ('disable','control_disable_authorization_required')])
+def test_enable_and_disable_require_their_own_authorization(control,action,code):
+    with pytest.raises(Error,match=code):m[action]('wrong')
+    assert control[1]==[]
+
+
+@pytest.mark.parametrize('mode',[None,False,'yes'])
+def test_enable_refuses_a_non_persistent_receipt(control,mode):
+    if mode is not None:control[2]['persistent']=mode
+    with pytest.raises(Error,match='control_enable_requires_persistent_mode'):
+        m['enable'](g['ENABLE_AUTH'])
+
+
+def test_enable_only_enables_and_never_starts(control,monkeypatch):
+    control[2]['persistent']=True
+    calls=iter(['disabled','enabled'])
+    monkeypatch.setitem(g,'_enabled',lambda:next(calls))
+    monkeypatch.setitem(g,'_show',lambda:{'ActiveState':'inactive','MainPID':'0'})
+    result=m['enable'](g['ENABLE_AUTH'])
+    assert result=={'enabled':True,'already':False,'started':False,
+        'boot_target':'multi-user.target','source_sha':SHA}
+    assert ('run',('/usr/bin/systemctl','enable',g['NAME'])) in control[1]
+    assert not any('start' in ' '.join(item[1]) for item in control[1] if isinstance(item,tuple))
+    assert 'validate:inactive' in control[1]
+
+
+def test_enable_is_idempotent_and_refuses_an_unwanted_start(control,monkeypatch):
+    control[2]['persistent']=True
+    monkeypatch.setitem(g,'_enabled',lambda:'enabled')
+    assert m['enable'](g['ENABLE_AUTH'])=={'enabled':True,'already':True,'started':False}
+    monkeypatch.setitem(g,'_enabled',lambda:'disabled')
+    monkeypatch.setitem(g,'_show',lambda:{'ActiveState':'active','MainPID':'123'})
+    with pytest.raises(Error,match='control_enable_started_the_unit'):
+        m['enable'](g['ENABLE_AUTH'])
+
+
+def test_disable_is_bounded_and_idempotent(control,monkeypatch):
+    monkeypatch.setitem(g,'_enabled',lambda:'disabled')
+    assert m['disable'](g['DISABLE_AUTH'])=={'enabled':False,'already':True,'started':False}
+    calls=iter(['enabled','disabled'])
+    monkeypatch.setitem(g,'_enabled',lambda:next(calls))
+    assert m['disable'](g['DISABLE_AUTH'])=={'enabled':False,'already':False,
+        'started':False,'source_sha':SHA}
+    assert ('run',('/usr/bin/systemctl','disable',g['NAME'])) in control[1]
+
+
+def test_disable_refuses_when_the_unit_stays_enabled(control,monkeypatch):
+    monkeypatch.setitem(g,'_enabled',lambda:'enabled')
+    with pytest.raises(Error,match='control_disable_not_confirmed'):m['disable'](g['DISABLE_AUTH'])

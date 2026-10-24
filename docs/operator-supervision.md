@@ -56,9 +56,29 @@ re-render with the recorded mode and refuse any receipt/unit mismatch. Receipts 
 before this field exist remain valid and mean `false` (transient), so an already
 installed TEST candidate can still be inspected, started and stopped.
 
-Still not granted: boot enable, restart-policy acceptance under real systemd, runtime
-capacity, backup/monitoring, and any production approval. The persistent shape must be
-proven by a fresh install under the real unit, not by rendering alone.
+Still not granted: boot enable is a separate explicit action below, restart-policy
+acceptance under real systemd, runtime capacity, backup/monitoring, and any production
+approval. The persistent shape must be proven by a fresh install under the real unit,
+not by rendering alone.
+
+## Boot enable — explicit, authorized, never started
+
+`operator_control.py` has two more actions, each with its own confirmation phrase:
+
+- `enable` (`ENABLE-OWNER-FIRST-CANDIDATE`): requires a receipt recorded with
+  `"persistent": true` (otherwise `control_enable_requires_persistent_mode`), the exact
+  inactive validated unit, then runs only `systemctl enable`. It confirms the unit file
+  state became `enabled` and that the unit is still `inactive` with `MainPID=0`
+  (`control_enable_started_the_unit` otherwise). Re-running is idempotent.
+- `disable` (`DISABLE-OWNER-FIRST-CANDIDATE`): requires the same validated inactive
+  unit, runs only `systemctl disable`, confirms the state left `enabled`, and is
+  idempotent when already disabled.
+
+Neither action starts, restarts, stops, edits or reloads the unit, and neither touches
+Caddy or another service. Enabling does not by itself make the candidate production:
+backup/restore, monitoring, real credentials, capacity measurement and the owner's
+release decision remain open, and every host action still needs separate approval and
+the special password.
 
 ## Next implementation and acceptance
 

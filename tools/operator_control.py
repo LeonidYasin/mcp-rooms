@@ -33,6 +33,8 @@ LOCK=Path('/run/mcp-rooms-operator')/'control.lock'
 FORMAT='mcp-rooms/fresh-install/v1'
 BOOTSTRAP_AUTH='CREATE-FRESH-OWNER-PROFILE'
 START_AUTH='START-OWNER-FIRST-CANDIDATE'
+ENABLE_AUTH='ENABLE-OWNER-FIRST-CANDIDATE'
+DISABLE_AUTH='DISABLE-OWNER-FIRST-CANDIDATE'
 MEMORY_MAX=1024**3
 HOST_MEMORY_FLOOR=2*1024**3
 BASE_FREE_FLOOR=2*1024**3
@@ -94,6 +96,20 @@ def _show():
         return values
     except (OSError,ValueError,subprocess.SubprocessError):
         raise ControlError('control_unit_observation_failed') from None
+
+
+def _enabled():
+    """Read the unit file state only; never starts, enables or edits anything."""
+    try:
+        result=subprocess.run(['/usr/bin/systemctl','is-enabled',NAME],env=ENV,cwd='/',
+            stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
+            text=True,timeout=10)
+    except (OSError,subprocess.SubprocessError):
+        raise ControlError('control_unit_observation_failed') from None
+    value=result.stdout.strip()
+    if value not in {'enabled','disabled','static','masked','linked','linked-runtime','indirect','generated','transient'}:
+        raise ControlError('control_unit_observation_failed')
+    return value
 
 
 def _usage(root,limit=16000):
@@ -361,6 +377,33 @@ def start(authorization):
         return {'started':True,'runtime_capacity_accepted':measurement['accepted'],'source_sha':receipt['source_sha']}
 
 
+def enable(authorization):
+    if authorization!=ENABLE_AUTH:raise ControlError('control_enable_authorization_required')
+    i=_installer()
+    with _lock(i):
+        receipt,_=_validate(i,'inactive')
+        if receipt.get('persistent') is not True:raise ControlError('control_enable_requires_persistent_mode')
+        if _enabled()=='enabled':return {'enabled':True,'already':True,'started':False}
+        _run(['/usr/bin/systemctl','enable',NAME],25)
+        if _enabled()!='enabled':raise ControlError('control_enable_not_confirmed')
+        values=_show()
+        if values['ActiveState']!='inactive' or values['MainPID']!='0':
+            raise ControlError('control_enable_started_the_unit')
+        return {'enabled':True,'already':False,'started':False,'boot_target':'multi-user.target',
+            'source_sha':receipt['source_sha']}
+
+
+def disable(authorization):
+    if authorization!=DISABLE_AUTH:raise ControlError('control_disable_authorization_required')
+    i=_installer()
+    with _lock(i):
+        receipt,_=_validate(i,'inactive')
+        if _enabled()!='enabled':return {'enabled':False,'already':True,'started':False}
+        _run(['/usr/bin/systemctl','disable',NAME],25)
+        if _enabled()=='enabled':raise ControlError('control_disable_not_confirmed')
+        return {'enabled':False,'already':False,'started':False,'source_sha':receipt['source_sha']}
+
+
 def stop():
     i=_installer()
     with _lock(i):
@@ -372,13 +415,15 @@ def stop():
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action',choices=['capacity','bootstrap','start','stop'])
+    parser.add_argument('action',choices=['capacity','bootstrap','start','stop','enable','disable'])
     parser.add_argument('--authorization');args=parser.parse_args();os.umask(0o077)
     try:
         if args.action=='capacity':result=capacity()
         elif args.action=='bootstrap':result=bootstrap(args.authorization)
         elif args.action=='start':result=start(args.authorization)
-        else:result=stop()
+        elif args.action=='stop':result=stop()
+        elif args.action=='enable':result=enable(args.authorization)
+        else:result=disable(args.authorization)
         print(json.dumps({'ok':True,**result},sort_keys=True));return 0
     except ControlError as exc:print(json.dumps({'ok':False,'error':str(exc)}));return 1
     except Exception:print(json.dumps({'ok':False,'error':'control_review_required'}));return 1

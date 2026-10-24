@@ -66,6 +66,9 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
   synthetic MCP publish/read/withdraw, stop-only rollback и restart + повторный
   flow PASS ([evidence](docs/owner-first-vps-test-2026-10-23.md)). Caddy/HTTPS,
   реальная карточка и production не принимались.
+- 2026-10-24: loopback TEST evidence и handoff-состояние смержены
+  ([PR #6](https://github.com/LeonidYasin/mcp-rooms/pull/6), merge commit
+  `06031dbc…`); application source не менялся, тег/релиз/production не созданы.
 
 ## Сейчас: первый fresh owner-first TEST
 

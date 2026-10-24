@@ -1,7 +1,8 @@
 # Текущее состояние MCP Rooms
 
 Проверено для принятого исходного SHA `db32c6ddf8f3b57874180dce81908e0d43aaa2f0`;
-`main` после owner merge — `258684311d2f4bb009e339f007978634211da8eb`. Это состояние
+`main` после owner merge — `06031dbcb1dcb37d7b0b6a700b0924a9ca09f19a` (PR #6, docs).
+Это состояние
 кода, CI и изолированного loopback TEST, **не production**.
 
 ## Проект в одном абзаце
@@ -80,8 +81,8 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю». Ос
 
 ## Текущая граница
 
-Принятый application source — `db32c6d…`; `main` — `2586843…` после merge
-[PR #5](https://github.com/LeonidYasin/mcp-rooms/pull/5). Pre-release
+Принятый application source — `db32c6d…`; `main` — `06031db…` после merge
+[PR #6](https://github.com/LeonidYasin/mcp-rooms/pull/6) (docs/loopback TEST). Pre-release
 `operator-wheelhouse-db32c6d` содержит проверенный offline bundle; тег и артефакт
 не являются production deploy.
 
@@ -108,8 +109,11 @@ external testing требует отдельного одобрения ново
 [PR #4](https://github.com/LeonidYasin/mcp-rooms/pull/4) (seccomp-исправление и
 первый VPS-отчёт, merge commit `fd2f61650bd3977947ea3679cd677dbc77bc8692`) и
 [PR #5](https://github.com/LeonidYasin/mcp-rooms/pull/5) (x-ui protected default и
-4 GiB preflight PASS, merge commit `258684311d2f4bb009e339f007978634211da8eb`).
-Текущий `main` — `2586843…`. Создан pre-release `operator-wheelhouse-db32c6d`
+4 GiB preflight PASS, merge commit `258684311d2f4bb009e339f007978634211da8eb`), а
+2026-10-24 — [PR #6](https://github.com/LeonidYasin/mcp-rooms/pull/6) (loopback TEST
+evidence и handoff-состояние, merge commit `06031dbcb1dcb37d7b0b6a700b0924a9ca09f19a`;
+application source не менялся).
+Текущий `main` — `06031db…`. Создан pre-release `operator-wheelhouse-db32c6d`
 для offline install; production deploy, тег production и real card не созданы.
 Принятый application source SHA — `db32c6d…`; новые изменения идут через особые
 owner-approved PR в `main`.

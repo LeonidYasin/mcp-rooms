@@ -41,6 +41,20 @@ These measurements demonstrate accounting/cleanup for this fixture, not real
 native photo load, candidate admission, disk retention, concurrency or capacity.
 A live candidate-in-unit test and aggregate stress/timeouts/disk measurements remain.
 
+## Opt-in persistent rendering (prepared, not activated)
+
+`tools/operator_unit.py` accepts `persistent=True` (CLI `--persistent`). The default
+output is byte-identical to the accepted TEST unit (`Restart=no`, `RuntimeMaxSec=2h`,
+no `[Install]`), so existing receipts and evidence stay valid. The persistent variant
+adds `Restart=on-failure`, `RestartSec=5s`, removes `RuntimeMaxSec`, and appends
+`[Install] WantedBy=multi-user.target` while keeping every sandbox/resource directive.
+
+This is rendering only: the installer and controller still render the default unit, no
+receipt carries the mode, and nothing is enabled at boot. Wiring the mode through
+`operator_install.py`/`operator_control.py` (receipt field, validation, refusal of a
+mode/unit mismatch, CI proof under real systemd, rollback) is the next bounded slice.
+A long-lived unit alone is not production capacity, backup, monitoring or approval.
+
 ## Next implementation and acceptance
 
 1. Root-owned fresh-only reviewed installation wrapper; atomic ready-last release

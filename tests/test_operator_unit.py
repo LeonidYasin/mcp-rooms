@@ -50,3 +50,35 @@ def test_renderer_no_host_or_credential_operations(monkeypatch):
     monkeypatch.setattr(socket,'socket',deny)
     monkeypatch.setattr(os,'system',deny)
     assert render(SHA,RESOURCE)==render(SHA,RESOURCE)
+
+
+def test_default_mode_keeps_accepted_transient_shape():
+    value=render(SHA,RESOURCE)
+    assert 'Restart=no\n' in value and 'RuntimeMaxSec=2h\n' in value
+    assert '[Install]' not in value and 'WantedBy=' not in value
+    assert 'Mode: transient review unit' in value
+
+
+def test_persistent_mode_is_opt_in_and_still_grants_no_authority():
+    value=render(SHA,RESOURCE,True)
+    assert 'Restart=on-failure\n' in value and 'RestartSec=5s\n' in value
+    assert 'RuntimeMaxSec=' not in value
+    assert '[Install]\nWantedBy=multi-user.target\n' in value
+    assert 'no install/enable authorization' in value
+    assert 'Mode: persistent' in value
+    assert value!=render(SHA,RESOURCE)
+
+
+@pytest.mark.parametrize('directive',[
+    'User=mcp-rooms-candidate','Group=mcp-rooms-candidate','UMask=0077',
+    'KillMode=control-group','MemoryMax=1G','TasksMax=64','MemorySwapMax=0',
+    'NoNewPrivileges=yes','ProtectSystem=strict','ReadOnlyPaths=/opt/mcp-rooms-candidate',
+    'ReadWritePaths=/var/lib/mcp-rooms-candidate','RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6',
+    'StandardOutput=null','StandardError=null'])
+def test_persistent_mode_keeps_hardening(directive):
+    assert directive+'\n' in render(SHA,RESOURCE,True)
+
+
+@pytest.mark.parametrize('mode',[None,1,0,'yes',[],object()])
+def test_persistent_mode_requires_strict_bool(mode):
+    with pytest.raises(ValueError):render(SHA,RESOURCE,mode)

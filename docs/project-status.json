@@ -412,6 +412,19 @@
       ]
     },
     {
+      "id": "operator_capacity_ci",
+      "title": "Aggregate capacity measurement under exact unit",
+      "stage": "CI",
+      "summary": "Aggregate cgroup capacity измерения (memory.peak, CPU, sampled tasks/native, state disk) под точным systemd unit приняты в Actions через tools/ci_candidate_unit.py. Нет OOM kill, peak < 1 GiB, tasks <= 64, cpu > 0. fixture_capacity_bounds_only=true, vps_capacity_accepted=false. Не установщик, не VPS capacity acceptance, не production.",
+      "doc": "docs/ci-f3c2c3c.md",
+      "source": "tools/ci_candidate_unit.py",
+      "evidence": "docs/ci-f3c2c3c.md",
+      "depends_on": [
+        "candidate_unit_ci",
+        "operator_supervision"
+      ]
+    },
+    {
       "id": "operator_install",
       "title": "Fresh-only root-trusted offline install",
       "stage": "TEST",

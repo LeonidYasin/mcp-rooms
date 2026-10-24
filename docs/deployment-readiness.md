@@ -213,7 +213,9 @@ disposable GitHub runner под **реальным systemd** рендер пер
 `systemctl enable` создаёт boot symlink без старта, kill -9 ведёт к авто-restart с новым `MainPID`,
 `disable` убирает symlink без stop, stop оставляет unit inactive.
 
-Это policy proof, а не установка на VPS и не capacity/VPS acceptance. Остаток F3c.2c.3: aggregate
-capacity измерения (cgroup memory.peak/RSS, CPU, tasks/native, state disk) и full install/state
-disk/retention/exhaustion policy; install/enable персистентного unit на VPS — отдельное
+Это policy proof, а не установка на VPS и не capacity/VPS acceptance. Aggregate capacity
+измерения под точным кандидатом приняты в CI (docs/ci-f3c2c3c.md): no OOM kill,
+peak < 1 GiB, tasks <= 64, cpu > 0; `fixture_capacity_bounds_only=true`,
+`vps_capacity_accepted=false`. Остаток F3c.2c.3: full install/state disk/retention/
+exhaustion policy; install/enable персистентного unit на VPS — отдельное
 owner-разрешение. Затем: fresh VPS preflight → loopback → HTTPS/external acceptance.

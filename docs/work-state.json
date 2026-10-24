@@ -89,7 +89,8 @@
     "docs/deployment-readiness.md",
     "docs/operator-install.md",
     "docs/ci-f3c2c3b.md",
-    "docs/ci-f3c2c3c.md"
+    "docs/ci-f3c2c3c.md",
+    "docs/production-readiness.md"
   ],
   "paused_tasks": [
     {

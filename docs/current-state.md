@@ -125,7 +125,7 @@ owner-approved PR в `main`.
 
 Проверено в CI: **F3c.2c.3c real systemd proof персистентного unit** (PR #12) и **F3c.2c.3c aggregate capacity measurement** (PR #13/work-state, docs/ci-f3c2c3c.md): no OOM kill, peak ~172 MiB < 1 GiB, tasks <= 64, cpu > 0; `fixture_capacity_bounds_only=true`, `vps_capacity_accepted=false`.
 
-Далее — только отдельным owner-разрешением: persistent install/enable персистентного unit на VPS и **HTTPS/external acceptance** (G3). Каждая серверная операция требует отдельного согласия владельца и специального пароля. Агент не выполняет remote/SSH/VPS.
+Далее — только отдельным owner-разрешением: persistent install/enable персистентного unit на VPS и **HTTPS/external acceptance** (G3). Каждая серверная операция требует отдельного согласия владельца и специального пароля. Агент не выполняет remote/SSH/VPS. Точный пакет owner-шагов и открытые блокеры production — в [docs/production-readiness.md](production-readiness.md).
 
 Loopback-часть fresh owner-first TEST завершена. HTTPS/external acceptance — только после нового отдельного разрешения:
 

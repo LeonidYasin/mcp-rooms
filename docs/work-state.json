@@ -46,17 +46,14 @@
     "summary": "Fresh isolated candidate installed from the public pre-release, bootstrapped, started on loopback, passed synthetic MCP publish/read/withdraw, then stop/start preserved state and the flow passed again. HTTPS/Caddy, real credentials, real listing and production are not accepted. Synthetic owner key has a 3600s TTL."
   },
   "next_task": {
-    "id": "OWNER-FIRST-HTTPS-EXTERNAL",
-    "title": "Separately authorized narrow HTTPS/Caddy route and external MCP/web acceptance",
-    "stage": "PERMISSION_GATE",
+    "id": "F3C-2C-3C-AGGREGATE-CAPACITY",
+    "title": "Aggregate capacity measurement under the exact candidate unit (cgroup memory.peak/RSS, CPU, tasks/native peak, state disk) via tools/ci_candidate_unit.py in Actions; then owner-approved persistent install/enable and HTTPS/external acceptance",
+    "stage": "CI",
     "acceptance": [
-      "Do not change Caddy, HTTPS, systemd or host services until the owner explicitly approves the exact narrow route and supplies the special password.",
-      "Use a temporary route that preserves Host and strips only the /rooms prefix; do not bypass global auth broadly or expose unrelated services.",
-      "The bootstrap synthetic key has a one-hour TTL and is not a reusable production credential. Do not silently issue, delegate or reuse credentials; a separately approved listing-scoped test credential or fresh profile/key gate is required.",
-      "Check external MCP without a token returns candidate 401, then perform an authenticated external flow only with the approved test credential; publish a real card only with explicit owner consent for exact content and photos.",
-      "Collect sanitized evidence, remove the temporary route, stop the candidate, and preserve state. No production rollout or real user onboarding."
+      "Run the existing candidate-in-unit harness in Actions and record cgroup measurements; no OOM kill, peak < 1 GiB, tasks <= 64, cpu > 0.",
+      "No VPS action; no merge/release/production; HTTPS/external acceptance still requires a new owner approval and special password."
     ],
-    "contract": "docs/owner-first-vps-test-2026-10-23.md"
+    "contract": "docs/candidate-unit-ci.md"
   },
   "runtime_last_known": {
     "not_a_current_probe": true,

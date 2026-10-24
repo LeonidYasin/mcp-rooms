@@ -105,11 +105,12 @@ unit), без ключей, host-секретов, базовой конфигу
 
 Этот gate закрывает только внешнюю доступность. Для эксплуатации нужно отдельно:
 
-1. **Персистентность сервиса.** Текущий unit: `Restart=no`, `RuntimeMaxSec=2h`
-   (`tools/operator_unit.py`). Сервис остановится через два часа и не поднимется
-   после перезагрузки; `install`/`start` намеренно не делают `enable`.
-   Нужен отдельно одобренный slice: `Restart=on-failure`, снятие/пересмотр
-   `RuntimeMaxSec`, boot-enable, CI-проверка нового unit и rollback.
+1. **Персистентность сервиса.** Slice принят в коде и CI-подтверждён (F3c.2c.3c, PR #12):
+   персистентный policy (`Restart=on-failure`, `RestartSec=5s`, без `RuntimeMaxSec`,
+   `[Install] WantedBy=multi-user.target`, `RuntimeMaxUSec=infinity`) проверен под real
+   systemd; enable/disable контроллер проверены. Осталось исполнить install/enable
+   персистентного unit на VPS и взять внешний route — отдельным owner-разрешением.
+   Transient unit (`RuntimeMaxSec=2h`) остаётся текущим на VPS до отдельного решения.
 2. **Route-helper для кандидата.** Существующий `deploy/vps_https_route.py` целит в
    исторический `rooms-test`/`8765`. Нужен reviewed scoped helper для
    `/rooms` → `127.0.0.1:8766` с идемпотентной уборкой.
@@ -130,7 +131,7 @@ unit), без ключей, host-секретов, базовой конфигу
 | G1 | Код + CI (принятый source `db32c6d…`) | принято |
 | G2 | Изолированный loopback TEST на VPS | принято 2026-10-23 |
 | G3 | HTTPS/external acceptance (этот документ) | подготовлено, не разрешено |
-| G4 | Персистентный unit + boot-enable + route-helper | рендер/wiring/enable-контроль и route-helper готовы в коде; реальная проверка под systemd и включение — по разрешению |
+| G4 | Персистентный unit + boot-enable + route-helper | real systemd proof персистентного policy принят в CI (F3c.2c.3c, PR #12); install/enable на VPS и route — по отдельному разрешению владельца |
 | G5 | Backup/restore, ключи, мониторинг, runbook | не начато |
 | G6 | Release/production rollout по решению владельца | не начато |
 

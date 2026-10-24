@@ -102,7 +102,9 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю».
 - [x] Запустить только loopback.
 - [x] Выполнить synthetic MCP draft → upload → preview → consent → publish → GET → withdraw.
 - [x] Проверить restart/state preservation и stop-only rollback.
-- [ ] Снять runtime resource measurements (RSS/peak cgroup) — отдельный ops/HTTPS gate.
+- [x] Снять runtime resource measurements (RSS/peak cgroup) — отдельный ops/HTTPS gate.
+      Сделано в Actions через `tools/ci_candidate_unit.py` (no OOM kill, peak<1GiB,
+      tasks<=64, cpu>0); это не VPS capacity acceptance.
 - [x] Не использовать старую Rooms TEST DB и не менять Caddy.
 
 ### Gate D — temporary HTTPS/external MCP acceptance

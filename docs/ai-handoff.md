@@ -46,6 +46,11 @@ core существует, но M3b.3 transaction-time authority остаётс�
 
 ## Следующий gate
 
+После подтверждённого в CI [F3c.2c.3c real systemd proof персистентного unit](../docs/deployment-readiness.md)
+(PR #12, workflow `Operator systemd supervision proof`) следующий шаг — aggregate capacity
+measurement через существующий harness `tools/ci_candidate_unit.py` в Actions; затем отдельное
+owner-разрешение на persistent install/enable и HTTPS/external acceptance.
+
 HTTPS/external acceptance — только после нового отдельного разрешения:
 
 1. узкий временный Caddy route: preserve Host, strip only `/rooms`, no broad auth bypass;

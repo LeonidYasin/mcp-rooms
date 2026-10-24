@@ -77,7 +77,10 @@ MCP Rooms — MCP-first площадка «Хочу / Предлагаю». Ос
 - приватные отклики и переговоры;
 - отдельный admin MCP и модерация;
 - полный независимый disaster-recovery cutover без исходной current authority;
-- runtime RSS/peak/cgroup measurements, off-host backup и production runbook.
+- VPS capacity acceptance и measured production RSS/peak под нагрузкой (cgroup
+  memory.peak/CPU/tasks измерены в Actions через `tools/ci_candidate_unit.py`,
+  но не являются доказательством достаточности конкретного VPS);
+- off-host backup, шифрование backup, retention и алертинг.
 
 ## Текущая граница
 
@@ -119,6 +122,11 @@ application source не менялся).
 owner-approved PR в `main`.
 
 ## Следующий шаг
+
+Проверено в CI: **F3c.2c.3c real systemd proof персистентного unit** (PR #12 — все чеки
+зелёные, `mergeStateStatus: CLEAN`, `deploy` skipped). Следующее — aggregate capacity
+measurement через `tools/ci_candidate_unit.py` в Actions, затем отдельное owner-разрешение
+на persistent install/enable и HTTPS/external acceptance.
 
 Loopback-часть fresh owner-first TEST завершена. Следующая крупная точка —
 **HTTPS/external acceptance**, только после нового отдельного разрешения:

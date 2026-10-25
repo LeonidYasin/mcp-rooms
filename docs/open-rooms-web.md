@@ -58,8 +58,10 @@
   `RoomStore.WEB_VISIBLE = ('open',)` в `store.py` (какие visibility отдаёт анонимный веб).
   Отдельного «приватного» кода нет; инвариант закрыт тестом
   `test_private_room_same_code_path_web_flag_only`.
-- **Срез D — production-prep статически.** Update operator docs/checklist/readiness для
-  включения комнат; реальный деплой — отдельный owner-gate + пароль.
+- **Срез D (реализовано статически) — production-prep.** Готов статический prep-документ
+  docs/rooms-web-production.md: композиция `public_rooms=True`, служебные пути, коллизия
+  внешнего префикса `/rooms` и рекомендация по маршрутизации, чек-лист. Реальный деплой —
+  отдельный owner-gate + пароль.
 
 ## Тесты (Срез A)
 

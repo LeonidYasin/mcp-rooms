@@ -11,6 +11,7 @@ from hashlib import sha256
 from .domain import DomainError, identifier
 from .draft_store import _bounded_integer
 from .publication_guard import publication_schema
+from .preview_contract import canonical_json
 
 MAX_RESPONSE_TEXT = 4000
 RESPONSE_PUBLIC_STATUS = frozenset({'opened', 'answered', 'closed', 'agreed', 'declined'})
@@ -81,7 +82,7 @@ class ResponseStore:
         if type(text) is not str or not 1 <= len(text) <= MAX_RESPONSE_TEXT:
             raise DomainError('invalid_response_text')
         payload = {'id': listing_id, 'text': text}
-        digest = sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+        digest = sha256(canonical_json(payload).encode()).hexdigest()
         with self.store._db(write=True) as db:
             response_schema(db)
             self.drafts._schema(db)
@@ -146,7 +147,7 @@ class ResponseStore:
         if public_status not in RESPONSE_PUBLIC_STATUS:
             raise DomainError('invalid_public_status')
         payload = {'id': listing_id, 'response': response_id, 'public_status': public_status}
-        digest = sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+        digest = sha256(canonical_json(payload).encode()).hexdigest()
         with self.store._db(write=True) as db:
             response_schema(db)
             now = self.store.clock()

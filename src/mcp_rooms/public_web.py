@@ -305,12 +305,12 @@ class PublicRooms:
             with self.admission.slot('public'):
                 if room_id is not None:
                     def fetch():
-                        room = self.store.public_open_room(room_id)
-                        return room, self.store.public_open_room_messages(room_id, cursor)
+                        room = self.store.web_room(room_id)
+                        return room, self.store.web_room_messages(room_id, cursor)
                     room, feed = await anyio.to_thread.run_sync(fetch)
                     data = render_room_feed(room['room'], feed, self.prefix)
                 else:
-                    index = await anyio.to_thread.run_sync(partial(self.store.public_open_rooms, topic=topic))
+                    index = await anyio.to_thread.run_sync(partial(self.store.web_rooms, topic=topic))
                     data = render_rooms_index(index, self.prefix, active_topic=topic)
             with anyio.fail_after(10):
                 await Response(data, media_type='text/html', headers=HEADERS)(scope, receive, tracked)

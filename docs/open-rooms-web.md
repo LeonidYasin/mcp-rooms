@@ -51,7 +51,13 @@
   GET `/rooms/room/<id>?cursor=...`: bounded чтение истории открытой комнаты (limit 20 по умолчанию,
   курсорная пагинация, удалённые/истёкшие исключены), весь текст escaped, rate control;
   приватные/legacy/несуществующие комнаты — 404 (fail closed), owner UUID/reply не раскрываются.
-  `RoomStore.public_open_room/public_open_room_messages` + `render_room_feed`.
+  `RoomStore.web_room/web_room_messages` + `render_room_feed`.
+- **Симметрия приватных/открытых (решение владельца 2026-10-26):** приватная комната — тот же
+  код, что и открытая, отличается ТОЛЬКО флагом веб-показа. Один store-код чтения
+  (room + messages), параметризованный по visibility; единственная точка решения —
+  `RoomStore.WEB_VISIBLE = ('open',)` в `store.py` (какие visibility отдаёт анонимный веб).
+  Отдельного «приватного» кода нет; инвариант закрыт тестом
+  `test_private_room_same_code_path_web_flag_only`.
 - **Срез D — production-prep статически.** Update operator docs/checklist/readiness для
   включения комнат; реальный деплой — отдельный owner-gate + пароль.
 

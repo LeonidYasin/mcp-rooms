@@ -110,12 +110,13 @@ class MarketAdapter:
                 'set_photos':self.photos.set_photos,'archive':self.drafts.archive,
                 'preview':self.publisher.preview,'confirm':self.publisher.confirm,
                 'publish':self.publisher.publish,'withdraw':self.publisher.withdraw,'publication_status':self._status,
-                'public_get':self.publisher.public_get,'public_index':self.publisher.public_index}
+                'public_get':lambda _a,**k:self.publisher.public_get(**k),
+                'public_index':lambda _a,**k:self.publisher.public_index(**k)}
             return {'ok':True,**methods[action](actor,**args)}
         except DomainError as exc:
             return {'ok':False,'error':exc.code,**exc.details}
-        except (ValidationError,TypeError,ValueError) as debug_exc:
-            return {'ok':False,'error':'invalid_arguments','debug':repr(debug_exc),'action':action,'args':sorted(args)}
+        except (ValidationError,TypeError,ValueError):
+            return {'ok':False,'error':'invalid_arguments'}
         except sqlite3.Error as exc:
             code=getattr(exc,'sqlite_errorcode',0)
             code=(code & 255) if type(code) is int else 0

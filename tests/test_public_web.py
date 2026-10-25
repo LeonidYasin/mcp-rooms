@@ -33,7 +33,8 @@ def test_mcp_publish_anonymous_card_photo_and_withdraw(web):
     path='/market/'+lid
     response=c.get(path,headers={'Sec-Fetch-Site':'cross-site','Sec-Fetch-Mode':'navigate','Sec-Fetch-Dest':'document'})
     assert response.status_code==200
-    assert '1 234,56 RUB' in response.text and 'Synthetic city' in response.text
+    assert '1 234,56 RUB' in response.text and 'Откуда: Synthetic city' in response.text
+    assert f'/market/section/things' in response.text and 'Раздел:' in response.text
     assert 'viewport' in response.text and 'loading="lazy"' in response.text
     assert not response.cookies and 'set-cookie' not in response.headers
     for secret in (x.ta,x.a,x.ma['credential_id']):assert secret not in response.text

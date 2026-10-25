@@ -265,15 +265,20 @@ class PublicationStore:
         """No arbitrary path/key. Public availability is rechecked after file I/O."""
         return self._read_public(listing_id,media_id,publication_revision)
 
-    def public_index(self, limit=50):
+    def public_index(self, limit=50, section=None):
         """Allowlisted read-only market index of explicitly published cards.
 
         Returns only already-public allowlisted data (no credentials, UUIDs,
         contacts or private room membership). Malformed/corrupt projections are
         skipped so one bad row cannot take down the whole index; each card GET
-        still independently revalidates and fails closed.
+        still independently revalidates and fails closed. `sections` carries
+        per-section counts (over the same bounded window); `items` is filtered
+        to `section` when given.
         """
         _bounded_integer(limit, 1, 100, 'invalid_limit')
+        if section is not None:
+            if not isinstance(section, str) or not 1 <= len(section) <= 64:
+                raise DomainError('invalid_section')
         with self.files._guard():
             with self.store._db() as db:
                 publication_schema(db)
@@ -284,7 +289,7 @@ class PublicationStore:
                     JOIN users u ON u.id=p.user_id
                     WHERE p.state='active' AND u.disabled=0 AND p.expires_at>?
                     ORDER BY p.updated_at DESC, p.listing_id LIMIT ?''', (now, limit)).fetchall()
-        items = []
+        entries = []
         for (proj,) in rows:
             try:
                 card = json.loads(proj)
@@ -292,7 +297,20 @@ class PublicationStore:
                 continue
             if not isinstance(card, dict):
                 continue
-            items.append({k: card.get(k) for k in (
+            top = (card.get('category_path') or [{}])[0]
+            sid = top.get('id') if isinstance(top, dict) else None
+            stitle = top.get('title') if isinstance(top, dict) else 'Разное'
+            entries.append({k: card.get(k) for k in (
                 'id', 'title', 'category', 'category_path', 'kind', 'modes',
-                'price_minor', 'currency', 'author', 'publication_revision')})
-        return {'items': items}
+                'price_minor', 'currency', 'author', 'publication_revision')}
+                | {'section': sid})
+        titles, counts = {}, {}
+        for e in entries:
+            sid = e['section']
+            counts[sid] = counts.get(sid, 0) + 1
+            if sid not in titles:
+                top = (e.get('category_path') or [{}])[0]
+                titles[sid] = top.get('title') if isinstance(top, dict) else 'Разное'
+        sections = [{'id': sid, 'title': titles[sid], 'count': counts[sid]} for sid in counts]
+        items = [e for e in entries if section is None or e['section'] == section]
+        return {'items': items, 'sections': sections}

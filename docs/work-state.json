@@ -62,11 +62,12 @@
     "not_a_current_probe": true,
     "rooms_test": "stopped; temporary HTTPS route removed by owner report",
     "rooms_production": "not accepted or deployed by this project",
-    "main_last_recorded_sha": "b4034f1ee9f3da9abbc75eee28540e1cbe3da915",
+    "main_last_recorded_sha": "41c7c12677a0d2a1cdc03239047fa549b075c267",
     "pages": "documentation only; not the marketplace runtime",
     "owner_first_candidate": "loopback PASS 2026-10-23; active after restart (PID 4222); synthetic key TTL 1h; no HTTPS/Caddy change",
     "web_market_author_context": "PR #17 merged into main (b4034f1): public card signed with allowlisted display_name author + explicit section, consent schema live-publication-consent/v3; CI green; source+docs only, not deployed; VPS runtime unchanged",
-    "web_market_navigation": "on feat/standalone-identity, not merged: read-only market index /market and /market/ (PublicationStore.public_index + render_index in public_web.py), bounded limit 1..100, skips corrupt projections; CI-only, not deployed; requires #18 merge then validation in Actions"
+    "web_market_navigation": "merged PR #18 (41c7c12): read-only market index /market and /market/ (PublicationStore.public_index + render_index), bounded limit 1..100, skips corrupt projections; CI green, not deployed",
+    "web_market_section_nav": "on feat/standalone-identity, not merged: section-filter navigation /market/section/<id> (public_index section filter + sections counts, render_index active pill); CI-only, not deployed",
   },
   "permission_gates": [
     "Each remote execution requires separate owner approval AND special password.",

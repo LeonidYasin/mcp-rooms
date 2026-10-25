@@ -344,7 +344,7 @@ class RoomStore:
         """Open-room row for public reads, or None (closed room). Fail-closed by construction:
         only room_topics.visibility='open' rows are visible; private/legacy/closed rooms return None."""
         row = db.execute(
-            'SELECT r.id, r.title, rt.topic_id, t.title AS topic_title '
+            'SELECT r.id, r.title, r.created_at, rt.topic_id, t.title AS topic_title '
             'FROM room_topics rt JOIN rooms r ON r.id=rt.room_id JOIN topics t ON t.id=rt.topic_id '
             'WHERE rt.room_id=? AND rt.visibility=?', (room_id, 'open')).fetchone()
         return dict(row) if row else None

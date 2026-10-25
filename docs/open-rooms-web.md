@@ -47,8 +47,11 @@
   (fail-closed; приватные и legacy не раскрываются даже существованием), навигация по дереву
   тем и карточки комнат, весь текст escaped. `RoomStore.public_open_rooms/public_topics`. Опциональный
   флаг `public_rooms` в `create_app`, handler `PublicRooms` в `public_web.py` (как `PublicMarket`).
-- **Срез C — read-only лента сообщений открытой комнаты в вебе.** Bounded чтение истории
-  открытой комнаты, escaping, курсор/TTL, rate control; приватные комнаты — 404/скрыты.
+- **Срез C (реализовано) — read-only лента сообщений открытой комнаты в вебе.** Анонимный
+  GET `/rooms/room/<id>?cursor=...`: bounded чтение истории открытой комнаты (limit 20 по умолчанию,
+  курсорная пагинация, удалённые/истёкшие исключены), весь текст escaped, rate control;
+  приватные/legacy/несуществующие комнаты — 404 (fail closed), owner UUID/reply не раскрываются.
+  `RoomStore.public_open_room/public_open_room_messages` + `render_room_feed`.
 - **Срез D — production-prep статически.** Update operator docs/checklist/readiness для
   включения комнат; реальный деплой — отдельный owner-gate + пароль.
 

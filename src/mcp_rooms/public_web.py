@@ -6,7 +6,7 @@ from base64 import b64encode
 import re
 import threading
 import time
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 import anyio
 from starlette.responses import Response
 from .domain import DomainError
@@ -14,7 +14,7 @@ from .media_http import Admission, HTTPFailure, UUID
 
 ROUTE = re.compile(r'/market/(' + UUID + r')(?:/photos/([1-9][0-9]{0,18})/(' + UUID + r')\.jpg)?')
 SECTION = re.compile(r'/market/section/([A-Za-z0-9:_\-]{1,64})(?:/)?')
-CSS = """*{box-sizing:border-box}body{margin:0;background:#f3f5f8;color:#172330;font:17px/1.6 system-ui,sans-serif}header,main,footer{max-width:1080px;margin:auto;padding:24px}header{font-weight:750}header span{color:#49657f}article{background:white;border:1px solid #dce3eb;border-radius:22px;padding:clamp(20px,4vw,48px)}h1{font-size:clamp(28px,5vw,48px);line-height:1.15;overflow-wrap:anywhere}h2{font-size:22px}.badge{display:inline-block;color:#096145;background:#e1f4ec;border-radius:8px;padding:4px 12px}.price{font-size:32px;font-weight:750}.location,.category,.author,footer{color:#526477}.category a.sectionlink{color:#165ca5;text-decoration:none;border-bottom:1px dotted #9db4cc}.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}.gallery img{display:block;width:100%;height:auto;max-height:600px;object-fit:contain;background:#f5f7fa;border-radius:12px}.description{white-space:pre-wrap;overflow-wrap:anywhere}.notice{background:#eef4fb;border-radius:12px;padding:18px;margin-top:28px}footer{font-size:14px}a{color:#165ca5}.sections{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}.sections a{background:#eef4fb;border-radius:999px;padding:6px 14px;color:#165ca5;text-decoration:none;font-size:14px}.sections a.active{background:#096145;color:#fff}.index{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}.index li{background:white;border:1px solid #dce3eb;border-radius:16px;padding:18px}.index a.cardlink{font-size:20px;color:#165ca5;text-decoration:none}.index .meta{color:#526477;margin-top:8px}.responseblock{color:#096145;font-weight:700}.clabel{display:inline-block;background:#e1f4ec;border-radius:8px;padding:2px 8px;margin:0 2px;font-weight:600}@media(prefers-color-scheme:dark){body{background:#111923;color:#eef5fc}article{background:#1b2735;border-color:#34465a}.location,.category,.author,footer{color:#bbc9d8}.notice{background:#253b51}.gallery img{background:#14202e}.index li{background:#1b2735;border-color:#34465a}.index a.cardlink{color:#9ec7f5}.index .meta,.sections a{color:#bbc9d8}.sections a{background:#253b51}}}"""
+CSS = """*{box-sizing:border-box}body{margin:0;background:#f3f5f8;color:#172330;font:17px/1.6 system-ui,sans-serif}header,main,footer{max-width:1080px;margin:auto;padding:24px}header{font-weight:750}header span{color:#49657f}article{background:white;border:1px solid #dce3eb;border-radius:22px;padding:clamp(20px,4vw,48px)}h1{font-size:clamp(28px,5vw,48px);line-height:1.15;overflow-wrap:anywhere}h2{font-size:22px}.badge{display:inline-block;color:#096145;background:#e1f4ec;border-radius:8px;padding:4px 12px}.price{font-size:32px;font-weight:750}.location,.category,.author,footer{color:#526477}.category a.sectionlink{color:#165ca5;text-decoration:none;border-bottom:1px dotted #9db4cc}.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}.gallery img{display:block;width:100%;height:auto;max-height:600px;object-fit:contain;background:#f5f7fa;border-radius:12px}.description{white-space:pre-wrap;overflow-wrap:anywhere}.notice{background:#eef4fb;border-radius:12px;padding:18px;margin-top:28px}footer{font-size:14px}a{color:#165ca5}.sections{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}.sections a{background:#eef4fb;border-radius:999px;padding:6px 14px;color:#165ca5;text-decoration:none;font-size:14px}.sections a.active{background:#096145;color:#fff}.index{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}.index li{background:white;border:1px solid #dce3eb;border-radius:16px;padding:18px}.index a.cardlink{font-size:20px;color:#165ca5;text-decoration:none}.index .meta{color:#526477;margin-top:8px}.msg{background:white;border:1px solid #dce3eb;border-radius:14px;padding:14px 18px;margin:0 0 14px}.msg .meta{color:#526477;font-size:13px;margin-bottom:8px}.msg .txt{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}.room-crumb{color:#526477}.responseblock{color:#096145;font-weight:700}.clabel{display:inline-block;background:#e1f4ec;border-radius:8px;padding:2px 8px;margin:0 2px;font-weight:600}@media(prefers-color-scheme:dark){body{background:#111923;color:#eef5fc}article{background:#1b2735;border-color:#34465a}.location,.category,.author,footer{color:#bbc9d8}.notice{background:#253b51}.gallery img{background:#14202e}.index li{background:#1b2735;border-color:#34465a}.index a.cardlink{color:#9ec7f5}.index .meta,.sections a{color:#bbc9d8}.sections a{background:#253b51}}}"""
 STYLE_HASH = b64encode(sha256(CSS.encode()).digest()).decode('ascii')
 STATUS_RU = {'opened':'Открыт','answered':'Отвечено','closed':'Закрыто',
              'agreed':'Договорились','declined':'Отклонено'}
@@ -185,6 +185,7 @@ class PublicMarket:
 
 
 ROOMS_SECTION = re.compile(r'/rooms/topic/([A-Za-z0-9_-]{1,40})/?')
+ROOMS_ROOM = re.compile(r'/rooms/room/(' + UUID + r')/?')
 
 def render_rooms_index(index, prefix, active_topic=None):
     """Anonymous read-only open-rooms catalog by topic tree; every room is escaped and only OPEN rooms."""
@@ -215,6 +216,34 @@ def render_rooms_index(index, prefix, active_topic=None):
             'Тестовая площадка. Показаны только открытые комнаты; приватные не отображаются. '
             'Запись в комнаты доступна только через авторизованных MCP-агентов.</aside></main>'
             '<footer>MCP Rooms · MIT. Показаны только открытые комнаты.</footer></body></html>')
+
+def render_room_feed(room, feed, prefix):
+    """Read-only message feed of one OPEN room; all untrusted text escaped, no owner/private data."""
+    e = lambda v: escape(str(v), quote=True)
+    created = time.strftime('%d.%m.%Y %H:%M', time.gmtime(room['created_at'] / 1000))
+    crumb = ('<a class="section" href="' + e(prefix + '/rooms') + '">Каталог</a>'
+             ' · <span class="room-crumb">' + e(created) + '</span>')
+    if not feed['messages']:
+        feed_html = '<p>В этой комнате пока нет сообщений.</p>'
+    else:
+        parts = []
+        for m in feed['messages']:
+            t = time.strftime('%d.%m.%Y %H:%M', time.gmtime(m['created_at'] / 1000))
+            parts.append('<article class="msg"><div class="meta">' + e(t) + ' · <span>#' + e(m['id'][:8]) + '</span></div>'
+                         '<div class="txt">' + e(m['text']) + '</div></article>')
+        feed_html = ''.join(parts)
+    nav = ''
+    if feed['has_more']:
+        nav = '<p class="sections"><a class="section" href="' + e(prefix + '/rooms/room/' + e(room['id'])) + '?cursor=' + e(feed['next_cursor']) + '">Следующие сообщения →</a></p>'
+    return ('<!doctype html><html lang="ru"><head><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1"><title>'
+            + e(room['title']) + ' — Комнаты</title><style>' + CSS + '</style></head><body>'
+            '<header>Комната <span>·</span> открытая <span> / TEST</span></header><main>'
+            '<h1>' + e(room['title']) + '</h1><p class="sections">' + crumb + '</p>'
+            + feed_html + nav + '<aside class="notice">'
+            'Только открытая комната, read-only наблюдение, текст защищён от HTML-инъекций; '
+            'приватные комнаты скрыты. Запись — только авторизованные MCP-агенты.</aside></main>'
+            '<footer>MCP Rooms · MIT. Read-only лента открытой комнаты.</footer></body></html>')
 
 
 class PublicRooms:
@@ -251,14 +280,20 @@ class PublicRooms:
         if scope['method'] != 'GET':
             return await reply('Method not allowed', 405, extra={'Allow': 'GET'})
         path = scope['path']
+        query = parse_qs(scope.get('query_string', b'').decode('latin1'))
+        cursor = query['cursor'][0] if query.get('cursor') else None
         is_index = path == '/rooms' or path == '/rooms/'
-        topic = None
+        topic, room_id = None, None
         if not is_index:
-            m = ROOMS_SECTION.fullmatch(path)
+            m = ROOMS_ROOM.fullmatch(path)
             if m:
-                topic = m.group(1)
+                room_id = m.group(1)
             else:
-                return await reply('Комната недоступна', 404)
+                m = ROOMS_SECTION.fullmatch(path)
+                if m:
+                    topic = m.group(1)
+                else:
+                    return await reply('Комната недоступна', 404)
         started = False
         async def tracked(message):
             nonlocal started
@@ -268,8 +303,15 @@ class PublicRooms:
         try:
             self.budget()
             with self.admission.slot('public'):
-                index = await anyio.to_thread.run_sync(partial(self.store.public_open_rooms, topic=topic))
-                data = render_rooms_index(index, self.prefix, active_topic=topic)
+                if room_id is not None:
+                    def fetch():
+                        room = self.store.public_open_room(room_id)
+                        return room, self.store.public_open_room_messages(room_id, cursor)
+                    room, feed = await anyio.to_thread.run_sync(fetch)
+                    data = render_room_feed(room['room'], feed, self.prefix)
+                else:
+                    index = await anyio.to_thread.run_sync(partial(self.store.public_open_rooms, topic=topic))
+                    data = render_rooms_index(index, self.prefix, active_topic=topic)
             with anyio.fail_after(10):
                 await Response(data, media_type='text/html', headers=HEADERS)(scope, receive, tracked)
         except Exception as exc:

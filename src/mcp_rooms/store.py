@@ -340,6 +340,44 @@ class RoomStore:
                 'WHERE rt.visibility=?' + where + ' ORDER BY r.seq DESC LIMIT 51', ('open', *args)).fetchall()
         return {'sections': sections, 'rooms': [dict(x) for x in rooms][:50]}
 
+    def _open_room(self, db, room_id):
+        """Open-room row for public reads, or None (closed room). Fail-closed by construction:
+        only room_topics.visibility='open' rows are visible; private/legacy/closed rooms return None."""
+        row = db.execute(
+            'SELECT r.id, r.title, r.created_at, rt.topic_id, t.title AS topic_title '
+            'FROM room_topics rt JOIN rooms r ON r.id=rt.room_id JOIN topics t ON t.id=rt.topic_id '
+            'WHERE rt.room_id=? AND rt.visibility=?', (room_id, 'open')).fetchone()
+        return dict(row) if row else None
+
+    def public_open_room(self, room_id):
+        """Anonymous metadata for one OPEN room; private/legacy rooms are indistinguishable from
+        missing (fail closed). No owner UUID, no member counts, no private data."""
+        _id(room_id)
+        with self._db() as db:
+            room = self._open_room(db, room_id)
+        if room is None:
+            raise RoomError('room_unavailable')
+        return {'room': room}
+
+    def public_open_room_messages(self, room_id, cursor=None, limit=20):
+        """Anonymous bounded read-only history of one OPEN room. Fail-closed: private/legacy rooms
+        are reported unavailable. Only safe fields (id, text, created_at) are exposed; owner UUID and
+        reply linkage never. Deleted/tombstoned messages are excluded. Bounded by limit + cursor."""
+        _id(room_id)
+        after, limit, now = _cursor(cursor, room_id), _limit(limit), self.clock()
+        with self._db() as db:
+            if self._open_room(db, room_id) is None:
+                raise RoomError('room_unavailable')
+            rows = db.execute(
+                'SELECT id, seq, text, created_at FROM messages WHERE room_id=? AND seq>? AND expires_at>? '
+                'AND deleted=0 ORDER BY seq LIMIT ?', (room_id, after, now, limit + 1)).fetchall()
+        selected = list(rows[:limit])
+        return {'room_id': room_id,
+                'messages': [{'id': m['id'], 'text': m['text'], 'created_at': m['created_at']} for m in selected],
+                'next_cursor': room_id + ':' + str(selected[-1]['seq'] if selected else after),
+                'has_more': len(rows) > limit, 'retention': 'active_window_only',
+                'ttl_ms': self.limits.ttl_ms, 'untrusted_content': True}
+
     def join(self, owner, room_id):
         with self._db(write=True) as db:
             self._room(db, room_id)

@@ -66,3 +66,33 @@ def test_public_rooms_host_and_method_gates(setup):
     tool(client, ta, 'rooms_create', title='x', topic_id='taxi', visibility='open')
     assert client.post('/rooms').status_code == 405
     assert client.get('/rooms', headers={'Host': '127.0.0.1:8765'}).status_code == 421
+
+
+def test_public_room_feed_shows_and_escapes(setup):
+    app, client, ta = setup
+    rid = tool(client, ta, 'rooms_create', title='Открыта <script>', topic_id='taxi', visibility='open')['room_id']
+    tool(client, ta, 'rooms_send', room_id=rid, text='привет <b>мир</b> & stuff', client_message_id='c1')
+    body = client.get('/rooms/room/' + rid).text
+    assert 'привет &lt;b&gt;мир&lt;/b&gt; &amp; stuff' in body
+    assert '<b>' not in body and '<script>' not in body
+    assert 'Открыта &lt;script&gt;' in body
+
+
+def test_public_room_feed_fail_closed(setup):
+    app, client, ta = setup
+    priv = tool(client, ta, 'rooms_create', title='Приват', topic_id='delivery', visibility='private')['room_id']
+    assert client.get('/rooms/room/' + priv).status_code == 404
+    nope = 'user:ffffffff-ffff-ffff-ffff-ffffffffffff'
+    assert client.get('/rooms/room/' + nope).status_code == 404
+    assert client.get('/rooms/room/nope').status_code == 404
+
+
+def test_public_room_feed_single_message_and_methods(setup):
+    app, client, ta = setup
+    rid = tool(client, ta, 'rooms_create', title='К', topic_id='taxi', visibility='open')['room_id']
+    tool(client, ta, 'rooms_send', room_id=rid, text='m0', client_message_id='c1')
+    first = client.get('/rooms/room/' + rid).text
+    assert 'm0' in first
+    assert 'Следующие' not in first  # no pagination link within default limit
+    assert client.post('/rooms/room/' + rid).status_code == 405
+    assert client.get('/rooms/room/' + rid, headers={'Host': '127.0.0.1:8765'}).status_code == 421

@@ -153,6 +153,16 @@ fresh profile/key gate. Caddy всё ещё не менялся.
       `unread_messages` + read-метки тред-диалога (namespace v3, mark-on-read); CI pending.
 - [ ] Никакого переименования shared Rooms в «приватный чат».
 
+### O. Открытые/приватные комнаты + read-only веб-каталог (2026-10-25)
+
+- [ ] Единое дерево тем на базе `market_categories`, расширенное на маркет/такси-доставку/
+      наём/инвесторов и др.; источник категорий объявлений и комнат.
+- [ ] Комнаты: `topic_id` + приватность (private|open), фиксируемые при создании.
+- [ ] Read-only веб-витрина открытых комнат по дереву тем (без приватных).
+- [ ] Read-only лента сообщений открытой комнаты в вебе (bounded, escaping, курсор/TTL).
+- [ ] Production-prep статически (docs/checklist); деплой — отдельный owner-gate + пароль.
+      Дизайн: docs/open-rooms-web.md.
+
 ### I. Отдельный admin MCP — 2–3 недели
 
 - [ ] Отдельные principal/audience/credentials.

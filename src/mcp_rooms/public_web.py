@@ -69,8 +69,8 @@ def render_index(index, prefix):
         seen.setdefault(key, [top.get('title') if isinstance(top, dict) else 'Разное', 0])
         seen[key][1] += 1
     sections = ''.join(
-        '<a class="section" href="' + e(prefix + '/market') + '">' + e(title) + ' (' + str(n) + ')</a>'
-        for title, n in [v for v in seen.values()] if v[1])
+        '<a class="section" href="' + e(prefix + '/market') + '">' + e(t) + ' (' + str(n) + ')</a>'
+        for t, n in seen.values())
     cards = ''
     for item in index['items']:
         cats = ' → '.join(e(p.get('title', '')) for p in (item.get('category_path') or []) if isinstance(p, dict))

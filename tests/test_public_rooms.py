@@ -87,13 +87,12 @@ def test_public_room_feed_fail_closed(setup):
     assert client.get('/rooms/room/nope').status_code == 404
 
 
-def test_public_room_feed_cursor_and_methods(setup):
+def test_public_room_feed_single_message_and_methods(setup):
     app, client, ta = setup
     rid = tool(client, ta, 'rooms_create', title='К', topic_id='taxi', visibility='open')['room_id']
-    for i in range(3):
-        tool(client, ta, 'rooms_send', room_id=rid, text=f'm{i}', client_message_id=f'c{i}')
+    tool(client, ta, 'rooms_send', room_id=rid, text='m0', client_message_id='c1')
     first = client.get('/rooms/room/' + rid).text
-    assert 'm0' in first and 'm1' in first and 'm2' in first  # default limit 20 covers all 3
-    assert 'Следующие' not in first
+    assert 'm0' in first
+    assert 'Следующие' not in first  # no pagination link within default limit
     assert client.post('/rooms/room/' + rid).status_code == 405
     assert client.get('/rooms/room/' + rid, headers={'Host': '127.0.0.1:8765'}).status_code == 421

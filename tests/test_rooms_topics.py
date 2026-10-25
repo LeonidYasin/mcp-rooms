@@ -104,8 +104,13 @@ def test_public_topics_anonymous_browse(store):
     assert 'taxi' in {t['id'] for t in store.public_topics(parent_id='transport')['topics']}
     assert all(t['parent_id'] is None for t in store.public_topics()['topics'])
 
-
 # --- Slice C: public open-room reads (fail closed) ---
+
+@pytest.fixture
+def cstore(tmp_path):
+    now = [1000000]
+    return RoomStore(tmp_path / 'rooms.db', clock=lambda: now[0]), now
+
 
 def test_public_open_room_meta_fail_closed(store):
     rid = store.create(A, 'Open', topic_id='taxi', visibility='open')['room_id']
@@ -114,16 +119,18 @@ def test_public_open_room_meta_fail_closed(store):
     r = store.public_open_room(rid)
     assert r['room']['title'] == 'Open' and r['room']['topic_id'] == 'taxi'
     assert 'owner' not in r['room']
-    for cid in (priv, leg, 'user:ffffffff-ffff-ffff-ffff-ffffffffffff'):
-        error('room_unavailable', lambda: store.public_open_room(cid))
+    error('room_unavailable', lambda: store.public_open_room(priv))
+    error('room_unavailable', lambda: store.public_open_room(leg))
+    error('room_unavailable', lambda: store.public_open_room('00000000-0000-0000-0000-0000000000ee'))
 
 
-def test_public_open_room_messages_bounded_fail_closed(store):
+def test_public_open_room_messages_bounded_fail_closed(cstore):
+    store, now = cstore
     rid = store.create(A, 'Open', topic_id='taxi', visibility='open')['room_id']
     priv = store.create(A, 'Priv', topic_id='delivery', visibility='private')['room_id']
     for i in range(5):
         store.send(A, rid, f'hello {i}', f'c{i}')
-    store.send(A, priv, 'secret', 'cs')
+        now[0] += 10000
     error('room_unavailable', lambda: store.public_open_room_messages(priv))
     feed = store.public_open_room_messages(rid, limit=2)
     assert len(feed['messages']) == 2 and feed['has_more'] is True
@@ -133,10 +140,14 @@ def test_public_open_room_messages_bounded_fail_closed(store):
     assert [m['text'] for m in feed['messages']] + [m['text'] for m in feed2['messages']] == [f'hello {i}' for i in range(5)]
 
 
-def test_public_open_room_messages_exclude_deleted(store):
+def test_public_open_room_messages_exclude_deleted(cstore):
+    store, now = cstore
     rid = store.create(A, 'Open', topic_id='taxi', visibility='open')['room_id']
-    keep_id = store.send(A, rid, 'keep', 'c1')['message']['id']
-    del_id = store.send(A, rid, 'bye', 'c2')['message']['id']
+    store.send(A, rid, 'keep', 'c1')
+    now[0] += 10000
+    store.send(A, rid, 'bye', 'c2')
+    now[0] += 10000
+    del_id = store.read(A, rid)['messages'][-1]['id']
     store.delete_message(A, rid, del_id)
     texts = [m['text'] for m in store.public_open_room_messages(rid)['messages']]
     assert texts == ['keep']

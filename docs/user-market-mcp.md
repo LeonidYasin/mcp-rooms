@@ -14,7 +14,7 @@ composition root через `market=MarketAdapter(drafts,photos,publisher)`, с�
 Startup проверяет market2/media3/publication1, но **не создаёт и не мигрирует** их.
 Нужен отдельный явный операторский initialize, а не запрос пользователя.
 
-В этом режиме официальный MCP SDK регистрирует20 методов:8 прежних rooms и12 новых
+В этом режиме официальный MCP SDK регистрирует22 метода:8 прежних rooms и14 новых
 listings. BearerGate проверяет ключ на каждом HTTP request и переносит проверенный
 Principal через request-local ContextVar в thread worker. Сервис дополнительно
 проверяет persisted user/credential/resource/scopes/revoke/expiry при каждом действии.
@@ -38,6 +38,8 @@ opt-in app; наличие в tools/list не даёт права вызова �
 | listings_publish | listings:publish | Consume/snapshot/receipt/audit; явное одобрение владельца |
 | listings_withdraw | listings:publish | Exact publication revision; не удаление чужих копий |
 | listings_publication_status | listings:read | Текущее stored state/epoch, не гарантия внешней видимости |
+| listings_public_get | listings:read | Allowlisted публичная карточка по id; не owner/room/credentials; 404 для недоступных |
+| listings_public_index | listings:read | Bounded read-only страница опубликованных (по root-разделу); allowlist |
 
 `ListingInput` запрещает лишние поля (включая owner/media_ids), coercion bool→price,
 число→title. JSON lists переводятся в domain tuples только после проверки. Внешние

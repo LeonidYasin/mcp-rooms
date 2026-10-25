@@ -64,3 +64,15 @@ def register_market_tools(mcp, call):
     async def listings_publication_status(listing_id: StrictStr) -> list[TextContent]:
         """Read your current stored publication state, not a guarantee of external availability."""
         return await call('publication_status',listing_id=listing_id)
+
+    @mcp.tool(structured_output=False, annotations=ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False))
+    async def listings_public_get(listing_id: StrictStr) -> list[TextContent]:
+        """Read one explicitly published allowlisted public card. Private drafts, rooms,
+        credentials and owner UUIDs are never exposed. Same 404 for unavailable cards."""
+        return await call('public_get',listing_id=listing_id)
+
+    @mcp.tool(structured_output=False, annotations=ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False))
+    async def listings_public_index(section: StrictStr | None=None, limit: StrictInt=50) -> list[TextContent]:
+        """Bounded read-only page of explicitly published cards (optionally by root section).
+        The listing owner UUID/room/credentials are never exposed by this allowlist projection."""
+        return await call('public_index',section=section,limit=limit)

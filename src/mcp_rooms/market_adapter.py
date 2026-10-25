@@ -33,7 +33,7 @@ class ListingInput(BaseModel):
         return ListingContent(**values)
 
 
-READ = frozenset({'get','list_own','categories','preview','publication_status'})
+READ = frozenset({'get','list_own','categories','preview','publication_status','public_get','public_index'})
 PUBLISH = frozenset({'confirm','publish','withdraw'})
 ARGUMENTS = {
     'create': {'content','category_id','client_id'},
@@ -48,6 +48,8 @@ ARGUMENTS = {
     'publish': {'listing_id','intent_id','client_id'},
     'withdraw': {'listing_id','expected_publication_revision','client_id'},
     'publication_status': {'listing_id'},
+    'public_get': {'listing_id'},
+    'public_index': {'section','limit'},
 }
 
 
@@ -107,7 +109,8 @@ class MarketAdapter:
                 'categories':self.drafts.categories,'update':self.photos.update_content,
                 'set_photos':self.photos.set_photos,'archive':self.drafts.archive,
                 'preview':self.publisher.preview,'confirm':self.publisher.confirm,
-                'publish':self.publisher.publish,'withdraw':self.publisher.withdraw,'publication_status':self._status}
+                'publish':self.publisher.publish,'withdraw':self.publisher.withdraw,'publication_status':self._status,
+                'public_get':self.publisher.public_get,'public_index':self.publisher.public_index}
             return {'ok':True,**methods[action](actor,**args)}
         except DomainError as exc:
             return {'ok':False,'error':exc.code,**exc.details}

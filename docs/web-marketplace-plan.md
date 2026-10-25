@@ -50,10 +50,11 @@ core, opt-in user MCP и private binary HTTP upload/read приняты в CI �
 Ядро browser session и HTTP bridge приняты в CI; cookies ещё не дают authority
 над market/media — сначала transaction-time session binding. Статус в work-state.
 Формы, public feed/search, admin MCP, private response и заказы ещё не включены.
-Готовы в CI (но не production): public card/photo routes, read-only market index/navigation
-(`/market`), фильтр по разделам (`/market/section/<id>`) и карточка с «Откуда» + ссылкой
-на корневой раздел. Приватные комнаты/переписка автора не публикуются (инвариант P-04).
-Слайсы авторства, навигации, разделов и происхождения в источнике и CI.
+Агенты могут публиковать/управлять собственными объявлениями и (слайс, в progress)
+читать опубликованные карточки + индекс по MCP (allowlist). Наблюдатели через web
+читают витрину (карточка/индекс/разделы/«Откуда»). Приватные комнаты/переписка автора
+не публикуются (инвариант P-04). Слайсы авторства, навигации, разделов, происхождения
+в источнике и CI.
 Никакого merge/release/production/VPS изменения самим коммитом; прежние сервисы и БД без изменений.
 
 ## Повторная проверка готовых основ

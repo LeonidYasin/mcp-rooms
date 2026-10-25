@@ -21,7 +21,8 @@ from test_server import RESOURCE, rpc, tool, NAMES
 
 MARKET_NAMES={'listings_create','listings_get','listings_list_own','listings_categories','listings_update',
     'listings_set_photos','listings_archive','listings_preview','listings_confirm_publication',
-    'listings_publish','listings_withdraw','listings_publication_status'}
+    'listings_publish','listings_withdraw','listings_publication_status',
+    'listings_public_get','listings_public_index'}
 CONTENT=dict(title='Synthetic item',description='Synthetic acceptance only; not a real sale.',
              category='things',kind='offer',modes=['shipping'])
 
@@ -57,7 +58,7 @@ def confirm(x,lid,preview=None):
         expected_revision=p['record']['listing']['revision'],preview_digest=p['digest'],consent=True,client_id=key())
 
 
-def test_opt_in_twenty_tools_no_admin_or_upload_methods(market):
+def test_opt_in_toolset_no_admin_or_upload_methods(market):
     x=market
     listed=rpc(x.client,x.ta,'tools/list').json()['result']['tools']
     assert {t['name'] for t in listed}==NAMES|MARKET_NAMES
@@ -65,7 +66,7 @@ def test_opt_in_twenty_tools_no_admin_or_upload_methods(market):
         if t['name'] in MARKET_NAMES:
             assert t['annotations']['destructiveHint'] == (t['name'] in {'listings_update','listings_set_photos','listings_archive','listings_publish','listings_withdraw'})
             assert t['annotations']['openWorldHint'] is False
-            assert t['annotations']['readOnlyHint'] == (t['name'] in {'listings_get','listings_list_own','listings_categories','listings_preview','listings_publication_status'})
+            assert t['annotations']['readOnlyHint'] == (t['name'] in {'listings_get','listings_list_own','listings_categories','listings_preview','listings_publication_status','listings_public_get','listings_public_index'})
             schema=t['inputSchema']['properties']
             assert not {'owner','user_id','principal','resource','path','filename'} & schema.keys()
     assert x.client.post('/listings',headers={'Authorization':'Bearer '+x.ta},json={}).status_code==404
@@ -208,7 +209,29 @@ def test_missing_namespace_refused_without_startup_migration(market):
         assert not db.execute("SELECT 1 FROM sqlite_master WHERE name='publication_audit'").fetchone()
 
 
-def test_http_delegation_preserves_listing_scopes_and_expiry(market):
+def test_agent_b_reads_public_card_and_index_of_a(market):
+    x=market
+    lid=create(x)['listing']['id']
+    actor=x.auth.authenticate(x.ta)
+    media=x.stages.stage(actor,lid,expected_revision=1,client_id=key(),payload=b'synthetic',declared_type='image/png')
+    assert tool(x.client,x.ta,'listings_set_photos',listing_id=lid,media_ids=[media['media_id']],expected_revision=1,client_id=key())['ok']
+    preview=tool(x.client,x.ta,'listings_preview',listing_id=lid)
+    intent=tool(x.client,x.ta,'listings_confirm_publication',listing_id=lid,
+        expected_revision=preview['record']['listing']['revision'],preview_digest=preview['digest'],consent=True,client_id=key())
+    assert tool(x.client,x.ta,'listings_publish',listing_id=lid,intent_id=intent['intent_id'],client_id=key())['ok']
+    # Agent B (a different actor) reads A's published card + index via MCP.
+    public=tool(x.client,x.tb,'listings_public_get',listing_id=lid)
+    assert public['ok'] and public['id']==lid and public['author']=='A'
+    encoded=json.dumps(public)
+    for secret in ('credential','user:'+x.a,'/rooms/','resource'):
+        assert secret not in encoded
+    index=tool(x.client,x.tb,'listings_public_index',limit=50)
+    assert index['ok'] and any(i['id']==lid for i in index['items'])
+    # Unavailable(private)/missing look identical to a non-owner agent.
+    unknown=tool(x.client,x.tb,'listings_public_get',listing_id=key())
+    assert unknown['ok'] is False and unknown['error']=='listing_unavailable'
+    private_id=create(x)['listing']['id']
+    assert tool(x.client,x.tb,'listings_public_get',listing_id=private_id)['error']=='listing_unavailable'
     x=market;headers={'Authorization':'Bearer '+x.ta}
     assert x.client.post('/credentials',headers=headers,json={'scopes':['admin:all']}).status_code==400
     response=x.client.post('/credentials',headers=headers,json={})

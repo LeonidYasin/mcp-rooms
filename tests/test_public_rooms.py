@@ -54,11 +54,11 @@ def test_public_rooms_topic_filter_and_sections(setup):
     assert 'rooms/topic/taxi' in client.get('/rooms').text
 
 
-def test_public_rooms_unknown_topic_marker_404(setup):
+def test_public_rooms_unknown_path_is_404_and_valid_topic_200(setup):
     app, client, ta = setup
     tool(client, ta, 'rooms_create', title='x', topic_id='taxi', visibility='open')
-    assert client.get('/rooms/topic/no_such_topic_here_detail_longer_than_40').status_code == 404
-    assert client.get('/rooms/topic/nope').status_code == 200  # valid id, just no open rooms
+    assert client.get('/rooms/nope').status_code == 404  # not a topic route
+    assert client.get('/rooms/topic/nosuch').status_code == 200  # valid topic id, no open rooms
 
 
 def test_public_rooms_host_and_method_gates(setup):

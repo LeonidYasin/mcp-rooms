@@ -322,6 +322,8 @@ class RoomStore:
         """Anonymous read-only projection of OPEN rooms; fail-closed: private/legacy rooms and
         owner UUIDs are never exposed, only room_topics.visibility='open' rows (closed rooms are
         removed from rooms/room_topics and therefore absent). Bounded to 50 newest open rooms."""
+        if topic is not None:
+            _topic_id(topic)
         with self._db() as db:
             sections = [
                 {'id': s['id'], 'title': s['title'], 'count': s['n']}

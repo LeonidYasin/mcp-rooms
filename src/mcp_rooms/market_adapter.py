@@ -35,9 +35,9 @@ class ListingInput(BaseModel):
 
 
 READ = frozenset({'get','list_own','categories','preview','publication_status','public_get','public_index',
-                  'responses','my_responses'})
+                  'responses','my_responses','thread'})
 PUBLISH = frozenset({'confirm','publish','withdraw'})
-RESPOND_WRITE = frozenset({'respond','respond_status'})
+RESPOND_WRITE = frozenset({'respond','respond_status','reply'})
 ARGUMENTS = {
     'create': {'content','category_id','client_id'},
     'get': {'listing_id'},
@@ -57,6 +57,8 @@ ARGUMENTS = {
     'responses': {'listing_id'},
     'my_responses': {'cursor','limit'},
     'respond_status': {'listing_id','response_id','public_status','client_id'},
+    'reply': {'response_id','text','client_id'},
+    'thread': {'response_id','cursor','limit'},
 }
 
 
@@ -112,7 +114,7 @@ class MarketAdapter:
                 raise DomainError('method_unavailable')
             if not args.keys() <= ARGUMENTS[action]:
                 raise DomainError('invalid_arguments')
-            if action in ('respond','responses','my_responses','respond_status') and self.responses is None:
+            if action in ('respond','responses','my_responses','respond_status','reply','thread') and self.responses is None:
                 raise DomainError('method_unavailable')
             scope = ('listings:read' if action in READ else 'listings:publish' if action in PUBLISH
                      else 'listings:write')
@@ -137,7 +139,8 @@ class MarketAdapter:
                 methods.update(
                     {'respond':self.responses.respond,'responses':self.responses.responses,
                      'my_responses':self.responses.my_responses,
-                     'respond_status':self.responses.respond_status})
+                     'respond_status':self.responses.respond_status,
+                     'reply':self.responses.reply,'thread':self.responses.thread})
             return {'ok':True,**methods[action](actor,**args)}
         except DomainError as exc:
             return {'ok':False,'error':exc.code,**exc.details}

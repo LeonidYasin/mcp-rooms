@@ -5,7 +5,7 @@ from .store import RoomError
 from .identity import Principal
 
 LOG = logging.getLogger(__name__)
-READ = frozenset({'list', 'read'})
+READ = frozenset({'list', 'read', 'topics'})
 ACTIONS = READ | frozenset({'create', 'join', 'leave', 'send', 'delete_message', 'close'})
 
 

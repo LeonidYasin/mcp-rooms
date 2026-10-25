@@ -237,14 +237,19 @@ def create_app(database, resource, registration_enabled=False, *, market=None, m
         return [TextContent(type='text', text=json.dumps(result, ensure_ascii=False))]
 
     @mcp.tool(structured_output=False)
-    async def rooms_create(title: StrictStr, description: StrictStr = '') -> list[TextContent]:
-        """Create a shared room and join as its owner. No private/invite-only rooms."""
-        return await call('create', title=title, description=description)
+    async def rooms_create(title: StrictStr, description: StrictStr = '', topic_id: StrictStr | None = None, visibility: StrictStr | None = None) -> list[TextContent]:
+        """Create a shared room and join as its owner. topic_id/visibility (private|open) are fixed at creation when supplied."""
+        return await call('create', title=title, description=description, topic_id=topic_id, visibility=visibility)
 
     @mcp.tool(structured_output=False)
-    async def rooms_list(cursor: StrictStr | None = None, limit: StrictInt = 20) -> list[TextContent]:
-        """List shared rooms visible to all enrolled users; bounded cursor pagination."""
-        return await call('list', cursor=cursor, limit=limit)
+    async def rooms_list(cursor: StrictStr | None = None, limit: StrictInt = 20, topic: StrictStr | None = None) -> list[TextContent]:
+        """List shared rooms (optionally filtered by a single topic); bounded cursor pagination."""
+        return await call('list', cursor=cursor, limit=limit, topic=topic)
+
+    @mcp.tool(structured_output=False)
+    async def rooms_topics(parent_id: StrictStr | None = None) -> list[TextContent]:
+        # Browse the united topic catalog tree by parent; roots when parent_id is omitted.
+        return await call('topics', parent_id=parent_id)
 
     @mcp.tool(structured_output=False)
     async def rooms_join(room_id: StrictStr) -> list[TextContent]:

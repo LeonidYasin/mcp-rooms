@@ -321,7 +321,7 @@ def main(bundle,source):
         print('CANDIDATE UNIT STEP: unit-ready',flush=True)
         sampler=Sampler(group);sampler.start()
         assert rpc(raw,'initialize',{'protocolVersion':'2025-11-25','capabilities':{},'clientInfo':{'name':'systemd-ci','version':'1'}})['serverInfo']['name']=='MCP Rooms'
-        assert len(rpc(raw,'tools/list',{})['tools'])==28
+        assert len(rpc(raw,'tools/list',{})['tools'])==29
         listing=call(raw,'listings_create',client_id=key(),category_id='things',content={
             'title':'CI synthetic unit item','description':'Synthetic; not a real offer',
             'category':'things','kind':'offer','modes':['shipping']})['listing']['id']

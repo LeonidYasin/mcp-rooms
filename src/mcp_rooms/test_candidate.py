@@ -27,7 +27,7 @@ from .market_adapter import MarketAdapter
 from .server import create_app
 
 PROFILE = 'mcp-rooms/owner-first-test/v1'
-BASE = {'actors','rooms','members','messages','users','credentials','enrollments','signup_budgets'}
+BASE = {'actors','rooms','members','messages','users','credentials','enrollments','signup_budgets','topics','room_topics'}
 REQUIRED = BASE | set(TABLES) | _TABLES | PUBLICATION_TABLES
 DB = 'market.sqlite3'
 MARKER = 'profile.json'

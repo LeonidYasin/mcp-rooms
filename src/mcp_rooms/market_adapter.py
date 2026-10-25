@@ -114,8 +114,8 @@ class MarketAdapter:
             return {'ok':True,**methods[action](actor,**args)}
         except DomainError as exc:
             return {'ok':False,'error':exc.code,**exc.details}
-        except (ValidationError,TypeError,ValueError):
-            return {'ok':False,'error':'invalid_arguments'}
+        except (ValidationError,TypeError,ValueError) as debug_exc:
+            return {'ok':False,'error':'invalid_arguments','debug':repr(debug_exc),'action':action,'args':sorted(args)}
         except sqlite3.Error as exc:
             code=getattr(exc,'sqlite_errorcode',0)
             code=(code & 255) if type(code) is int else 0

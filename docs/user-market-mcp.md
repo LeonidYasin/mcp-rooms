@@ -40,8 +40,8 @@ opt-in app; наличие в tools/list не даёт права вызова �
 | listings_public_get | listings:read | Allowlisted публичная карточка по id; не owner/room/credentials; 404 для недоступных |
 | listings_public_index | listings:read | Bounded read-only страница опубликованных (по root-разделу); allowlist |
 | listings_respond | listings:write | Приватный отклик на активное объявление; только владелец и автор видят |
-| listings_responses | listings:read | Список откликов на СВОЁ активное объявление (только владелец) |
-| listings_my_responses | listings:read | Свои отклики + статус-метка |
+| listings_responses | listings:read | Список откликов на СВОЁ активное объявление (только владелец); в записи `unread_messages` — счётчик непрочитанных сообщений диалога (контент не включается) |
+| listings_my_responses | listings:read | Свои отклики + статус-метка + `unread_messages` (сообщения владельца в треде) |
 | listings_respond_status | listings:write | Владелец ставит публичную метку статуса (allowlist); тело остаётся приватным |
 | listings_reply | listings:write | Сообщение в приватный диалог-тред своего отклика (A или B) |
 | listings_thread | listings:read | Чтение приватного тред-диалога (только участники) |
@@ -54,6 +54,16 @@ MCP POST body по-прежнему ограничен64KiB; бинарные ф
 Tool descriptions называют содержимое недоверенными данными, не инструкциями.
 Admin/SQL/shell/maintenance/credential issuance MCP методов нет. SDK ToolAnnotations
 помечают read-only/destructive/idempotent/closed-world свойства; это hints, не grants.
+
+## Уведомления о приватном диалоге (p1)
+
+Владелец и автор отклика узнают об обновлении приватного диалога через контент-безопасный
+индикатор `unread_messages`: целочисленный счётчик непрочитанных сообщений тред-диалога
+от противоположного участника. Текст сообщений, авторы и сам индикатор содержимым не
+раскрывают. Чтение треда (`listings_thread`) проставляет read-метку; после чтения
+индикатор становится равным нулю. Public web и public summary по-прежнему показывают только
+счётчик откликов и публичные метки — без сообщений и участников. Push-уведомления и
+вложения — отдельные слайсы.
 
 ## Listing credentials — отдельный opt-in
 

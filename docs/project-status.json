@@ -203,7 +203,7 @@
       "id": "response",
       "title": "Приватный отклик",
       "stage": "SOURCE",
-      "summary": "ResponseStore: приватный отклик R-01 (владелец и автор видят тело), публичная статус-метка allowlist, web показывает счётчик+метки. Не превращает общие Rooms в личную переписку. В тестовом прогоне CI, но exact-SHA evidence ещё не принят.",
+      "summary": "ResponseStore: приватный отклик R-01 (владелец и автор видят тело), публичная статус-метка allowlist, web показывает счётчик+метки; p1 уведомление диалога — контент-безопасный unread_messages + read-метки (namespace v3). Не превращает общие Rooms в личную переписку. В тестовом прогоне CI, но exact-SHA evidence ещё не принят.",
       "doc": "docs/private-response.md",
       "source": "src/mcp_rooms/response_store.py",
       "evidence": null,

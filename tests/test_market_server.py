@@ -349,3 +349,34 @@ def test_private_dialogue_thread_owner_and_author(market):
     outsider=tool(x.client,tc,'listings_thread',response_id=rid)
     assert outsider['error']=='response_unavailable'
     assert tool(x.client,tc,'listings_reply',response_id=rid,text='spam',client_id=key())['error']=='response_unavailable'
+
+
+def test_private_dialogue_unread_indicator_and_content_free(market):
+    x=market;lid,_=publish(x)
+    rid=tool(x.client,x.tb,'listings_respond',listing_id=lid,text='I am interested',client_id=key())['id']
+    owned=tool(x.client,x.ta,'listings_responses',listing_id=lid)
+    response=[r for r in owned['responses'] if r['id']==rid][0]
+    # No dialogue messages yet: no unread indicator.
+    assert response['unread_messages']==0
+    # Author B replies: owner A gets a content-free unread indicator on the response.
+    assert tool(x.client,x.tb,'listings_reply',response_id=rid,text='Могу ли я посмотреть?',client_id=key())['ok']
+    owned=tool(x.client,x.ta,'listings_responses',listing_id=lid)
+    response=[r for r in owned['responses'] if r['id']==rid][0]
+    assert response['unread_messages']==1
+    # Indicator carries metadata only: private dialogue text never leaks through it.
+    assert 'Могу ли я посмотреть?' not in json.dumps(owned, ensure_ascii=False)
+    # Owner reads the thread: unread clears for the owner.
+    assert tool(x.client,x.ta,'listings_thread',response_id=rid,limit=50)['ok']
+    owned=tool(x.client,x.ta,'listings_responses',listing_id=lid)
+    response=[r for r in owned['responses'] if r['id']==rid][0]
+    assert response['unread_messages']==0
+    # Owner replies: author B gets the unread indicator; content stays participant-only.
+    assert tool(x.client,x.ta,'listings_reply',response_id=rid,text='Конечно, давайте посмотрим',client_id=key())['ok']
+    mine=tool(x.client,x.tb,'listings_my_responses',limit=20)
+    response=[r for r in mine['responses'] if r['id']==rid][0]
+    assert response['unread_messages']==1
+    # Author reads the thread: unread clears for the author.
+    assert tool(x.client,x.tb,'listings_thread',response_id=rid,limit=50)['ok']
+    mine=tool(x.client,x.tb,'listings_my_responses',limit=20)
+    response=[r for r in mine['responses'] if r['id']==rid][0]
+    assert response['unread_messages']==0

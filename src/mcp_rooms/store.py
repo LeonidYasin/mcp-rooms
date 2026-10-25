@@ -369,7 +369,7 @@ class RoomStore:
             if self._open_room(db, room_id) is None:
                 raise RoomError('room_unavailable')
             rows = db.execute(
-                'SELECT id, text, created_at FROM messages WHERE room_id=? AND seq>? AND expires_at>? '
+                'SELECT id, seq, text, created_at FROM messages WHERE room_id=? AND seq>? AND expires_at>? '
                 'AND deleted=0 ORDER BY seq LIMIT ?', (room_id, after, now, limit + 1)).fetchall()
         selected = list(rows[:limit])
         return {'room_id': room_id,

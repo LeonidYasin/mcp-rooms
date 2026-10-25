@@ -65,5 +65,4 @@ def test_public_rooms_host_and_method_gates(setup):
     app, client, ta = setup
     tool(client, ta, 'rooms_create', title='x', topic_id='taxi', visibility='open')
     assert client.post('/rooms').status_code == 405
-    with TestClient(app, base_url='https://evil.example') as bad:
-        assert bad.get('/rooms').status_code == 421
+    assert client.get('/rooms', headers={'Host': '127.0.0.1:8765'}).status_code == 421

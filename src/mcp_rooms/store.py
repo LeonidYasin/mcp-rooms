@@ -268,7 +268,7 @@ class RoomStore:
                     raise RoomError('topic_unavailable')
                 db.execute("INSERT INTO room_topics(room_id,topic_id,visibility) VALUES (?,?,?)", (room_id, topic_id, visibility or "private"))
         result = {'room_id': room_id, 'owner': owner, 'title': title,
-                  'visibility': visibility if have_meta else 'public_to_enrolled_users'}
+                  'visibility': (visibility or 'private') if have_meta else 'public_to_enrolled_users'}
         if have_meta:
             result['topic_id'] = topic_id
         return result

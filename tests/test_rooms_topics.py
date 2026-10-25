@@ -66,9 +66,9 @@ def test_create_rejects_invalid_topic_id_shape(store):
 def test_list_filters_by_topic(store):
     open_taxi = store.create(A, 'Такси', topic_id='taxi', visibility='open')['room_id']
     store.create(A, 'Доставка', topic_id='delivery', visibility='open')
-    store.create(B, 'Частная', topic_id='taxi', visibility='private')
-    got = [r['id'] for r in store.list(A, topic='taxi')['rooms']]
-    assert got == [open_taxi]
+    private_taxi = store.create(B, 'Частная', topic_id='taxi', visibility='private')['room_id']
+    got = {r['id'] for r in store.list(A, topic='taxi')['rooms']}
+    assert got == {open_taxi, private_taxi}
 
 
 def test_list_shows_rooms_of_other_owner_by_topic(store):

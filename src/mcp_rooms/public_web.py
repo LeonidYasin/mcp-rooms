@@ -80,13 +80,14 @@ def render_index(index, prefix):
                   '<div class="meta">' + e(item.get('author', '')) + ' · ' + e(cats) +
                   ' · ' + e(_price(item)) + '</div>'
                   '<div class="meta">' + e(modes) + '</div></li>')
-    body = ('' if cards else '<p>Пока опубликованных объявлений нет.</p>')
+    body = ('<ul class="index">' + cards + '</ul>' if cards
+            else '<p>Пока опубликованных объявлений нет.</p>')
     return ('<!doctype html><html lang="ru"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1"><title>'
             'Рынок — Хочу · Предлагаю</title><style>' + CSS + '</style></head><body>'
             '<header>Хочу <span>·</span> Предлагаю <span> / TEST</span></header><main>'
             '<h1>Что предлагают и ищут</h1><p class="sections">' + sections + '</p>'
-            '<ul class="index">' + cards + '</ul><aside class="notice">'
+            + body + '<aside class="notice">'
             'Тестовая площадка. Встроенная переписка, оплата и гарантии сделки пока недоступны. '
             'Не передавайте ключи доступа и не переводите предоплату незнакомцам.</aside></main>'
             '<footer>MCP Rooms · MIT. Показаны только явно опубликованные объявления.</footer></body></html>')

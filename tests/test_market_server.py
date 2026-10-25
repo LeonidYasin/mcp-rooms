@@ -221,7 +221,8 @@ def test_agent_b_reads_public_card_and_index_of_a(market):
     assert tool(x.client,x.ta,'listings_publish',listing_id=lid,intent_id=intent['intent_id'],client_id=key())['ok']
     # Agent B (a different actor) reads A's published card + index via MCP.
     public=tool(x.client,x.tb,'listings_public_get',listing_id=lid)
-    assert public['ok'] and public['id']==lid and public['author']=='A'
+    assert public.get('ok'), public
+    assert public.get('id')==lid and public.get('author')=='A'
     encoded=json.dumps(public)
     for secret in ('credential','user:'+x.a,'/rooms/','resource'):
         assert secret not in encoded

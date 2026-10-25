@@ -162,6 +162,6 @@ def test_private_room_same_code_path_web_flag_only(store, monkeypatch):
     error('room_unavailable', lambda: store.web_room(priv))
     # flipping the single flag serves the same room through the same code (no special-casing)
     monkeypatch.setattr(store_mod, 'WEB_VISIBLE', ('open', 'private'))
-    assert store.web_room(priv)['room']['title'] == 'P'
+    assert store.web_room(priv)['room']['title'] == 'Приват'
     assert any(r['id'] == priv for r in store.web_rooms()['rooms'])
     assert store.web_room_messages(priv)['messages'] == []

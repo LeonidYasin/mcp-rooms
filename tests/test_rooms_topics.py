@@ -83,21 +83,21 @@ def test_topics_browse_capacity_and_exact_parent(store):
     assert taxi == []
 
 
-def test_public_open_rooms_fail_closed_on_private_and_legacy(store):
+def test_web_rooms_fail_closed_on_private_and_legacy(store):
     store.create(A, 'Открыта', topic_id='taxi', visibility='open')
     store.create(A, 'Скрыта', topic_id='delivery', visibility='private')
     store.create(A, 'Без темы')
-    index = store.public_open_rooms()
+    index = store.web_rooms()
     assert {r['title'] for r in index['rooms']} == {'Открыта'}
     assert all('owner' not in r and 'visibility' not in r and 'joined' not in r for r in index['rooms'])
 
 
-def test_public_open_rooms_filter_by_topic(store):
+def test_web_rooms_filter_by_topic(store):
     store.create(A, 'Такси', topic_id='taxi', visibility='open')
     store.create(A, 'Доставка', topic_id='delivery', visibility='open')
-    got = store.public_open_rooms(topic='taxi')['rooms']
+    got = store.web_rooms(topic='taxi')['rooms']
     assert len(got) == 1 and got[0]['topic_id'] == 'taxi'
-    error('invalid_topic_id', lambda: store.public_open_rooms(topic='bad id'))
+    error('invalid_topic_id', lambda: store.web_rooms(topic='bad id'))
 
 
 def test_public_topics_anonymous_browse(store):
@@ -112,35 +112,35 @@ def cstore(tmp_path):
     return RoomStore(tmp_path / 'rooms.db', clock=lambda: now[0]), now
 
 
-def test_public_open_room_meta_fail_closed(store):
+def test_web_room_meta_fail_closed(store):
     rid = store.create(A, 'Open', topic_id='taxi', visibility='open')['room_id']
     priv = store.create(A, 'Priv', topic_id='delivery', visibility='private')['room_id']
     leg = store.create(A, 'Legacy')['room_id']
-    r = store.public_open_room(rid)
+    r = store.web_room(rid)
     assert r['room']['title'] == 'Open' and r['room']['topic_id'] == 'taxi'
     assert 'owner' not in r['room']
-    error('room_unavailable', lambda: store.public_open_room(priv))
-    error('room_unavailable', lambda: store.public_open_room(leg))
-    error('room_unavailable', lambda: store.public_open_room('00000000-0000-0000-0000-0000000000ee'))
+    error('room_unavailable', lambda: store.web_room(priv))
+    error('room_unavailable', lambda: store.web_room(leg))
+    error('room_unavailable', lambda: store.web_room('00000000-0000-0000-0000-0000000000ee'))
 
 
-def test_public_open_room_messages_bounded_fail_closed(cstore):
+def test_web_room_messages_bounded_fail_closed(cstore):
     store, now = cstore
     rid = store.create(A, 'Open', topic_id='taxi', visibility='open')['room_id']
     priv = store.create(A, 'Priv', topic_id='delivery', visibility='private')['room_id']
     for i in range(5):
         store.send(A, rid, f'hello {i}', f'c{i}')
         now[0] += 10000
-    error('room_unavailable', lambda: store.public_open_room_messages(priv))
-    feed = store.public_open_room_messages(rid, limit=2)
+    error('room_unavailable', lambda: store.web_room_messages(priv))
+    feed = store.web_room_messages(rid, limit=2)
     assert len(feed['messages']) == 2 and feed['has_more'] is True
     assert all('owner' not in m and 'reply_to' not in m and 'digest' not in m for m in feed['messages'])
     assert feed['messages'][0]['text'] == 'hello 0'
-    feed2 = store.public_open_room_messages(rid, cursor=feed['next_cursor'], limit=10)
+    feed2 = store.web_room_messages(rid, cursor=feed['next_cursor'], limit=10)
     assert [m['text'] for m in feed['messages']] + [m['text'] for m in feed2['messages']] == [f'hello {i}' for i in range(5)]
 
 
-def test_public_open_room_messages_exclude_deleted(cstore):
+def test_web_room_messages_exclude_deleted(cstore):
     store, now = cstore
     rid = store.create(A, 'Open', topic_id='taxi', visibility='open')['room_id']
     store.send(A, rid, 'keep', 'c1')
@@ -149,5 +149,19 @@ def test_public_open_room_messages_exclude_deleted(cstore):
     now[0] += 10000
     del_id = store.read(A, rid)['messages'][-1]['id']
     store.delete_message(A, rid, del_id)
-    texts = [m['text'] for m in store.public_open_room_messages(rid)['messages']]
+    texts = [m['text'] for m in store.web_room_messages(rid)['messages']]
     assert texts == ['keep']
+
+
+def test_private_room_same_code_path_web_flag_only(store, monkeypatch):
+    """Owner direction: private rooms run the exact same store/web read code as open rooms;
+    the ONLY difference is the single WEB_VISIBLE decision point."""
+    from mcp_rooms import store as store_mod
+    priv = store.create(A, 'Приват', topic_id='taxi', visibility='private')['room_id']
+    # not web-exposed by default
+    error('room_unavailable', lambda: store.web_room(priv))
+    # flipping the single flag serves the same room through the same code (no special-casing)
+    monkeypatch.setattr(store_mod, 'WEB_VISIBLE', ('open', 'private'))
+    assert store.web_room(priv)['room']['title'] == 'Приват'
+    assert any(r['id'] == priv for r in store.web_rooms()['rooms'])
+    assert store.web_room_messages(priv)['messages'] == []

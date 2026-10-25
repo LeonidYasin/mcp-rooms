@@ -38,6 +38,12 @@ TOPIC_SEED = (
 
 _VISIBLE = frozenset({'private', 'open'})
 
+# Single decision point for read-only WEB exposure: rooms with a visibility in this
+# tuple are served by the anonymous web; any other visibility (e.g. 'private') is
+# stored/read with the exact same code but not web-exposed. Open and private rooms
+# therefore share one implementation and differ only by this web-visibility flag.
+WEB_VISIBLE = ('open',)
+
 
 def _topic_id(value):
     if not isinstance(value, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,40}', value):
@@ -318,55 +324,61 @@ class RoomStore:
         if len(rows) > 100: raise RoomError('topic_capacity')
         return {'topics': [dict(row) for row in rows]}
 
-    def public_open_rooms(self, topic=None):
-        """Anonymous read-only projection of OPEN rooms; fail-closed: private/legacy rooms and
-        owner UUIDs are never exposed, only room_topics.visibility='open' rows (closed rooms are
-        removed from rooms/room_topics and therefore absent). Bounded to 50 newest open rooms."""
-        if topic is not None:
-            _topic_id(topic)
-        with self._db() as db:
-            sections = [
-                {'id': s['id'], 'title': s['title'], 'count': s['n']}
-                for s in db.execute(
-                    'SELECT t.id, t.title, COUNT(rt.room_id) AS n FROM room_topics rt '
-                    'JOIN topics t ON t.id=rt.topic_id WHERE rt.visibility=? '
-                    'GROUP BY t.id, t.title ORDER BY t.title',
-                    ('open',)).fetchall()
-            ]
-            where, args = ('', []) if topic is None else (' AND rt.topic_id=?', [topic])
-            rooms = db.execute(
-                'SELECT r.id, r.title, rt.topic_id AS topic_id, t.title AS topic_title, r.created_at '
-                'FROM room_topics rt JOIN rooms r ON r.id=rt.room_id JOIN topics t ON t.id=rt.topic_id '
-                'WHERE rt.visibility=?' + where + ' ORDER BY r.seq DESC LIMIT 51', ('open', *args)).fetchall()
-        return {'sections': sections, 'rooms': [dict(x) for x in rooms][:50]}
+    def _web_rooms(self, db, topic):
+        """Shared room read for the anonymous web, parameterized by WEB_VISIBLE; deterministic."""
+        marks = ','.join('?' * len(WEB_VISIBLE))
+        sections = [
+            {'id': x['id'], 'title': x['title'], 'count': x['n']}
+            for x in db.execute(
+                'SELECT t.id, t.title, COUNT(rt.room_id) AS n FROM room_topics rt '
+                'JOIN topics t ON t.id=rt.topic_id WHERE rt.visibility IN (' + marks + ') '
+                'GROUP BY t.id, t.title ORDER BY t.title', WEB_VISIBLE).fetchall()
+        ]
+        where, args = ('', ()) if topic is None else (' AND rt.topic_id=?', (topic,))
+        rooms = db.execute(
+            'SELECT r.id, r.title, rt.topic_id AS topic_id, t.title AS topic_title, r.created_at '
+            'FROM room_topics rt JOIN rooms r ON r.id=rt.room_id JOIN topics t ON t.id=rt.topic_id '
+            'WHERE rt.visibility IN (' + marks + ')' + where + ' ORDER BY r.seq DESC LIMIT 51',
+            WEB_VISIBLE + args).fetchall()
+        return sections, [dict(x) for x in rooms][:50]
 
-    def _open_room(self, db, room_id):
-        """Open-room row for public reads, or None (closed room). Fail-closed by construction:
-        only room_topics.visibility='open' rows are visible; private/legacy/closed rooms return None."""
+    def _web_room(self, db, room_id):
+        """Room row for web reads as None if not web-visible (private/legacy/closed). Fail-closed."""
         row = db.execute(
             'SELECT r.id, r.title, r.created_at, rt.topic_id, t.title AS topic_title '
             'FROM room_topics rt JOIN rooms r ON r.id=rt.room_id JOIN topics t ON t.id=rt.topic_id '
-            'WHERE rt.room_id=? AND rt.visibility=?', (room_id, 'open')).fetchone()
+            'WHERE rt.room_id=? AND rt.visibility IN (' + ','.join('?' * len(WEB_VISIBLE)) + ')',
+            (room_id,) + WEB_VISIBLE).fetchone()
         return dict(row) if row else None
 
-    def public_open_room(self, room_id):
-        """Anonymous metadata for one OPEN room; private/legacy rooms are indistinguishable from
-        missing (fail closed). No owner UUID, no member counts, no private data."""
+    def web_rooms(self, topic=None):
+        """Anonymous read-only projection of web-visible rooms (visibility in WEB_VISIBLE),
+        grouped by topic tree. Same code path as any visibility; only WEB_VISIBLE decides
+        exposure. Bounded to 50 newest web-visible rooms."""
+        if topic is not None:
+            _topic_id(topic)
+        with self._db() as db:
+            sections, rooms = self._web_rooms(db, topic)
+        return {'sections': sections, 'rooms': rooms}
+
+    def web_room(self, room_id):
+        """Anonymous metadata for one web-visible room; private/legacy rooms are indistinguishable
+        from missing (fail closed). No owner UUID, no member counts, no private data."""
         _id(room_id)
         with self._db() as db:
-            room = self._open_room(db, room_id)
+            room = self._web_room(db, room_id)
         if room is None:
             raise RoomError('room_unavailable')
         return {'room': room}
 
-    def public_open_room_messages(self, room_id, cursor=None, limit=20):
-        """Anonymous bounded read-only history of one OPEN room. Fail-closed: private/legacy rooms
-        are reported unavailable. Only safe fields (id, text, created_at) are exposed; owner UUID and
-        reply linkage never. Deleted/tombstoned messages are excluded. Bounded by limit + cursor."""
+    def web_room_messages(self, room_id, cursor=None, limit=20):
+        """Anonymous bounded read-only history of one web-visible room. Fail-closed: private/legacy
+        rooms are reported unavailable. Only safe fields (id, text, created_at) are exposed; owner
+        UUID and reply linkage never. Deleted/tombstoned messages are excluded. Bounded by cursor."""
         _id(room_id)
         after, limit, now = _cursor(cursor, room_id), _limit(limit), self.clock()
         with self._db() as db:
-            if self._open_room(db, room_id) is None:
+            if self._web_room(db, room_id) is None:
                 raise RoomError('room_unavailable')
             rows = db.execute(
                 'SELECT id, seq, text, created_at FROM messages WHERE room_id=? AND seq>? AND expires_at>? '

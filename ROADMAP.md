@@ -160,7 +160,7 @@ fresh profile/key gate. Caddy всё ещё не менялся.
       `rooms`/`user_version` не меняются); `rooms_create`/`rooms_list` расширены,
       `rooms_topics` — просмотр дерева (9-й rooms tool). Дизайн: docs/open-rooms-web.md.
 - [ ] Единый каталог: `market_categories` впоследствии сводится к базовому каталогу тем.
-- [ ] Срез B — read-only веб-витрина открытых комнат по дереву тем (без приватных).
+- [x] **Срез B (реализовано)**: read-only веб-витрина открытых комнат по дереву тем (`/rooms`, `/rooms/topic/<id>`); только `open`, приватные/legacy не раскрываются, весь текст escaped.
 - [ ] Срез C — read-only лента сообщений открытой комнаты в вебе (bounded, escaping).
 - [ ] Срез D — production-prep статически (docs/checklist); деплой — отдельный owner-gate + пароль.
 

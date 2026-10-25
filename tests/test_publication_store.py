@@ -82,6 +82,35 @@ def test_new_consent_contract_and_atomic_allowlisted_publication(market):
     assert x.drafts.get(x.a,x.draft_id)['listing']['visibility'] == 'private'
 
 
+def test_public_index_lists_only_active_allowlisted_cards(market):
+    x = market
+    publish(x)
+    index = x.market.public_index()
+    assert index['items'] and index['items'][0]['id'] == x.draft_id
+    assert index['items'][0]['title'] and index['items'][0]['author'] == 'A'
+    assert index['items'][0]['publication_revision'] == 1
+    encoded = json.dumps(index)
+    for private_name in ('owner','credential_id','blob_key','source_hash','intent_id','resource','user_id'):
+        assert private_name not in encoded
+    # limit bounded and enforced
+    assert x.market.public_index(limit=1)['items']
+    fails('invalid_limit',lambda:x.market.public_index(limit=0))
+    fails('invalid_limit',lambda:x.market.public_index(limit=101))
+    # Withdraw removes it from the index.
+    withdraw(x)
+    assert x.market.public_index()['items'] == []
+
+
+def test_public_index_skips_corrupt_projection_without_taking_down_feed(market):
+    x = market
+    publish(x)
+    with x.store._db(write=True) as db:
+        db.execute('UPDATE listing_publications SET projection=? WHERE listing_id=?',
+                   ('{not json', x.draft_id))
+    index = x.market.public_index()
+    assert index['items'] == []
+
+
 @pytest.mark.parametrize('value',[False,None,1,'yes'])
 def test_consent_must_be_explicit_boolean(market,value):
     x=market; preview=x.market.preview(x.a,x.draft_id)

@@ -202,14 +202,15 @@
     {
       "id": "response",
       "title": "Приватный отклик",
-      "stage": "SPEC",
-      "summary": "Отдельные участники/ACL/retention. Не превращать общие Rooms в личную переписку.",
-      "doc": "docs/delivery-plan.md",
-      "source": null,
+      "stage": "CI",
+      "summary": "ResponseStore: приватный отклик R-01 (владелец и автор видят тело), публичная статус-метка allowlist, web показывает счётчик+метки. Не превращает общие Rooms в личную переписку.",
+      "doc": "docs/private-response.md",
+      "source": "src/mcp_rooms/response_store.py",
       "evidence": null,
       "depends_on": [
         "drafts",
-        "identity"
+        "identity",
+        "publish"
       ]
     },
     {

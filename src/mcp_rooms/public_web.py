@@ -14,8 +14,10 @@ from .media_http import Admission, HTTPFailure, UUID
 
 ROUTE = re.compile(r'/market/(' + UUID + r')(?:/photos/([1-9][0-9]{0,18})/(' + UUID + r')\.jpg)?')
 SECTION = re.compile(r'/market/section/([A-Za-z0-9:_\-]{1,64})(?:/)?')
-CSS = """*{box-sizing:border-box}body{margin:0;background:#f3f5f8;color:#172330;font:17px/1.6 system-ui,sans-serif}header,main,footer{max-width:1080px;margin:auto;padding:24px}header{font-weight:750}header span{color:#49657f}article{background:white;border:1px solid #dce3eb;border-radius:22px;padding:clamp(20px,4vw,48px)}h1{font-size:clamp(28px,5vw,48px);line-height:1.15;overflow-wrap:anywhere}h2{font-size:22px}.badge{display:inline-block;color:#096145;background:#e1f4ec;border-radius:8px;padding:4px 12px}.price{font-size:32px;font-weight:750}.location,.category,.author,footer{color:#526477}.category a.sectionlink{color:#165ca5;text-decoration:none;border-bottom:1px dotted #9db4cc}.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}.gallery img{display:block;width:100%;height:auto;max-height:600px;object-fit:contain;background:#f5f7fa;border-radius:12px}.description{white-space:pre-wrap;overflow-wrap:anywhere}.notice{background:#eef4fb;border-radius:12px;padding:18px;margin-top:28px}footer{font-size:14px}a{color:#165ca5}.sections{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}.sections a{background:#eef4fb;border-radius:999px;padding:6px 14px;color:#165ca5;text-decoration:none;font-size:14px}.sections a.active{background:#096145;color:#fff}.index{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}.index li{background:white;border:1px solid #dce3eb;border-radius:16px;padding:18px}.index a.cardlink{font-size:20px;color:#165ca5;text-decoration:none}.index .meta{color:#526477;margin-top:8px}@media(prefers-color-scheme:dark){body{background:#111923;color:#eef5fc}article{background:#1b2735;border-color:#34465a}.location,.category,.author,footer{color:#bbc9d8}.notice{background:#253b51}.gallery img{background:#14202e}.index li{background:#1b2735;border-color:#34465a}.index a.cardlink{color:#9ec7f5}.index .meta,.sections a{color:#bbc9d8}.sections a{background:#253b51}}}"""
+CSS = """*{box-sizing:border-box}body{margin:0;background:#f3f5f8;color:#172330;font:17px/1.6 system-ui,sans-serif}header,main,footer{max-width:1080px;margin:auto;padding:24px}header{font-weight:750}header span{color:#49657f}article{background:white;border:1px solid #dce3eb;border-radius:22px;padding:clamp(20px,4vw,48px)}h1{font-size:clamp(28px,5vw,48px);line-height:1.15;overflow-wrap:anywhere}h2{font-size:22px}.badge{display:inline-block;color:#096145;background:#e1f4ec;border-radius:8px;padding:4px 12px}.price{font-size:32px;font-weight:750}.location,.category,.author,footer{color:#526477}.category a.sectionlink{color:#165ca5;text-decoration:none;border-bottom:1px dotted #9db4cc}.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}.gallery img{display:block;width:100%;height:auto;max-height:600px;object-fit:contain;background:#f5f7fa;border-radius:12px}.description{white-space:pre-wrap;overflow-wrap:anywhere}.notice{background:#eef4fb;border-radius:12px;padding:18px;margin-top:28px}footer{font-size:14px}a{color:#165ca5}.sections{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}.sections a{background:#eef4fb;border-radius:999px;padding:6px 14px;color:#165ca5;text-decoration:none;font-size:14px}.sections a.active{background:#096145;color:#fff}.index{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}.index li{background:white;border:1px solid #dce3eb;border-radius:16px;padding:18px}.index a.cardlink{font-size:20px;color:#165ca5;text-decoration:none}.index .meta{color:#526477;margin-top:8px}.responseblock{color:#096145;font-weight:700}.clabel{display:inline-block;background:#e1f4ec;border-radius:8px;padding:2px 8px;margin:0 2px;font-weight:600}@media(prefers-color-scheme:dark){body{background:#111923;color:#eef5fc}article{background:#1b2735;border-color:#34465a}.location,.category,.author,footer{color:#bbc9d8}.notice{background:#253b51}.gallery img{background:#14202e}.index li{background:#1b2735;border-color:#34465a}.index a.cardlink{color:#9ec7f5}.index .meta,.sections a{color:#bbc9d8}.sections a{background:#253b51}}}"""
 STYLE_HASH = b64encode(sha256(CSS.encode()).digest()).decode('ascii')
+STATUS_RU = {'opened':'Открыт','answered':'Отвечено','closed':'Закрыто',
+             'agreed':'Договорились','declined':'Отклонено'}
 HEADERS = {'Cache-Control':'no-store','Pragma':'no-cache',
     'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
     'X-Robots-Tag':'noindex, nofollow, noarchive',
@@ -23,7 +25,7 @@ HEADERS = {'Cache-Control':'no-store','Pragma':'no-cache',
     'Content-Security-Policy':"default-src 'none'; img-src 'self'; style-src 'sha256-"+STYLE_HASH+"'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"}
 
 
-def render_card(card, prefix):
+def render_card(card, prefix, summary=None):
     """Escape untrusted plain text; never turn participant text into HTML or links."""
     e=lambda v: escape(str(v),quote=True)
     title=e(card['title'])
@@ -44,12 +46,18 @@ def render_card(card, prefix):
         categories=''
     modes=' · '.join({'pickup':'Самовывоз','shipping':'Доставка','online':'Онлайн'}[m] for m in card['modes'])
     kind='Предлагаю' if card['kind']=='offer' else 'Ищу'
+    responses=''
+    if summary and summary.get('count'):
+        labels=' · '.join('<span class="clabel">'+e(STATUS_RU.get(ln['label'],ln['label']))+' ('+str(ln['count'])+')</span>'
+                          for ln in summary.get('labels',[]))
+        responses=('<p class="responseblock">Откликов: <strong>'+str(summary['count'])+'</strong>'
+                   + (' · '+labels if labels else '')+'</p>')
     return ('<!doctype html><html lang="ru"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+
         ' — Хочу · Предлагаю</title><style>'+CSS+'</style></head><body>'
         '<header>Хочу <span>·</span> Предлагаю <span> / TEST</span></header><main><article>'
         '<div class="category">Раздел: '+(categories or 'не указан')+'</div><p class="badge">'+kind+'</p><h1>'+title+
-        '</h1><p class="author">Автор: '+e(card['author'])+'</p><p class="location">'+('Откуда: '+location if location else 'Откуда: не указано')+'</p><p class="price">'+price+'</p><p>'+modes+'</p><div class="gallery">'+
+        '</h1><p class="author">Автор: '+e(card['author'])+'</p><p class="location">'+('Откуда: '+location if location else 'Откуда: не указано')+'</p><p class="price">'+price+'</p><p>'+modes+'</p>'+responses+'<div class="gallery">'+
         (gallery or '<p>Фотографии не добавлены.</p>')+'</div><h2>Описание и условия</h2>'
         '<div class="description">'+e(card['description'])+'</div><aside class="notice">'
         'Тестовая площадка. Встроенная переписка, оплата и гарантии сделки пока недоступны. '
@@ -106,8 +114,9 @@ def render_index(index, prefix, active_section=None):
 
 
 class PublicMarket:
-    def __init__(self,publisher,resource):
+    def __init__(self,publisher,resource,responses=None):
         self.publisher=publisher
+        self.responses=responses
         url=urlsplit(resource)
         self.authority,self.prefix=url.netloc,url.path[:-4]
         self.admission=Admission(2,2)
@@ -155,7 +164,13 @@ class PublicMarket:
                     lid,epoch,mid=route.groups()
                     if mid is None:
                         card=await anyio.to_thread.run_sync(self.publisher.public_get,lid)
-                        data,media=render_card(card,self.prefix),'text/html'
+                        summary=None
+                        if self.responses is not None:
+                            try:
+                                summary=await anyio.to_thread.run_sync(self.responses.public_response_summary,lid)
+                            except DomainError:
+                                summary=None
+                        data,media=render_card(card,self.prefix,summary),'text/html'
                     else:
                         data=await anyio.to_thread.run_sync(partial(self.publisher.public_photo,lid,int(epoch),mid))
                         media='image/jpeg'

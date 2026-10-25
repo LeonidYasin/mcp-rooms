@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, StrictInt, StrictStr, ValidationErro
 from .domain import DomainError, Principal
 from .listing_contract import ListingContent
 from .publication_guard import publication_schema
+from .response_store import response_schema
 
 LOG = logging.getLogger(__name__)
 
@@ -33,8 +34,10 @@ class ListingInput(BaseModel):
         return ListingContent(**values)
 
 
-READ = frozenset({'get','list_own','categories','preview','publication_status','public_get','public_index'})
+READ = frozenset({'get','list_own','categories','preview','publication_status','public_get','public_index',
+                  'responses','my_responses'})
 PUBLISH = frozenset({'confirm','publish','withdraw'})
+RESPOND_WRITE = frozenset({'respond','respond_status'})
 ARGUMENTS = {
     'create': {'content','category_id','client_id'},
     'get': {'listing_id'},
@@ -50,16 +53,24 @@ ARGUMENTS = {
     'publication_status': {'listing_id'},
     'public_get': {'listing_id'},
     'public_index': {'section','limit'},
+    'respond': {'listing_id','text','client_id'},
+    'responses': {'listing_id'},
+    'my_responses': {'cursor','limit'},
+    'respond_status': {'listing_id','response_id','public_status','client_id'},
 }
 
 
 class MarketAdapter:
-    def __init__(self, drafts, photos, publisher):
+    def __init__(self, drafts, photos, publisher, responses=None):
         if (photos.drafts is not drafts or publisher.photos is not photos
                 or publisher.drafts is not drafts or publisher.store is not drafts.store):
             raise DomainError('market_binding_mismatch')
         self.drafts, self.photos, self.publisher = drafts, photos, publisher
         self.store, self.resource = drafts.store, drafts.resource
+        if responses is not None and (responses.drafts is not drafts
+                or responses.publisher is not publisher or responses.store is not self.store):
+            raise DomainError('market_binding_mismatch')
+        self.responses = responses
 
     def check_binding(self, database, resource):
         if Path(database) != self.store.path or resource != self.resource:
@@ -68,6 +79,13 @@ class MarketAdapter:
             self.drafts._schema(db)
             self.photos.stages._schema(db)
             publication_schema(db)
+            if self.responses is not None:
+                try:
+                    response_schema(db)
+                except DomainError:
+                    # Response namespace may not be initialized on this store yet;
+                    # it is not part of the binding precondition for existing apps.
+                    pass
         # Only schema reads here. Startup never initializes marketplace tables.
 
     def _status(self, actor, listing_id):
@@ -94,7 +112,10 @@ class MarketAdapter:
                 raise DomainError('method_unavailable')
             if not args.keys() <= ARGUMENTS[action]:
                 raise DomainError('invalid_arguments')
-            scope = 'listings:read' if action in READ else 'listings:publish' if action in PUBLISH else 'listings:write'
+            if action in ('respond','responses','my_responses','respond_status') and self.responses is None:
+                raise DomainError('method_unavailable')
+            scope = ('listings:read' if action in READ else 'listings:publish' if action in PUBLISH
+                     else 'listings:write')
             # Also protects direct adapter calls; never trust only a scope snapshot.
             with self.store._db() as db:
                 self.drafts._authorize(db,actor,scope,self.store.clock())
@@ -112,6 +133,11 @@ class MarketAdapter:
                 'publish':self.publisher.publish,'withdraw':self.publisher.withdraw,'publication_status':self._status,
                 'public_get':lambda _a,**k:self.publisher.public_get(**k),
                 'public_index':lambda _a,**k:self.publisher.public_index(**k)}
+            if self.responses is not None:
+                methods.update(
+                    {'respond':self.responses.respond,'responses':self.responses.responses,
+                     'my_responses':self.responses.my_responses,
+                     'respond_status':self.responses.respond_status})
             return {'ok':True,**methods[action](actor,**args)}
         except DomainError as exc:
             return {'ok':False,'error':exc.code,**exc.details}

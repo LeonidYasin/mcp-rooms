@@ -69,8 +69,9 @@
     "web_market_navigation": "merged PR #18 (41c7c12): read-only market index /market and /market/ (PublicationStore.public_index + render_index), bounded limit 1..100, skips corrupt projections; CI green, not deployed",
     "web_market_section_nav": "on feat/standalone-identity, PR #19 open: section-filter navigation /market/section/<id> (public_index section filter + sections counts, render_index active pill); CI-only, not deployed",
     "web_market_card_origin": "merged PR #20 (4a2f2ec): card shows 'Откуда: …' (allowlist locality/region/country) and top-section link to /market/section/<root>; rooms/credentials/owner NOT published (P-04 invariant preserved); CI green, not deployed",
-    "owner_direction_2026_10_25": "Owner priority AFTER merged PRs #17-#20: agents must actually communicate/respond/react to listings (publish + view already exist); web for observers stays read-only convenient observation. Next slice: bounded private-response/communication layer for agents over listings. NOT yet designed.",
-    "agent_public_read": "on feat/standalone-identity, not merged: agents can read published cards + index via MCP (listings_public_get / listings_public_index through existing allowlisted core); no owner/room/credentials leaked over MCP; CI-only, not deployed; then next slice = private response R-01"
+    "owner_direction_2026_10_25": "Owner priority: agents publish, view, respond/react to listings; web stays read-only observation. Agent public read (PR #21) merged; private response R-01 in progress.",
+    "private_response": "on feat/standalone-identity, not merged: ResponseStore namespace + MCP respond/responses/my_responses/respond_status; owner-public status label allowlist; web card shows only count+labels; CI-only, not deployed",
+    "agent_public_read": "on feat/standalone-identity, PR #21 open: listings_public_get / listings_public_index over allowlisted core; no owner/room/credentials leak; CI green, not deployed"
   },
   "permission_gates": [
     "Each remote execution requires separate owner approval AND special password.",

@@ -69,7 +69,7 @@ with tempfile.TemporaryDirectory(prefix='rooms-lifecycle-ci-') as parent:
         record=json.loads((root/'process.json').read_text());first_pid=record['identity']['pid']
         response=rpc(raw,'initialize',{'protocolVersion':'2025-11-25','capabilities':{},'clientInfo':{'name':'lifecycle-ci','version':'1'}})
         assert response['serverInfo']['name']=='MCP Rooms'
-        tools=rpc(raw,'tools/list',{})['tools'];assert len(tools)==22
+        tools=rpc(raw,'tools/list',{})['tools'];assert len(tools)==26
         created=rpc(raw,'tools/call',{'name':'listings_create','arguments':{'client_id':str(uuid.uuid4()),'category_id':'things',
             'content':{'title':'Synthetic lifecycle item','description':'Not a real offer','category':'things','kind':'offer','modes':['shipping']}}})
         created=json.loads(created['content'][0]['text']);assert created['ok']

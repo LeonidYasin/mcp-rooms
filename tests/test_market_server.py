@@ -292,8 +292,7 @@ def test_private_response_only_owner_and_author_see_it(market):
     mine=tool(x.client,x.tb,'listings_my_responses',limit=20)
     assert mine['ok'] and any(r['id']==rid for r in mine['responses'])
     # A third lightweight reader (rooms-only key) cannot read responses.
-    response=rpc(x.client,x.tr,'tools/call',{'name':'listings_responses','arguments':{'listing_id':lid}})
-    assert response.status_code==401
+    assert tool(x.client,x.tr,'listings_responses',listing_id=lid)['error']=='insufficient_scope'
     # Owner sets a public status label; response body was never exposed publicly.
     assert tool(x.client,x.ta,'listings_respond_status',listing_id=lid,response_id=rid,
                 public_status='answered',client_id=key())['ok']

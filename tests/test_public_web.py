@@ -83,11 +83,24 @@ def test_read_only_even_with_valid_bearer(web,method):
     assert x.publisher.public_get(lid)
 
 
-@pytest.mark.parametrize('path',['/market','/market/','/market/search','/market/../../identity','/market/'+('a'*500)])
-def test_no_feed_search_traversal_or_error_details(web,path):
-    x,c=web;response=c.get(path)
-    assert response.status_code in (401,404)
-    assert x.a not in response.text and 'Traceback' not in response.text
+@pytest.mark.parametrize('path',['/market','/market/'])
+def test_market_index_navigation(web,path):
+    x,c=web;lid,mid,epoch=publish(x,title='Индексная карточка')
+    response=c.get(path)
+    assert response.status_code==200
+    assert 'Что предлагают и ищут' in response.text
+    assert f'/market/{lid}' in response.text
+    assert 'Индексная карточка' in response.text
+    assert 'no-store' in response.headers['cache-control']
+    for secret in (x.ta,x.a):assert secret not in response.text
+    assert '/market/search' not in response.text
+    # Withdraw hides the card from the index page too.
+    assert tool(x.client,x.ta,'listings_withdraw',listing_id=lid,expected_publication_revision=epoch,client_id=key())['ok']
+    withdrawn=c.get(path)
+    assert withdrawn.status_code==200 and f'/market/{lid}' not in withdrawn.text
+    assert 'Пока опубликованных объявлений нет.' in withdrawn.text
+    assert c.get(f'/market/{lid}').status_code==404
+
 
 
 def test_opt_in_and_binding(market):

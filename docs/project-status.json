@@ -186,7 +186,7 @@
       "id": "web",
       "title": "Web и пользовательский MCP",
       "stage": "SPEC",
-      "summary": "Одна карточка и одни правила, защищённые сессии, публичная allowlist-проекция, поиск и доступная галерея.",
+      "summary": "Одна карточка и одни правила, защищённые сессии, публичная allowlist-проекция, поиск и доступная галерея. В CI: public card/photo routes и read-only market index (навигация) — не production.",
       "doc": "docs/web-marketplace-plan.md",
       "source": null,
       "evidence": null,

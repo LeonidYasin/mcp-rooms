@@ -264,3 +264,35 @@ class PublicationStore:
     def public_photo(self, listing_id, publication_revision, media_id):
         """No arbitrary path/key. Public availability is rechecked after file I/O."""
         return self._read_public(listing_id,media_id,publication_revision)
+
+    def public_index(self, limit=50):
+        """Allowlisted read-only market index of explicitly published cards.
+
+        Returns only already-public allowlisted data (no credentials, UUIDs,
+        contacts or private room membership). Malformed/corrupt projections are
+        skipped so one bad row cannot take down the whole index; each card GET
+        still independently revalidates and fails closed.
+        """
+        _bounded_integer(limit, 1, 100, 'invalid_limit')
+        with self.files._guard():
+            with self.store._db() as db:
+                publication_schema(db)
+                self.drafts._schema(db); self.stages._schema(db)
+                now = self.store.clock()
+                rows = db.execute('''
+                    SELECT p.projection FROM listing_publications p
+                    JOIN users u ON u.id=p.user_id
+                    WHERE p.state='active' AND u.disabled=0 AND p.expires_at>?
+                    ORDER BY p.updated_at DESC, p.listing_id LIMIT ?''', (now, limit)).fetchall()
+        items = []
+        for (proj,) in rows:
+            try:
+                card = json.loads(proj)
+            except ValueError:
+                continue
+            if not isinstance(card, dict):
+                continue
+            items.append({k: card.get(k) for k in (
+                'id', 'title', 'category', 'category_path', 'kind', 'modes',
+                'price_minor', 'currency', 'author', 'publication_revision')})
+        return {'items': items}

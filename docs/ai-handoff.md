@@ -25,9 +25,9 @@ core существует, но M3b.3 transaction-time authority остаётс�
 ## Принятое состояние
 
 - Branch: `feat/standalone-identity`; PRs #1–#6 merged into `main` by separate owner
-  approvals (2026-10-22/24). `main` is at
-  `06031dbcb1dcb37d7b0b6a700b0924a9ca09f19a` (PR #6 merged docs/loopback TEST only);
-  pre-release
+  approvals (2026-10-22/24), then #12–#15 (operator/capacity/production-readiness docs)
+  and #17 (web card author context). `main` is at
+  `b4034f1ee9f3da9abbc75eee28540e1cbe3da915`; pre-release
   `operator-wheelhouse-db32c6d` exists, but there is no production deploy.
 - Accepted application source SHA: `db32c6ddf8f3b57874180dce81908e0d43aaa2f0`.
 - Evidence: `docs/ci-f3c2d2.md` and

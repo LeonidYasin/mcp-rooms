@@ -111,6 +111,21 @@ def test_public_index_skips_corrupt_projection_without_taking_down_feed(market):
     assert index['items'] == []
 
 
+def test_public_index_section_filter_and_counts(market):
+    x = market
+    publish(x)
+    idx = x.market.public_index()
+    assert idx['sections'] and any(s['count'] >= 1 for s in idx['sections'])
+    sid = idx['items'][0]['section']
+    assert sid is not None
+    assert x.market.public_index(section=sid)['items']
+    assert x.market.public_index(section='no-such-section')['items'] == []
+    # Section counts stay global across the window even when filtered.
+    assert x.market.public_index(section=sid)['sections'] == idx['sections']
+    fails('invalid_section',lambda:x.market.public_index(section='x'*65))
+    fails('invalid_limit',lambda:x.market.public_index(limit=0))
+
+
 @pytest.mark.parametrize('value',[False,None,1,'yes'])
 def test_consent_must_be_explicit_boolean(market,value):
     x=market; preview=x.market.preview(x.a,x.draft_id)

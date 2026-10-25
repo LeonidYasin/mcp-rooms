@@ -102,6 +102,19 @@ def test_market_index_navigation(web,path):
     assert c.get(f'/market/{lid}').status_code==404
 
 
+def test_market_index_section_navigation(web):
+    x,c=web;lid,_,_=publish(x,title='Раздельная карточка')
+    idx=x.publisher.public_index();sid=idx['items'][0]['section']
+    assert sid
+    r=c.get('/market/section/'+sid)
+    assert r.status_code==200 and f'/market/{lid}' in r.text
+    assert 'class="section active"' in r.text and 'no-store' in r.headers['cache-control']
+    empty=c.get('/market/section/no-such-slug')
+    assert empty.status_code==200 and f'/market/{lid}' not in empty.text
+    assert 'Пока в этом разделе нет объявлений.' in empty.text
+    for secret in (x.ta,x.a):assert secret not in r.text and secret not in empty.text
+
+
 
 def test_opt_in_and_binding(market):
     x=market;lid,_,_=publish(x)

@@ -51,7 +51,8 @@ core, opt-in user MCP и private binary HTTP upload/read приняты в CI �
 над market/media — сначала transaction-time session binding. Статус в work-state.
 Формы, public feed/search, admin MCP, private response и заказы ещё не включены.
 Готовы в CI и на TEST (но не production): public card/photo routes и read-only market
-index/navigation (`/market`). Слайсы авторства карточки и навигации маркета в источнике и CI.
+index/navigation (`/market`), включая фильтр по разделам (`/market/section/<id>`).
+Слайсы авторства карточки, навигации и разделов маркета в источнике и CI.
 Никакого merge/release/production/VPS изменения самим коммитом; прежние сервисы и БД без изменений.
 
 ## Повторная проверка готовых основ

@@ -13,7 +13,8 @@ from .domain import DomainError
 from .media_http import Admission, HTTPFailure, UUID
 
 ROUTE = re.compile(r'/market/(' + UUID + r')(?:/photos/([1-9][0-9]{0,18})/(' + UUID + r')\.jpg)?')
-CSS = """*{box-sizing:border-box}body{margin:0;background:#f3f5f8;color:#172330;font:17px/1.6 system-ui,sans-serif}header,main,footer{max-width:1080px;margin:auto;padding:24px}header{font-weight:750}header span{color:#49657f}article{background:white;border:1px solid #dce3eb;border-radius:22px;padding:clamp(20px,4vw,48px)}h1{font-size:clamp(28px,5vw,48px);line-height:1.15;overflow-wrap:anywhere}h2{font-size:22px}.badge{display:inline-block;color:#096145;background:#e1f4ec;border-radius:8px;padding:4px 12px}.price{font-size:32px;font-weight:750}.location,.category,.author,footer{color:#526477}.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}.gallery img{display:block;width:100%;height:auto;max-height:600px;object-fit:contain;background:#f5f7fa;border-radius:12px}.description{white-space:pre-wrap;overflow-wrap:anywhere}.notice{background:#eef4fb;border-radius:12px;padding:18px;margin-top:28px}footer{font-size:14px}a{color:#165ca5}.sections{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}.sections a{background:#eef4fb;border-radius:999px;padding:6px 14px;color:#165ca5;text-decoration:none;font-size:14px}.index{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}.index li{background:white;border:1px solid #dce3eb;border-radius:16px;padding:18px}.index a.cardlink{font-size:20px;color:#165ca5;text-decoration:none}.index .meta{color:#526477;margin-top:8px}@media(prefers-color-scheme:dark){body{background:#111923;color:#eef5fc}article{background:#1b2735;border-color:#34465a}.location,.category,.author,footer{color:#bbc9d8}.notice{background:#253b51}.gallery img{background:#14202e}.index li{background:#1b2735;border-color:#34465a}.index a.cardlink{color:#9ec7f5}.index .meta,.sections a{color:#bbc9d8}.sections a{background:#253b51}}}"""
+SECTION = re.compile(r'/market/section/([A-Za-z0-9:_\-]{1,64})(?:/)?')
+CSS = """*{box-sizing:border-box}body{margin:0;background:#f3f5f8;color:#172330;font:17px/1.6 system-ui,sans-serif}header,main,footer{max-width:1080px;margin:auto;padding:24px}header{font-weight:750}header span{color:#49657f}article{background:white;border:1px solid #dce3eb;border-radius:22px;padding:clamp(20px,4vw,48px)}h1{font-size:clamp(28px,5vw,48px);line-height:1.15;overflow-wrap:anywhere}h2{font-size:22px}.badge{display:inline-block;color:#096145;background:#e1f4ec;border-radius:8px;padding:4px 12px}.price{font-size:32px;font-weight:750}.location,.category,.author,footer{color:#526477}.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}.gallery img{display:block;width:100%;height:auto;max-height:600px;object-fit:contain;background:#f5f7fa;border-radius:12px}.description{white-space:pre-wrap;overflow-wrap:anywhere}.notice{background:#eef4fb;border-radius:12px;padding:18px;margin-top:28px}footer{font-size:14px}a{color:#165ca5}.sections{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}.sections a{background:#eef4fb;border-radius:999px;padding:6px 14px;color:#165ca5;text-decoration:none;font-size:14px}.sections a.active{background:#096145;color:#fff}.index{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}.index li{background:white;border:1px solid #dce3eb;border-radius:16px;padding:18px}.index a.cardlink{font-size:20px;color:#165ca5;text-decoration:none}.index .meta{color:#526477;margin-top:8px}@media(prefers-color-scheme:dark){body{background:#111923;color:#eef5fc}article{background:#1b2735;border-color:#34465a}.location,.category,.author,footer{color:#bbc9d8}.notice{background:#253b51}.gallery img{background:#14202e}.index li{background:#1b2735;border-color:#34465a}.index a.cardlink{color:#9ec7f5}.index .meta,.sections a{color:#bbc9d8}.sections a{background:#253b51}}}"""
 STYLE_HASH = b64encode(sha256(CSS.encode()).digest()).decode('ascii')
 HEADERS = {'Cache-Control':'no-store','Pragma':'no-cache',
     'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
@@ -59,18 +60,20 @@ def _price(item):
     return f"{amount//100:,}".replace(',', ' ') + (f",{amount%100:02d}" if amount % 100 else '') + ' ' + currency
 
 
-def render_index(index, prefix):
-    """Read-only market navigation: sections and published cards, fully escaped."""
+def render_index(index, prefix, active_section=None):
+    """Read-only market navigation: section filter and published cards, fully escaped."""
     e = lambda v: escape(str(v), quote=True)
-    seen = {}
-    for item in index['items']:
-        top = (item.get('category_path') or [{}])[0]
-        key = top.get('id') if isinstance(top, dict) else None
-        seen.setdefault(key, [top.get('title') if isinstance(top, dict) else 'Разное', 0])
-        seen[key][1] += 1
-    sections = ''.join(
-        '<a class="section" href="' + e(prefix + '/market') + '">' + e(t) + ' (' + str(n) + ')</a>'
-        for t, n in seen.values())
+    total = sum(s['count'] for s in index['sections'])
+    def pill(cls, href, text):
+        return '<a class="section' + cls + '" href="' + href + '">' + text + '</a>'
+    active_all = ' active' if active_section is None else ''
+    pills = [pill(active_all, e(prefix + '/market'),
+                  e('Все') + ' (' + str(total) + ')')]
+    for s in index['sections']:
+        active = ' active' if s['id'] == active_section else ''
+        href = e(prefix + '/market/section/' + e(s['id'])) if s['id'] else e(prefix + '/market')
+        pills.append(pill(active, href, e(s['title']) + ' (' + str(s['count']) + ')'))
+    sections = ''.join(pills)
     cards = ''
     for item in index['items']:
         cats = ' → '.join(e(p.get('title', '')) for p in (item.get('category_path') or []) if isinstance(p, dict))
@@ -81,7 +84,8 @@ def render_index(index, prefix):
                   ' · ' + e(_price(item)) + '</div>'
                   '<div class="meta">' + e(modes) + '</div></li>')
     body = ('<ul class="index">' + cards + '</ul>' if cards
-            else '<p>Пока опубликованных объявлений нет.</p>')
+            else ('<p>Пока в этом разделе нет объявлений.</p>' if active_section is not None
+                  else '<p>Пока опубликованных объявлений нет.</p>'))
     return ('<!doctype html><html lang="ru"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1"><title>'
             'Рынок — Хочу · Предлагаю</title><style>' + CSS + '</style></head><body>'
@@ -123,8 +127,11 @@ class PublicMarket:
         if scope['method']!='GET':return await reply('Method not allowed',405,extra={'Allow':'GET'})
         path=scope['path']
         is_index=path=='/market' or path=='/market/'
-        route=None if is_index else ROUTE.fullmatch(path)
-        if not is_index and route is None:return await reply('Объявление недоступно',404)
+        sec=None if is_index else SECTION.fullmatch(path)
+        section=sec.group(1) if sec else None
+        route=None if (is_index or sec) else ROUTE.fullmatch(path)
+        if not is_index and sec is None and route is None:
+            return await reply('Объявление недоступно',404)
         started=False
         async def tracked(message):
             nonlocal started
@@ -133,9 +140,9 @@ class PublicMarket:
         try:
             self.budget()
             with self.admission.slot('public'):
-                if is_index:
-                    index=await anyio.to_thread.run_sync(self.publisher.public_index)
-                    data,media=render_index(index,self.prefix),'text/html'
+                if is_index or sec:
+                    index=await anyio.to_thread.run_sync(partial(self.publisher.public_index, section=section))
+                    data,media=render_index(index,self.prefix,active_section=section),'text/html'
                 else:
                     lid,epoch,mid=route.groups()
                     if mid is None:

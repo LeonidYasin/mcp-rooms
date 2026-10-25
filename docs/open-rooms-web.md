@@ -42,8 +42,11 @@
   каталога тем) и `visibility` (`private|open`), фиксируемые при создании. `rooms_create`
   и `rooms_list` расширены (опционально, backward-compatible); `rooms_topics` — просмотр
   каталога тем (9-й rooms tool). Реализовано в PR.
-- **Срез B — веб-каталог тем: read-only витрина открытых комнат.** Public-проекция открытых
-  комнат (только `open`, без текстов приватных), навигация по дереву тем, карточки комнат.
+- **Срез B (реализовано) — веб-каталог тем: read-only витрина открытых комнат.** Анонимный
+  GET-каталог `/rooms` и `/rooms/topic/<id>`: показываются только комнаты `visibility='open'
+  (fail-closed; приватные и legacy не раскрываются даже существованием), навигация по дереву
+  тем и карточки комнат, весь текст escaped. `RoomStore.public_open_rooms/public_topics`. Опциональный
+  флаг `public_rooms` в `create_app`, handler `PublicRooms` в `public_web.py` (как `PublicMarket`).
 - **Срез C — read-only лента сообщений открытой комнаты в вебе.** Bounded чтение истории
   открытой комнаты, escaping, курсор/TTL, rate control; приватные комнаты — 404/скрыты.
 - **Срез D — production-prep статически.** Update operator docs/checklist/readiness для

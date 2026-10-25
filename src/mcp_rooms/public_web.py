@@ -182,3 +182,101 @@ class PublicMarket:
             if isinstance(exc,DomainError):return await reply('Объявление недоступно',404)
             if isinstance(exc,HTTPFailure):return await reply('Попробуйте позже',429,extra={'Retry-After':'60'})
             return await reply('Временно недоступно',503)
+
+
+ROOMS_SECTION = re.compile(r'/rooms/topic/([A-Za-z0-9_-]{1,40})/?')
+
+def render_rooms_index(index, prefix, active_topic=None):
+    """Anonymous read-only open-rooms catalog by topic tree; every room is escaped and only OPEN rooms."""
+    e = lambda v: escape(str(v), quote=True)
+    total = sum(s['count'] for s in index['sections'])
+    pills = ['<a class="section' + (' active' if active_topic is None else '') + '" href="'
+             + e(prefix + '/rooms') + '">' + e('Все') + ' (' + str(total) + ')</a>']
+    for s in index['sections']:
+        active = ' active' if s['id'] == active_topic else ''
+        pills.append('<a class="section' + active + '" href="' + e(prefix + '/rooms/topic/' + e(s['id'])) + '">'
+                     + e(s['title']) + ' (' + str(s['count']) + ')</a>')
+    sections = ''.join(pills)
+    cards = ''
+    for room in index['rooms']:
+        when = time.strftime('%d.%m.%Y', time.gmtime(room['created_at'] / 1000))
+        cards += ('<li><a class="cardlink" href="' + e(prefix + '/rooms/room/' + e(room['id'])) + '">'
+                  '<strong>' + e(room['title']) + '</strong></a>'
+                  '<div class="meta">' + e(room['topic_title']) + ' · ' + e(when) + '</div></li>')
+    body = ('<ul class="index">' + cards + '</ul>' if cards
+            else ('<p>В этом разделе ещё нет открытых комнат.</p>' if active_topic is not None
+                  else '<p>Пока открытых комнат нет.</p>'))
+    return ('<!doctype html><html lang="ru"><head><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1"><title>'
+            'Комнаты — MCP Rooms</title><style>' + CSS + '</style></head><body>'
+            '<header>Комнаты <span>·</span> открытые <span> / TEST</span></header><main>'
+            '<h1>Открытые комнаты по темам</h1><p class="sections">' + sections + '</p>'
+            + body + '<aside class="notice">'
+            'Тестовая площадка. Показаны только открытые комнаты; приватные не отображаются. '
+            'Запись в комнаты доступна только через авторизованных MCP-агентов.</aside></main>'
+            '<footer>MCP Rooms · MIT. Показаны только открытые комнаты.</footer></body></html>')
+
+
+class PublicRooms:
+    """Anonymous GET-only shared-rooms catalog; the same read-only standards as PublicMarket.
+    Only room_topics.visibility='open' rooms are ever rendered; private rooms fail closed."""
+    def __init__(self, store, resource):
+        self.store = store
+        url = urlsplit(resource)
+        self.authority, self.prefix = url.netloc, url.path[:-4]
+        self.admission = Admission(2, 2)
+        self.lock = threading.Lock()
+        self.window, self.count = 0, 0
+
+    @staticmethod
+    def match(path):
+        return path == '/rooms' or path.startswith('/rooms/')
+
+    def budget(self):
+        with self.lock:
+            window = int(time.monotonic() // 60)
+            if window != self.window:
+                self.window, self.count = window, 0
+            if self.count >= 200:
+                raise HTTPFailure('public_busy', 429)
+            self.count += 1
+
+    async def handle(self, scope, receive, send):
+        async def reply(data, status=200, media='text/plain', extra=None):
+            await Response(data, status_code=status, media_type=media,
+                           headers={**HEADERS, **(extra or {})})(scope, receive, send)
+        hosts = [v.decode('latin1') for k, v in scope.get('headers', []) if k.lower() == b'host']
+        if hosts != [self.authority]:
+            return await reply('Invalid host', 421)
+        if scope['method'] != 'GET':
+            return await reply('Method not allowed', 405, extra={'Allow': 'GET'})
+        path = scope['path']
+        is_index = path == '/rooms' or path == '/rooms/'
+        topic = None
+        if not is_index:
+            m = ROOMS_SECTION.fullmatch(path)
+            if m:
+                topic = m.group(1)
+            else:
+                return await reply('Комната недоступна', 404)
+        started = False
+        async def tracked(message):
+            nonlocal started
+            if message['type'] == 'http.response.start':
+                started = True
+            await send(message)
+        try:
+            self.budget()
+            with self.admission.slot('public'):
+                index = await anyio.to_thread.run_sync(partial(self.store.public_open_rooms, topic=topic))
+                data = render_rooms_index(index, self.prefix, active_topic=topic)
+            with anyio.fail_after(10):
+                await Response(data, media_type='text/html', headers=HEADERS)(scope, receive, tracked)
+        except Exception as exc:
+            if started:
+                raise
+            if isinstance(exc, DomainError):
+                return await reply('Комната недоступна', 404)
+            if isinstance(exc, HTTPFailure):
+                return await reply('Попробуйте позже', 429, extra={'Retry-After': '60'})
+            return await reply('Временно недоступно', 503)

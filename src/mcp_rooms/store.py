@@ -307,6 +307,37 @@ class RoomStore:
         if db.execute('SELECT COUNT(*) FROM members WHERE owner=?', (owner,)).fetchone()[0] >= self.limits.memberships_per_owner:
             raise RoomError('membership_capacity')
 
+    def public_topics(self, parent_id=None):
+        """Anonymous bounded-1-level browse of the united topic tree; no principal."""
+        where, params = 'parent_id IS ?', [None]
+        if parent_id is not None:
+            _topic_id(parent_id)
+            where, params = 'parent_id = ?', [parent_id]
+        with self._db() as db:
+            rows = db.execute('SELECT id, parent_id, title FROM topics WHERE ' + where + ' ORDER BY id LIMIT 101', params).fetchall()
+        if len(rows) > 100: raise RoomError('topic_capacity')
+        return {'topics': [dict(row) for row in rows]}
+
+    def public_open_rooms(self, topic=None):
+        """Anonymous read-only projection of OPEN rooms; fail-closed: private/legacy rooms and
+        owner UUIDs are never exposed, only room_topics.visibility='open' rows (closed rooms are
+        removed from rooms/room_topics and therefore absent). Bounded to 50 newest open rooms."""
+        with self._db() as db:
+            sections = [
+                {'id': s['id'], 'title': s['title'], 'count': s['n']}
+                for s in db.execute(
+                    'SELECT t.id, t.title, COUNT(rt.room_id) AS n FROM room_topics rt '
+                    'JOIN topics t ON t.id=rt.topic_id WHERE rt.visibility=? '
+                    'GROUP BY t.id, t.title ORDER BY t.title',
+                    ('open',)).fetchall()
+            ]
+            where, args = ('', []) if topic is None else (' AND rt.topic_id=?', [topic])
+            rooms = db.execute(
+                'SELECT r.id, r.title, rt.topic_id AS topic_id, t.title AS topic_title, r.created_at '
+                'FROM room_topics rt JOIN rooms r ON r.id=rt.room_id JOIN topics t ON t.id=rt.topic_id '
+                'WHERE rt.visibility=?' + where + ' ORDER BY r.seq DESC LIMIT 51', ('open', *args)).fetchall()
+        return {'sections': sections, 'rooms': [dict(x) for x in rooms][:50]}
+
     def join(self, owner, room_id):
         with self._db(write=True) as db:
             self._room(db, room_id)

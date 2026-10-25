@@ -81,3 +81,25 @@ def test_topics_browse_capacity_and_exact_parent(store):
     assert all(t['parent_id'] is None for t in store.topics(A)['topics'])
     taxi = store.topics(A, parent_id='taxi')['topics']
     assert taxi == []
+
+
+def test_public_open_rooms_fail_closed_on_private_and_legacy(store):
+    store.create(A, 'Открыта', topic_id='taxi', visibility='open')
+    store.create(A, 'Скрыта', topic_id='delivery', visibility='private')
+    store.create(A, 'Без темы')
+    index = store.public_open_rooms()
+    assert {r['title'] for r in index['rooms']} == {'Открыта'}
+    assert all('owner' not in r and 'visibility' not in r and 'joined' not in r for r in index['rooms'])
+
+
+def test_public_open_rooms_filter_by_topic(store):
+    store.create(A, 'Такси', topic_id='taxi', visibility='open')
+    store.create(A, 'Доставка', topic_id='delivery', visibility='open')
+    got = store.public_open_rooms(topic='taxi')['rooms']
+    assert len(got) == 1 and got[0]['topic_id'] == 'taxi'
+    error('invalid_topic_id', lambda: store.public_open_rooms(topic='bad id'))
+
+
+def test_public_topics_anonymous_browse(store):
+    assert 'taxi' in {t['id'] for t in store.public_topics(parent_id='transport')['topics']}
+    assert all(t['parent_id'] is None for t in store.public_topics()['topics'])

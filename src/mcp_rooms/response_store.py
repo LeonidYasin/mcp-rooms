@@ -239,10 +239,9 @@ class ResponseStore:
             self._participant(db, response_id, principal, now)
             rows = db.execute('SELECT id,author_user_id,text,created_at '
                               'FROM response_messages WHERE response_id=? '
-                              'ORDER BY created_at DESC LIMIT ?',
+                              'ORDER BY created_at,rowid LIMIT ?',
                               (response_id, limit)).fetchall()
-            return {'response_id': response_id,
-                    'messages': [dict(r) for r in list(reversed(rows))]}
+            return {'response_id': response_id, 'messages': [dict(r) for r in rows]}
 
     def public_response_summary(self, listing_id):
         """Read-only public count + owner-chosen status labels; never authors/text."""

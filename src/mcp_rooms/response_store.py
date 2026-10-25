@@ -15,7 +15,7 @@ from .preview_contract import canonical_json
 
 MAX_RESPONSE_TEXT = 4000
 RESPONSE_PUBLIC_STATUS = frozenset({'opened', 'answered', 'closed', 'agreed', 'declined'})
-RESPONSE_TABLES = frozenset({'response_schema', 'listing_responses'})
+RESPONSE_TABLES = frozenset({'response_schema', 'listing_responses', 'response_messages'})
 
 
 def response_schema(db, *, required=True):
@@ -26,7 +26,7 @@ def response_schema(db, *, required=True):
     if found != RESPONSE_TABLES:
         raise DomainError('unsupported_response_schema')
     rows = db.execute('SELECT singleton,version FROM response_schema').fetchall()
-    if len(rows) != 1 or tuple(rows[0]) != (1, 1):
+    if len(rows) != 1 or tuple(rows[0]) != (1, 2):
         raise DomainError('unsupported_response_schema')
     return True
 
@@ -40,6 +40,23 @@ class ResponseStore:
         with self.store._db(write=True) as db:
             self.drafts._schema(db)
             if response_schema(db, required=False):
+                return
+            names = {r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+            if names & RESPONSE_TABLES:
+                # Explicit owner-approval upgrade of an existing response namespace (v1 -> v2):
+                # add the threaded-messages table and bump the version. Never a startup action.
+                row = db.execute('SELECT version FROM response_schema WHERE singleton=1').fetchone()
+                if not row or row['version'] != 1:
+                    raise DomainError('unsupported_response_schema')
+                db.execute('''CREATE TABLE response_messages(
+                    id TEXT PRIMARY KEY,
+                    response_id TEXT NOT NULL REFERENCES listing_responses(id) ON DELETE CASCADE,
+                    author_user_id TEXT NOT NULL REFERENCES users(id),
+                    marker INTEGER NOT NULL DEFAULT 0, text TEXT NOT NULL,
+                    client_id TEXT NOT NULL, created_at INTEGER NOT NULL,
+                    expires_at INTEGER NOT NULL,
+                    UNIQUE(response_id,author_user_id,client_id))''')
+                db.execute('UPDATE response_schema SET version=2 WHERE singleton=1')
                 return
             db.execute('CREATE TABLE response_schema(singleton INTEGER PRIMARY KEY CHECK(singleton=1),version INTEGER NOT NULL)')
             db.execute('''CREATE TABLE listing_responses(
@@ -56,7 +73,15 @@ class ResponseStore:
                 CHECK((status='active' AND public_status IN (
                        'opened','answered','closed','agreed','declined')) OR status='withdrawn'),
                 UNIQUE(listing_id,author_user_id))''')
-            db.execute('INSERT INTO response_schema VALUES (1,1)')
+            db.execute('''CREATE TABLE response_messages(
+                id TEXT PRIMARY KEY,
+                response_id TEXT NOT NULL REFERENCES listing_responses(id) ON DELETE CASCADE,
+                author_user_id TEXT NOT NULL REFERENCES users(id),
+                marker INTEGER NOT NULL DEFAULT 0, text TEXT NOT NULL,
+                client_id TEXT NOT NULL, created_at INTEGER NOT NULL,
+                expires_at INTEGER NOT NULL,
+                UNIQUE(response_id,author_user_id,client_id))''')
+            db.execute('INSERT INTO response_schema VALUES (1,2)')
 
     def _check_publication(self, db, listing_id, now):
         publication_schema(db)
@@ -166,6 +191,58 @@ class ResponseStore:
                       'public_status': public_status, 'updated_at': now}
             self._receipt(db, principal, client_id, 'respond_status', digest, result, now)
             return {**result, 'replayed': False}
+
+    def _participant(self, db, response_id, principal, now):
+        identifier(response_id)
+        row = db.execute('SELECT * FROM listing_responses WHERE id=?', (response_id,)).fetchone()
+        if (not row or row['status'] != 'active' or not row['expires_at'] > now
+                or row['author_user_id'] != principal.user_id and row['owner_user_id'] != principal.user_id):
+            raise DomainError('response_unavailable')
+        return row
+
+    def reply(self, principal, response_id, text, client_id):
+        identifier(response_id)
+        identifier(client_id)
+        if type(text) is not str or not 1 <= len(text) <= MAX_RESPONSE_TEXT:
+            raise DomainError('invalid_response_text')
+        payload = {'response': response_id, 'text': text}
+        digest = sha256(canonical_json(payload).encode()).hexdigest()
+        with self.store._db(write=True) as db:
+            response_schema(db)
+            now = self.store.clock()
+            self.drafts._authorize(db, principal, 'listings:write', now)
+            row = self._participant(db, response_id, principal, now)
+            _, replay = self._retry(db, principal, client_id, 'reply', payload)
+            if replay is not None:
+                return {**replay, 'replayed': True}
+            if db.execute('SELECT COUNT(*) FROM response_messages WHERE response_id=?',
+                          (response_id,)).fetchone()[0] >= 2000:
+                raise DomainError('thread_capacity')
+            message_id = str(uuid.uuid4())
+            db.execute('INSERT INTO response_messages '
+                       '(id,response_id,author_user_id,text,client_id,created_at,expires_at) '
+                       'VALUES (?,?,?,?,?,?,?)',
+                       (message_id, response_id, principal.user_id, text, client_id, now,
+                        min(now + 86400000, row['expires_at'])))
+            db.execute('UPDATE listing_responses SET updated_at=? WHERE id=?', (now, response_id))
+            result = {'id': message_id, 'response_id': response_id, 'created_at': now}
+            self._receipt(db, principal, client_id, 'reply', digest, result, now)
+            return {**result, 'replayed': False}
+
+    def thread(self, principal, response_id, cursor=None, limit=50):
+        identifier(response_id)
+        _bounded_integer(limit, 1, 200, 'invalid_limit')
+        with self.store._db() as db:
+            response_schema(db)
+            now = self.store.clock()
+            self.drafts._authorize(db, principal, 'listings:read', now)
+            self._participant(db, response_id, principal, now)
+            rows = db.execute('SELECT id,author_user_id,text,created_at '
+                              'FROM response_messages WHERE response_id=? '
+                              'ORDER BY created_at DESC LIMIT ?',
+                              (response_id, limit)).fetchall()
+            return {'response_id': response_id,
+                    'messages': [dict(r) for r in list(reversed(rows))]}
 
     def public_response_summary(self, listing_id):
         """Read-only public count + owner-chosen status labels; never authors/text."""

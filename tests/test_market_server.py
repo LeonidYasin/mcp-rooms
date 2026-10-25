@@ -23,7 +23,8 @@ MARKET_NAMES={'listings_create','listings_get','listings_list_own','listings_cat
     'listings_set_photos','listings_archive','listings_preview','listings_confirm_publication',
     'listings_publish','listings_withdraw','listings_publication_status',
     'listings_public_get','listings_public_index',
-    'listings_respond','listings_responses','listings_my_responses','listings_respond_status'}
+    'listings_respond','listings_responses','listings_my_responses','listings_respond_status',
+    'listings_reply','listings_thread'}
 CONTENT=dict(title='Synthetic item',description='Synthetic acceptance only; not a real sale.',
              category='things',kind='offer',modes=['shipping'])
 
@@ -85,7 +86,7 @@ def test_opt_in_toolset_no_admin_or_upload_methods(market):
         if t['name'] in MARKET_NAMES:
             assert t['annotations']['destructiveHint'] == (t['name'] in {'listings_update','listings_set_photos','listings_archive','listings_publish','listings_withdraw'})
             assert t['annotations']['openWorldHint'] is False
-            assert t['annotations']['readOnlyHint'] == (t['name'] in {'listings_get','listings_list_own','listings_categories','listings_preview','listings_publication_status','listings_public_get','listings_public_index','listings_responses','listings_my_responses'})
+            assert t['annotations']['readOnlyHint'] == (t['name'] in {'listings_get','listings_list_own','listings_categories','listings_preview','listings_publication_status','listings_public_get','listings_public_index','listings_responses','listings_my_responses','listings_thread'})
             schema=t['inputSchema']['properties']
             assert not {'owner','user_id','principal','resource','path','filename'} & schema.keys()
     assert x.client.post('/listings',headers={'Authorization':'Bearer '+x.ta},json={}).status_code==404
@@ -321,3 +322,30 @@ def test_private_response_unavailable_and_scope_deny(market):
     tool(x.client,x.ta,'listings_withdraw',listing_id=lid,expected_publication_revision=1,client_id=key())
     after=tool(x.client,x.tb,'listings_respond',listing_id=lid,text='later',client_id=key())
     assert after['ok'] is False and after['error']=='listing_unavailable'
+
+
+def test_private_dialogue_thread_owner_and_author(market):
+    x=market;lid,_=publish(x)
+    resp_cid=key()
+    rid=tool(x.client,x.tb,'listings_respond',listing_id=lid,text='I am interested',client_id=resp_cid)['id']
+    # B (author) starts the dialogue, A (owner) replies; only participants can read.
+    b_cid=key()
+    m1=tool(x.client,x.tb,'listings_reply',response_id=rid,text='Могу ли я посмотреть?',client_id=b_cid)
+    assert m1['ok'] and m1['id']
+    a_cid=key()
+    assert tool(x.client,x.ta,'listings_reply',response_id=rid,text='Конечно, давайте',client_id=a_cid)['ok']
+    thread=tool(x.client,x.tb,'listings_thread',response_id=rid,limit=50)
+    assert thread['ok'] and [m['text'] for m in thread['messages']]==['Могу ли я посмотреть?','Конечно, давайте']
+    # Owner reads the identical thread.
+    athread=tool(x.client,x.ta,'listings_thread',response_id=rid,limit=50)
+    assert athread['messages']==thread['messages']
+    # Idempotent reply replay returns the same message.
+    replay=tool(x.client,x.tb,'listings_reply',response_id=rid,text='Могу ли я посмотреть?',client_id=b_cid)
+    assert replay['replayed'] is True and replay['id']==m1['id']
+    # A third actor cannot read the thread.
+    assert tool(x.client,x.tr,'listings_thread',response_id=rid)['error']=='insufficient_scope'
+    # Non-participant response_id is uniform unavailability for a scoped outsider (create extra user C).
+    authc=x.auth.create_user('C')['user_id'];_,tc=x.auth.issue_token(authc,scopes=sorted(LISTING_SCOPES))
+    outsider=tool(x.client,tc,'listings_thread',response_id=rid)
+    assert outsider['error']=='response_unavailable'
+    assert tool(x.client,tc,'listings_reply',response_id=rid,text='spam',client_id=key())['error']=='response_unavailable'

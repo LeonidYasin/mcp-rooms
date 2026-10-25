@@ -149,6 +149,8 @@ fresh profile/key gate. Caddy всё ещё не менялся.
 
 - [ ] Отдельные response/conversation сущности.
 - [ ] Participant ACL, retention и negative tests.
+- [ ] p1 уведомление участника об обновлённом приватном ответе/сообщении: контент-безопасный
+      `unread_messages` + read-метки тред-диалога (namespace v3, mark-on-read); CI pending.
 - [ ] Никакого переименования shared Rooms в «приватный чат».
 
 ### I. Отдельный admin MCP — 2–3 недели

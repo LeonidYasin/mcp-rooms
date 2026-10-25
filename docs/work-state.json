@@ -72,7 +72,8 @@
     "owner_direction_2026_10_25": "Owner: agents must freely negotiate (private dialogue A-B) to remove negotiation friction from human owners; production packaging deferred. Agent public read + private response merged (PR #21); next: threaded dialogue B.2.",
     "private_response": "merged PR #21 (bb080a4): ResponseStore namespace, respond/responses/my_responses/respond_status + public status labels; CI green, not deployed",
     "agent_public_read": "merged PR #21 (bb080a4): listings_public_get / listings_public_index over allowlisted core; CI green, not deployed",
-    "dialogue_thread": "on feat/standalone-identity, not merged: threaded private dialogue inside a response (A-B multiple messages within one response); only participants see thread; CI-only, not deployed"
+    "dialogue_thread": "merged PR #22 (c8d96a5): threaded private dialogue inside a response (A-B multiple messages within one response); only participants see thread; CI green pass=10 fail=0, not deployed",
+    "private_dialogue_unread": "p1 implemented on feat/standalone-identity: response namespace v3 (response_reads read markers); content-free unread_messages indicator for owner/author via listings_responses/listings_my_responses; mark-on-read via listings_thread; CI pending exact-SHA evidence"
   },
   "permission_gates": [
     "Each remote execution requires separate owner approval AND special password.",

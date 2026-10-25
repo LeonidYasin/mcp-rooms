@@ -10,9 +10,10 @@ browser session bridge и [F1 read-only карточка](ci-f1.md); default CLI
 
 ## Новое согласие, не повышение старого intent
 
-Текущий notice-контракт `mcp-rooms/live-publication-consent/v2` (с F1) отличается
-от обоих private intents и прежнего live-consent/v1. Старое v1 согласие не разрешает
-новую публикацию v2. SQLite publication namespace остаётся версии1, не мигрируется
+Текущий notice-контракт `mcp-rooms/live-publication-consent/v3` (по compare c v2:
++allowlisted `card.author`) отличается от обоих private intents и прежнего
++live-consent/v1/v2. Старые v1/v2 согласия не разрешают новую публикацию v3.
+SQLite publication namespace остаётся версии1, не мигрируется
 на request. Поле preview `public_transport_enabled: null` означает, что core не знает
 настройки opt-in transport.
 Preview включает точный private record, отдельный allowlisted card_preview (время
@@ -21,6 +22,9 @@ Preview включает точный private record, отдельный allowli
 будущая публичная карточка доступна всем, текст/география/фото видны, личные данные
 введённые в эти поля тоже станут публичными; снятие не уничтожает чужие копии.
 Приватные комнаты, ключи и свойства аккаунта в проекцию не входят.
+Публичная проекция включает `card.author` — display-name автора (без user UUID,
+credential и контактов); комнаты не раскрываются, объявление остаётся независимым
+от комнаты сущностью.
 
 `confirm(..., consent=True)` требует отдельного listings:publish, exact revision/digest
 и свежих persisted grants. Это короткое согласие, не публикация и не доказательство

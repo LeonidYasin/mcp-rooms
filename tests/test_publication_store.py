@@ -58,6 +58,7 @@ def test_new_consent_contract_and_atomic_allowlisted_publication(market):
     assert preview['digest'] != private['digest']
     assert preview['card_preview']['published_at'] is None
     assert 'owner' not in preview['card_preview'] and 'user_id' not in preview['card_preview']
+    assert preview['card_preview']['author'] == 'A'
     consent = approve(x,preview)
     assert consent['published'] is False and not audit(x)
     fails('listing_unavailable',lambda:x.market.public_get(x.draft_id))
@@ -67,7 +68,7 @@ def test_new_consent_contract_and_atomic_allowlisted_publication(market):
     assert card['id'] == x.draft_id and card['photos'][0]['media_id'] == x.media_id
     assert card['revision'] == 2 and card['publication_revision'] == 1
     assert set(card) == {'id','revision','publication_revision','title','description','category','kind','modes',
-        'locality','region','country','price_minor','currency','category_id','category_path','photos','published_at','expires_at'}
+        'locality','region','country','price_minor','currency','category_id','category_path','photos','published_at','expires_at','author'}
     encoded = json.dumps(card)
     for private_name in ('user_id','owner','credential_id','blob_key','source_hash','intent_id','resource'):
         assert private_name not in encoded

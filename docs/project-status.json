@@ -293,7 +293,7 @@
       "id": "public_card",
       "title": "Read-only карточка по ссылке",
       "stage": "TEST",
-      "summary": "Anonymous card/photo read и withdrawal 404 проверены в loopback synthetic flow; внешний HTTPS/Caddy и реальная карточка ещё не приняты.",
+      "summary": "Anonymous card/photo read и withdrawal 404 проверены в loopback synthetic flow; карточка подписана allowlisted display_name автора (без owner UUID/контактов/комнаты), раздел показан явно. Внешний HTTPS/Caddy и реальная карточка ещё не приняты.",
       "doc": "docs/owner-first-test.md",
       "source": "src/mcp_rooms/public_web.py",
       "evidence": "docs/owner-first-vps-test-2026-10-23.md",

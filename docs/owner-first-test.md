@@ -88,8 +88,9 @@ thread/SQLite ожидания отдельно ограничиваются н�
 умножат бюджет; TEST candidate должен быть однопроцессным. Unexpected errors503
 без текста исключения. Native decoding при публичном чтении не запускается.
 
-Publication consent notice обновлён до `live-publication-consent/v2`: preview больше
-не заявляет, что public transport обязательно выключен. Старые intent digests
+Publication consent notice обновлён до `live-publication-consent/v3`: preview
+больше не заявляет, что public transport обязательно выключен; card содержит
+allowlisted `author` (display-name, не owner UUID). Старые intent digests
 не должны давать новое согласие. Core поле `public_transport_enabled: null` означает
 «composition неизвестна core», не включённый endpoint; availability не выводится
 из preview. Старые receipt/snapshot и live migration этим изменением не тестируются

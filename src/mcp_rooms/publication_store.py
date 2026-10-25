@@ -69,8 +69,10 @@ class PublicationStore:
 
     def _document(self, db, draft, rows, epoch):
         private = self.photos._document(db, draft, rows)
+        author = db.execute('SELECT display_name FROM users WHERE id=?',
+                            (draft['user_id'],)).fetchone()['display_name']
         return publication_preview(private['record'], private['category_path'], self.drafts.resource,
-                                   private['photos'], epoch)
+                                   private['photos'], epoch, author=author)
 
     def preview(self, actor, listing_id):
         with self.files._guard():
@@ -157,7 +159,7 @@ class PublicationStore:
                     raise DomainError('preview_conflict')
                 self._consent(db, actor, listing_id, intent_id, draft, rows, epoch, now)
                 document = self._document(db, draft, rows, epoch)
-                card = public_card(document['record'], document['category_path'], document['photos'], epoch+1, now)
+                card = public_card(document['record'], document['category_path'], document['photos'], epoch+1, now, author=document['card_preview']['author'])
                 source_hash = sha256(canonical_json(document['record']).encode()).hexdigest()
                 db.execute('''INSERT INTO listing_publications VALUES (?,?, 'active',?,?,?,?,?,?)
                     ON CONFLICT(listing_id) DO UPDATE SET state='active',epoch=excluded.epoch,
@@ -207,7 +209,7 @@ class PublicationStore:
         publication_schema(db)
         self.drafts._schema(db); self.stages._schema(db)
         now = self.store.clock()
-        row = db.execute('SELECT p.* FROM listing_publications p JOIN users u ON u.id=p.user_id WHERE p.listing_id=? AND p.state=\'active\' AND u.disabled=0', (listing_id,)).fetchone()
+        row = db.execute('SELECT p.*, u.display_name AS author FROM listing_publications p JOIN users u ON u.id=p.user_id WHERE p.listing_id=? AND p.state=\'active\' AND u.disabled=0', (listing_id,)).fetchone()
         if not row or not row['updated_at'] <= now < row['expires_at']:
             raise DomainError('listing_unavailable')
         draft = self.drafts._owned(db,row['user_id'],listing_id,now)
@@ -222,7 +224,7 @@ class PublicationStore:
         rows = self.photos._links(db,SimpleNamespace(user_id=row['user_id']),dict(draft))
         self.photos._live(rows,dict(draft),now)
         private = self.photos._document(db,dict(draft),rows)
-        card = public_card(record,private['category_path'],private['photos'],row['epoch'],row['updated_at'])
+        card = public_card(record,private['category_path'],private['photos'],row['epoch'],row['updated_at'],author=row['author'])
         if canonical_json(card) != row['projection']:
             raise DomainError('listing_unavailable')
         return dict(row), rows, card

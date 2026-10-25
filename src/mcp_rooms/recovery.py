@@ -188,7 +188,7 @@ def _audit(root, resource, *, already_locked=False):
                 ordered[lid]=rows
             categories = {r['id']:dict(r) for r in db.execute('SELECT * FROM market_categories')}
             now = int(time.time()*1000)
-            for pub in db.execute('SELECT * FROM listing_publications'):
+            for pub in db.execute('SELECT p.*, u.display_name AS author FROM listing_publications p JOIN users u ON u.id=p.user_id'):
                 card = json.loads(pub['projection']); lid=pub['listing_id']
                 if type(card) is not dict or card.get('id')!=lid or type(card.get('photos')) is not list or len(card['photos'])>8:
                     raise DomainError('recovery_publication_mismatch')
@@ -205,7 +205,7 @@ def _audit(root, resource, *, already_locked=False):
                     seen.add(cid); category=categories[cid]
                     path.append({k:category[k] for k in ('id','parent_id','root','title')}); cid=category['parent_id']
                 record=json.loads(canonical_json(DraftStore._record(draft)))
-                expected=public_card(record,list(reversed(path)),PhotoDraftStore._photos(ordered[lid]),pub['epoch'],pub['updated_at'])
+                expected=public_card(record,list(reversed(path)),PhotoDraftStore._photos(ordered[lid]),pub['epoch'],pub['updated_at'],author=pub['author'])
                 if (draft['user_id']!=pub['user_id'] or draft['revision']!=pub['revision']
                         or sha256(canonical_json(record).encode()).hexdigest()!=pub['source_hash']
                         or canonical_json(expected)!=pub['projection']):

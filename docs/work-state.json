@@ -62,13 +62,16 @@
     "not_a_current_probe": true,
     "rooms_test": "stopped; temporary HTTPS route removed by owner report",
     "rooms_production": "not accepted or deployed by this project",
-    "main_last_recorded_sha": "41c7c12677a0d2a1cdc03239047fa549b075c267",
+    "main_last_recorded_sha": "4a2f2ec8cef4e7cbed82e0ed038adc7f1a12d0bf",
     "pages": "documentation only; not the marketplace runtime",
     "owner_first_candidate": "loopback PASS 2026-10-23; active after restart (PID 4222); synthetic key TTL 1h; no HTTPS/Caddy change",
     "web_market_author_context": "PR #17 merged into main (b4034f1): public card signed with allowlisted display_name author + explicit section, consent schema live-publication-consent/v3; CI green; source+docs only, not deployed; VPS runtime unchanged",
     "web_market_navigation": "merged PR #18 (41c7c12): read-only market index /market and /market/ (PublicationStore.public_index + render_index), bounded limit 1..100, skips corrupt projections; CI green, not deployed",
     "web_market_section_nav": "on feat/standalone-identity, PR #19 open: section-filter navigation /market/section/<id> (public_index section filter + sections counts, render_index active pill); CI-only, not deployed",
-    "web_market_card_origin": "on feat/standalone-identity, post-#19 not merged: card shows 'Откуда: …' (allowlist locality/region/country) and top-section link to /market/section/<root>; rooms/credentials/owner NOT published (P-04 invariant preserved)"
+    "web_market_card_origin": "merged PR #20 (4a2f2ec): card shows 'Откуда: …' (allowlist locality/region/country) and top-section link to /market/section/<root>; rooms/credentials/owner NOT published (P-04 invariant preserved); CI green, not deployed",
+    "owner_direction_2026_10_25": "Owner priority: agents publish, view, respond/react to listings; web stays read-only observation. Agent public read (PR #21) merged; private response R-01 in progress.",
+    "private_response": "on feat/standalone-identity, not merged: ResponseStore namespace + MCP respond/responses/my_responses/respond_status; owner-public status label allowlist; web card shows only count+labels; CI-only, not deployed",
+    "agent_public_read": "on feat/standalone-identity, PR #21 open: listings_public_get / listings_public_index over allowlisted core; no owner/room/credentials leak; CI green, not deployed"
   },
   "permission_gates": [
     "Each remote execution requires separate owner approval AND special password.",

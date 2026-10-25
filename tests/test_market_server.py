@@ -21,7 +21,9 @@ from test_server import RESOURCE, rpc, tool, NAMES
 
 MARKET_NAMES={'listings_create','listings_get','listings_list_own','listings_categories','listings_update',
     'listings_set_photos','listings_archive','listings_preview','listings_confirm_publication',
-    'listings_publish','listings_withdraw','listings_publication_status'}
+    'listings_publish','listings_withdraw','listings_publication_status',
+    'listings_public_get','listings_public_index',
+    'listings_respond','listings_responses','listings_my_responses','listings_respond_status'}
 CONTENT=dict(title='Synthetic item',description='Synthetic acceptance only; not a real sale.',
              category='things',kind='offer',modes=['shipping'])
 
@@ -40,10 +42,13 @@ def market(tmp_path):
     files=PrivatePhotoFiles(root)
     stages=MediaStageStore(drafts,files,Worker());stages.initialize()
     photos=PhotoDraftStore(stages);publisher=PublicationStore(photos);publisher.initialize()
-    adapter=MarketAdapter(drafts,photos,publisher)
+    from mcp_rooms.response_store import ResponseStore
+    responses=ResponseStore(drafts,publisher);responses.initialize()
+    adapter=MarketAdapter(drafts,photos,publisher,responses=responses)
     with TestClient(create_app(store.path,RESOURCE,True,market=adapter),base_url='https://rooms.example') as client:
         yield SimpleNamespace(store=store,auth=auth,a=a,b=b,ma=ma,ta=ta,mb=mb,tb=tb,mr=mr,tr=tr,
-            now=now,drafts=drafts,root=root,files=files,stages=stages,photos=photos,publisher=publisher,adapter=adapter,client=client)
+            now=now,drafts=drafts,root=root,files=files,stages=stages,photos=photos,publisher=publisher,
+            responses=responses,adapter=adapter,client=client)
     files.close()
 
 
@@ -57,7 +62,22 @@ def confirm(x,lid,preview=None):
         expected_revision=p['record']['listing']['revision'],preview_digest=p['digest'],consent=True,client_id=key())
 
 
-def test_opt_in_twenty_tools_no_admin_or_upload_methods(market):
+def publish(x, token=None):
+    """Publish the most recent draft owned by token's actor; returns (listing_id, epoch)."""
+    t=token or x.ta
+    lid=create(x,t)['listing']['id']
+    actor=x.auth.authenticate(t)
+    media=x.stages.stage(actor,lid,expected_revision=1,client_id=key(),payload=b'synthetic',declared_type='image/png')
+    assert tool(x.client,t,'listings_set_photos',listing_id=lid,media_ids=[media['media_id']],expected_revision=1,client_id=key())['ok']
+    preview=tool(x.client,t,'listings_preview',listing_id=lid)
+    intent=tool(x.client,t,'listings_confirm_publication',listing_id=lid,
+        expected_revision=preview['record']['listing']['revision'],preview_digest=preview['digest'],consent=True,client_id=key())
+    result=tool(x.client,t,'listings_publish',listing_id=lid,intent_id=intent['intent_id'],client_id=key())
+    assert result['ok']
+    return lid,result['publication_revision']
+
+
+def test_opt_in_toolset_no_admin_or_upload_methods(market):
     x=market
     listed=rpc(x.client,x.ta,'tools/list').json()['result']['tools']
     assert {t['name'] for t in listed}==NAMES|MARKET_NAMES
@@ -65,7 +85,7 @@ def test_opt_in_twenty_tools_no_admin_or_upload_methods(market):
         if t['name'] in MARKET_NAMES:
             assert t['annotations']['destructiveHint'] == (t['name'] in {'listings_update','listings_set_photos','listings_archive','listings_publish','listings_withdraw'})
             assert t['annotations']['openWorldHint'] is False
-            assert t['annotations']['readOnlyHint'] == (t['name'] in {'listings_get','listings_list_own','listings_categories','listings_preview','listings_publication_status'})
+            assert t['annotations']['readOnlyHint'] == (t['name'] in {'listings_get','listings_list_own','listings_categories','listings_preview','listings_publication_status','listings_public_get','listings_public_index','listings_responses','listings_my_responses'})
             schema=t['inputSchema']['properties']
             assert not {'owner','user_id','principal','resource','path','filename'} & schema.keys()
     assert x.client.post('/listings',headers={'Authorization':'Bearer '+x.ta},json={}).status_code==404
@@ -208,6 +228,25 @@ def test_missing_namespace_refused_without_startup_migration(market):
         assert not db.execute("SELECT 1 FROM sqlite_master WHERE name='publication_audit'").fetchone()
 
 
+def test_agent_b_reads_public_card_and_index_of_a(market):
+    x=market
+    lid,epoch=publish(x)
+    # Agent B (a different actor) reads A's published card + index via MCP.
+    public=tool(x.client,x.tb,'listings_public_get',listing_id=lid)
+    assert public.get('ok'), public
+    assert public['id']==lid and public['author']=='A'
+    encoded=json.dumps(public)
+    for secret in ('credential','user:'+x.a,'/rooms/','resource'):
+        assert secret not in encoded
+    index=tool(x.client,x.tb,'listings_public_index',limit=50)
+    assert index['ok'] and any(i['id']==lid for i in index['items'])
+    # Unavailable(private)/missing look identical to a non-owner agent.
+    unknown=tool(x.client,x.tb,'listings_public_get',listing_id=key())
+    assert unknown['ok'] is False and unknown['error']=='listing_unavailable'
+    private_id=create(x)['listing']['id']
+    assert tool(x.client,x.tb,'listings_public_get',listing_id=private_id)['error']=='listing_unavailable'
+
+
 def test_http_delegation_preserves_listing_scopes_and_expiry(market):
     x=market;headers={'Authorization':'Bearer '+x.ta}
     assert x.client.post('/credentials',headers=headers,json={'scopes':['admin:all']}).status_code==400
@@ -234,3 +273,51 @@ def test_revoke_between_gate_and_delegation_cannot_issue(market,monkeypatch):
     assert response.status_code==409 and response.json()['error']=='authentication_required'
     assert 'key' not in response.json()
     with x.store._db() as db:assert db.execute('SELECT COUNT(*) FROM credentials').fetchone()[0]==count
+
+
+def test_private_response_only_owner_and_author_see_it(market):
+    x=market;lid,_=publish(x)
+    cid=key()
+    respond=tool(x.client,x.tb,'listings_respond',listing_id=lid,text='<script>untrusted</script> contact@example',
+             client_id=cid)
+    rid=respond['id']
+    # Idempotent replay with the same client_id returns the same response, not a duplicate.
+    replay=tool(x.client,x.tb,'listings_respond',listing_id=lid,text='<script>untrusted</script> contact@example',
+                client_id=cid)
+    assert replay['replayed'] is True and replay['id']==rid
+    # Owner A sees the response body (only owner-level response list).
+    owned=tool(x.client,x.ta,'listings_responses',listing_id=lid)
+    assert owned['ok'] and any(r['id']==rid for r in owned['responses'])
+    # B sees its own responses (metadata only, no bodies in my_responses? we return ids/status).
+    mine=tool(x.client,x.tb,'listings_my_responses',limit=20)
+    assert mine['ok'] and any(r['id']==rid for r in mine['responses'])
+    # A third lightweight reader (rooms-only key) cannot read responses.
+    assert tool(x.client,x.tr,'listings_responses',listing_id=lid)['error']=='insufficient_scope'
+    # Owner sets a public status label; response body was never exposed publicly.
+    assert tool(x.client,x.ta,'listings_respond_status',listing_id=lid,response_id=rid,
+                public_status='answered',client_id=key())['ok']
+    summary=x.responses.public_response_summary(lid)
+    assert summary['count']==1 and summary['labels']==[{'label':'answered','count':1}]
+    # Corporal details never reach the web/index summary.
+    assert 'untrusted' not in json.dumps(summary) and 'contact@example' not in json.dumps(summary)
+    # Owner cannot respond to own listing; B cannot respond twice to the same listing.
+    own=tool(x.client,x.ta,'listings_respond',listing_id=lid,text='own',client_id=key())
+    assert own['error']=='cannot_respond_own_listing'
+    again=tool(x.client,x.tb,'listings_respond',listing_id=lid,text='again',client_id=key())
+    assert again['error']=='response_already_exists'
+
+
+def test_private_response_unavailable_and_scope_deny(market):
+    x=market;lid,_=publish(x)
+    # Unpublished/unknown listing fails the same way for an outsider.
+    missing=tool(x.client,x.tb,'listings_respond',listing_id=key(),text='x',client_id=key())
+    assert missing['ok'] is False and missing['error']=='listing_unavailable'
+    # Invalid status label rejected.
+    first=tool(x.client,x.tb,'listings_respond',listing_id=lid,text='hello',client_id=key())
+    bad=tool(x.client,x.ta,'listings_respond_status',listing_id=lid,response_id=first['id'],
+             public_status='nonsense',client_id=key())
+    assert bad['ok'] is False and bad['error']=='invalid_public_status'
+    # Response to a withdrawn listing is unavailable for new responders.
+    tool(x.client,x.ta,'listings_withdraw',listing_id=lid,expected_publication_revision=1,client_id=key())
+    after=tool(x.client,x.tb,'listings_respond',listing_id=lid,text='later',client_id=key())
+    assert after['ok'] is False and after['error']=='listing_unavailable'

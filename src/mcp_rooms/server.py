@@ -288,7 +288,8 @@ def create_app(database, resource, registration_enabled=False, *, market=None, m
     from .public_web import PublicMarket
     return BearerGate(mcp.streamable_http_app(), auth, registration_enabled,
                       MediaHTTP(market, upload_slots=media_upload_slots) if media_http else None, browser_sessions,
-                      PublicMarket(market.publisher, resource) if public_market else None)
+                      PublicMarket(market.publisher, resource,
+                                   getattr(market,'responses',None)) if public_market else None)
 
 
 def main():

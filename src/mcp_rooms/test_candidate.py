@@ -227,7 +227,9 @@ def compose(state,resource):
         worker.check_sandbox()  # Fail closed before constructing/exposing any app.
         stages=MediaStageStore(drafts,files,worker)
         photos=PhotoDraftStore(stages);publisher=PublicationStore(photos)
-        adapter=MarketAdapter(drafts,photos,publisher)
+        from .response_store import ResponseStore
+        responses=ResponseStore(drafts,publisher)
+        adapter=MarketAdapter(drafts,photos,publisher,responses=responses)
         app=create_app(store.path,resource,market=adapter,media_http=True,
                        public_market=True,media_upload_slots=1)
         return Candidate(app,files,worker,lock)

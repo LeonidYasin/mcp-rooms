@@ -8,7 +8,7 @@ from mcp_rooms.store import RoomStore
 
 RESOURCE = 'https://rooms.example/mcp'
 HEADERS = {'Accept': 'application/json, text/event-stream', 'MCP-Protocol-Version': '2025-11-25'}
-NAMES = {'rooms_create', 'rooms_list', 'rooms_join', 'rooms_leave', 'rooms_send', 'rooms_read', 'rooms_delete_message', 'rooms_close'}
+NAMES = {'rooms_create', 'rooms_list', 'rooms_join', 'rooms_leave', 'rooms_send', 'rooms_read', 'rooms_delete_message', 'rooms_close', 'rooms_topics'}
 
 
 @pytest.fixture

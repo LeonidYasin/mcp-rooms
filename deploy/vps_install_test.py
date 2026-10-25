@@ -55,7 +55,7 @@ Restart=no
 '''
 UNIT_HASH = hashlib.sha256(UNIT_TEXT.encode()).hexdigest()
 TOOLS = {'rooms_create', 'rooms_list', 'rooms_join', 'rooms_leave', 'rooms_read',
-         'rooms_send', 'rooms_delete_message', 'rooms_close'}
+         'rooms_send', 'rooms_delete_message', 'rooms_close', 'rooms_topics'}
 
 
 def require(condition, code):
@@ -210,7 +210,7 @@ try:
     check(status==200)
     check({t['name'] for t in catalog['result']['tools']}=={
         'rooms_create','rooms_list','rooms_join','rooms_leave','rooms_read',
-        'rooms_send','rooms_delete_message','rooms_close'})
+        'rooms_send','rooms_delete_message','rooms_close','rooms_topics'})
     room=tool(ka,'rooms_create',title='loopback acceptance')['room_id']
     check(tool(kb,'rooms_read',room_id=room).get('error')=='membership_required')
     check(tool(kb,'rooms_join',room_id=room)['ok'])

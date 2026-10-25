@@ -15,6 +15,35 @@ import uuid
 # Compatibility aliases: existing clients/tests keep the same exception identity.
 from .domain import DomainError as RoomError, identifier as _id, text as _text
 
+# Base topic catalog seed (unified tree source for rooms; the marketplace categories are
+# eventually folded into it). Root has parent_id None. Slugs, not UUIDs.
+TOPIC_SEED = (
+    ('market', None, 'Маркет и товары'),
+    ('market-goods', 'market', 'Товары и услуги'),
+    ('market-used', 'market', 'Б/у вещи'),
+    ('transport', None, 'Транспорт'),
+    ('taxi', 'transport', 'Такси'),
+    ('delivery', 'transport', 'Доставка и курьеры'),
+    ('hiring', None, 'Найм и работа'),
+    ('jobs', 'hiring', 'Предложения работы'),
+    ('resumes', 'hiring', 'Резюме и вакансии'),
+    ('finance', None, 'Финансы и стартапы'),
+    ('investors', 'finance', 'Поиск инвесторов'),
+    ('startups', 'finance', 'Стартапы'),
+    ('realestate', None, 'Недвижимость'),
+    ('home', 'realestate', 'Жильё'),
+    ('commercial', 'realestate', 'Коммерческая'),
+    ('misc', None, 'Разное'),
+)
+
+_VISIBLE = frozenset({'private', 'open'})
+
+
+def _topic_id(value):
+    if not isinstance(value, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,40}', value):
+        raise RoomError('invalid_topic_id')
+    return value
+
 
 @dataclass(frozen=True)
 class Limits:
@@ -115,6 +144,12 @@ class RoomStore:
             # Additive v1->v2 standalone migration; never touches embedded owners.
             db.execute('CREATE TABLE IF NOT EXISTS enrollments (bootstrap_digest TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id), credential_id TEXT NOT NULL UNIQUE REFERENCES credentials(id), contact_kind TEXT NOT NULL, created_at INTEGER NOT NULL)')
             db.execute('CREATE TABLE IF NOT EXISTS signup_budgets (scope TEXT NOT NULL, bucket INTEGER NOT NULL, used INTEGER NOT NULL, expires_at INTEGER NOT NULL, PRIMARY KEY(scope,bucket))')
+            # Additive base topic catalog; rooms table and user_version are UNCHANGED.
+            # room_topics is a side table (room -> topic/visibility, fixed at create).
+            db.execute('CREATE TABLE IF NOT EXISTS topics (id TEXT PRIMARY KEY, parent_id TEXT REFERENCES topics(id), title TEXT NOT NULL)')
+            db.execute("CREATE TABLE IF NOT EXISTS room_topics (room_id TEXT PRIMARY KEY REFERENCES rooms(id) ON DELETE CASCADE, topic_id TEXT NOT NULL REFERENCES topics(id), visibility TEXT NOT NULL CHECK(visibility IN ('private','open')))")
+            if db.execute('SELECT COUNT(*) FROM topics').fetchone()[0] == 0:
+                db.executemany('INSERT INTO topics VALUES (?,?,?)', TOPIC_SEED)
             db.execute('PRAGMA user_version=2')
 
     def _open_existing(self):
@@ -208,9 +243,16 @@ class RoomStore:
     def _message(row):
         return {k: row[k] for k in ('id', 'room_id', 'owner', 'text', 'reply_to', 'deleted', 'created_at', 'expires_at')}
 
-    def create(self, owner, title, description=''):
+    def create(self, owner, title, description='', topic_id=None, visibility=None):
         title = _text(title, 80)
         description = _text(description, 300) if description != '' else ''
+        have_meta = topic_id is not None or visibility is not None
+        if topic_id is not None:
+            _topic_id(topic_id)
+        if visibility is not None and visibility not in _VISIBLE:
+            raise RoomError('invalid_visibility')
+        if have_meta and topic_id is None:
+            raise RoomError('topic_required')
         room_id, now = str(uuid.uuid4()), self.clock()
         with self._db(write=True) as db:
             self._actor(db, owner)
@@ -221,15 +263,45 @@ class RoomStore:
             self._join_capacity(db, owner)
             db.execute('INSERT INTO rooms(id,owner,title,description,created_at) VALUES (?,?,?,?,?)', (room_id, owner, title, description, now))
             db.execute('INSERT INTO members VALUES (?,?)', (room_id, owner))
-        return {'room_id': room_id, 'owner': owner, 'title': title, 'visibility': 'public_to_enrolled_users'}
+            if have_meta:
+                if not db.execute('SELECT 1 FROM topics WHERE id=?', (topic_id,)).fetchone():
+                    raise RoomError('topic_unavailable')
+                db.execute("INSERT INTO room_topics(room_id,topic_id,visibility) VALUES (?,?,?)", (room_id, topic_id, visibility or "private"))
+        result = {'room_id': room_id, 'owner': owner, 'title': title,
+                  'visibility': (visibility or 'private') if have_meta else 'public_to_enrolled_users'}
+        if have_meta:
+            result['topic_id'] = topic_id
+        return result
 
-    def list(self, owner, cursor=None, limit=20):
+    def list(self, owner, cursor=None, limit=20, topic=None):
         after, limit = _cursor(cursor, 'rooms'), _limit(limit)
+        topic_filter, params = '', []
+        if topic is not None:
+            _topic_id(topic)
+            topic_filter = ' AND EXISTS(SELECT 1 FROM room_topics rt WHERE rt.room_id=r.id AND rt.topic_id=?)'
+            params.append(topic)
         with self._db() as db:
-            rows = db.execute('SELECT r.*, EXISTS(SELECT 1 FROM members m WHERE m.room_id=r.id AND m.owner=?) AS joined FROM rooms r WHERE r.seq>? ORDER BY r.seq LIMIT ?', (owner, after, limit + 1)).fetchall()
+            rows = db.execute(
+                'SELECT r.*, rt.topic_id AS topic_id, rt.visibility AS visibility, '
+                'EXISTS(SELECT 1 FROM members m WHERE m.room_id=r.id AND m.owner=?) AS joined '
+                'FROM rooms r LEFT JOIN room_topics rt ON rt.room_id=r.id '
+                'WHERE r.seq>?' + topic_filter + ' ORDER BY r.seq LIMIT ?',
+                (owner, after, *params, limit + 1)).fetchall()
         selected = rows[:limit]
-        return {'rooms': [{k: row[k] for k in ('id', 'owner', 'title', 'description', 'created_at', 'joined')} for row in selected],
+        return {'rooms': [{k: row[k] for k in ('id', 'owner', 'title', 'description', 'created_at', 'joined', 'topic_id', 'visibility')} for row in selected],
                 'next_cursor': 'rooms:' + str(selected[-1]['seq'] if selected else after), 'has_more': len(rows) > limit}
+
+    def topics(self, owner, parent_id=None):
+        """Bounded catalog children for the united topic tree; read-only scope."""
+        where, params = 'parent_id IS ?', [None]
+        if parent_id is not None:
+            _topic_id(parent_id)
+            where, params = 'parent_id = ?', [parent_id]
+        with self._db() as db:
+            rows = db.execute('SELECT id, parent_id, title FROM topics WHERE ' + where + ' ORDER BY id LIMIT 101', params).fetchall()
+        if len(rows) > 100:
+            raise RoomError('topic_capacity')
+        return {'topics': [dict(row) for row in rows]}
 
     def _join_capacity(self, db, owner):
         if db.execute('SELECT COUNT(*) FROM members WHERE owner=?', (owner,)).fetchone()[0] >= self.limits.memberships_per_owner:

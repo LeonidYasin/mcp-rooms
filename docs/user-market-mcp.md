@@ -14,7 +14,7 @@ composition root через `market=MarketAdapter(drafts,photos,publisher)`, с�
 Startup проверяет market2/media3/publication1, но **не создаёт и не мигрирует** их.
 Нужен отдельный явный операторский initialize, а не запрос пользователя.
 
-В этом режиме официальный MCP SDK регистрирует 28 методов: 8 прежних rooms и 20 listings. BearerGate проверяет ключ на каждом HTTP request и переносит проверенный
+В этом режиме официальный MCP SDK регистрирует 29 методов: 9 прежних rooms (включая browsable catalog тем) и 20 listings. BearerGate проверяет ключ на каждом HTTP request и переносит проверенный
 Principal через request-local ContextVar в thread worker. Сервис дополнительно
 проверяет persisted user/credential/resource/scopes/revoke/expiry при каждом действии.
 Principal/owner/path/resource не строятся из tool JSON. Параллельные клиенты не должны

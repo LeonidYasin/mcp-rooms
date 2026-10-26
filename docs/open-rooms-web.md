@@ -89,9 +89,11 @@ legacy `market_categories` сведён к нему и удалён (Фаза 3)
 - candidate `REQUIRED` больше не содержит `market_categories`; ожидаемая версия `market_schema` — 3.
 - Тесты: проверка «5 строк в market_categories» заменена проверкой отсутствия таблицы; фикстура
   v1→v2 и её три теста удалены осознанно (путь миграции больше не существует), отказ старой схемы
-  остаётся покрытым `test_missing_and_future_schema_fail_closed`.
-- CI green на 5c1968e (3.10: 1028 passed, 42 skipped; 3.11–3.13: 1089 passed each;
-  build/supervision/wheelhouse pass; deploy skipping, owner-gated).
+  закреплён `test_legacy_market_categories_database_refused_without_mutation` (PR #32) и
+  `test_missing_and_future_schema_fail_closed`.
+- PR #31 смержен в main `2652409`. CI green на 5c1968e (3.10: 1028 passed, 42 skipped;
+  3.11–3.13: 1089 passed each); follow-up PR #32 green на 0d329ea (3.10: 1029 passed, 42 skipped;
+  3.11–3.13: 1090 passed each); build/supervision/wheelhouse pass; deploy skipping, owner-gated.
 
 ## Bounded-срезы
 

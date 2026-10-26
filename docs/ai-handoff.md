@@ -52,14 +52,16 @@ core существует, но M3b.3 transaction-time authority остаётс�
   `PhotoDraftStore._document`, `recovery`). Поведение сохранено: category_path останавливается на
   семантическом корне (`id==root`) — пути карточек и веб-секции прежние; top-level броуз =
   listing-корни (`['services','things']`). CI green на cf28f5e.
-- **Единый каталог, Фаза 3 (PR #31 open, owner merge pending; вариант 2)**: `market_categories`
+- **Единый каталог, Фаза 3 (PR #31, смержен в main `2652409`; вариант 2)**: `market_categories`
   удалена — `SCHEMA_VERSION` 3, `TABLES` без legacy-таблицы, `initialize()` больше не создаёт/сеет
   её и отвергает старые БД (`unsupported_market_schema`), FK `market_drafts.category_id` → `topics(id)`.
   Вариант 2 — чистый отказ от старых БД: миграция v1→v2 и её 3 теста удалены осознанно (переносить
   нечего); отказ старой схемы покрыт `test_missing_and_future_schema_fail_closed`. candidate
   `REQUIRED` без `market_categories`, ожидаемая версия `market_schema` 3. CI green на 5c1968e
   (3.10: 1028 passed, 42 skipped; 3.11–3.13: 1089 passed; build/supervision/wheelhouse pass;
-  deploy owner-gated).
+  deploy owner-gated). Follow-up PR #32 закрывает пробел покрытия: тест
+  `test_legacy_market_categories_database_refused_without_mutation` проверяет отказ БД с ещё
+  присутствующей `market_categories` (green на 0d329ea: 3.10 1029+42; 3.11–3.13 1090).
 
 ## Следующий gate
 

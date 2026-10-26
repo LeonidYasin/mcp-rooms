@@ -110,6 +110,25 @@ def test_partial_namespace_refused_without_creating_other_tables(tmp_path):
         assert not db.execute("SELECT 1 FROM sqlite_master WHERE name='market_drafts'").fetchone()
 
 
+def test_legacy_market_categories_database_refused_without_mutation(tmp_path):
+    """Variant 2: a pre-Phase-3 DB is refused, never partially migrated or rewritten."""
+    store = RoomStore(tmp_path / 'rooms.db')
+    with store._db(write=True) as db:
+        db.execute('CREATE TABLE market_schema (singleton INTEGER PRIMARY KEY CHECK(singleton=1), version INTEGER NOT NULL)')
+        db.execute('CREATE TABLE market_categories (id TEXT PRIMARY KEY, parent_id TEXT REFERENCES market_categories(id), root TEXT NOT NULL, title TEXT NOT NULL, active INTEGER NOT NULL CHECK(active IN (0,1)))')
+        db.execute('CREATE TABLE market_drafts (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id), category_id TEXT NOT NULL REFERENCES market_categories(id), content TEXT NOT NULL, revision INTEGER NOT NULL CHECK(revision>0), created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, expires_at INTEGER NOT NULL, status TEXT NOT NULL DEFAULT \'draft\' CHECK(status IN (\'draft\',\'archived\')), CHECK(created_at<=updated_at AND updated_at<expires_at))')
+        db.execute('CREATE TABLE market_commands (user_id TEXT NOT NULL REFERENCES users(id), client_id TEXT NOT NULL, operation TEXT NOT NULL, digest TEXT NOT NULL, result TEXT NOT NULL, created_at INTEGER NOT NULL, PRIMARY KEY(user_id,client_id))')
+        db.execute('INSERT INTO market_categories VALUES (?,?,?,?,1)', ('toilets', None, 'toilets', 'Унитазы'))
+        db.execute('INSERT INTO market_schema VALUES (1,2)')
+    with pytest.raises(DomainError, match='unsupported_market_schema'):
+        DraftStore(store, RESOURCE).initialize()
+    with store._db() as db:
+        assert db.execute('SELECT version FROM market_schema').fetchone()[0] == 2
+        assert db.execute("SELECT 1 FROM sqlite_master WHERE name='market_categories'").fetchone()
+        assert db.execute('SELECT id FROM market_categories').fetchone()[0] == 'toilets'
+        assert not db.execute("SELECT 1 FROM sqlite_master WHERE name='market_drafts_page'").fetchone()
+
+
 def test_create_reopen_read_and_update(setup):
     store, auth, drafts, a, b, now = setup
     result = create(drafts, a)

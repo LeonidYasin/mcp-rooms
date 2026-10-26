@@ -23,8 +23,9 @@ TOPIC_SEED = (
     ('market', None, 'Маркет и товары', 'market'),
     ('market-goods', 'market', 'Товары и услуги', 'market'),
     ('market-used', 'market', 'Б/у вещи', 'market'),
-    # Listing-category subtree under market (folded in from market_categories seed):
-    # semantic roots 'things' and 'services' are preserved for the root-match contract.
+    # Listing-category subtree under market (folded in from the legacy market_categories
+    # seed, which Phase 3 removed): semantic roots 'things' and 'services' are preserved
+    # for the marketplace root-match contract.
     ('things', 'market', 'Вещи', 'things'),
     ('home-repair', 'things', 'Дом и ремонт', 'things'),
     ('plumbing', 'home-repair', 'Сантехника', 'things'),
@@ -162,9 +163,9 @@ class RoomStore:
             # Additive base topic catalog; rooms table and user_version are UNCHANGED.
             # room_topics is a side table (room -> topic/visibility, fixed at create).
             # topics is the single catalog: root/active are listing-catalog attributes
-            # (same semantics as market_categories) added additively and backfilled.
-            # market_categories keeps operating until Phases 2-3 fold its readers onto this
-            # tree -- no behavior change in Phase 1.
+            # (same semantics as the removed market_categories) added additively and
+            # backfilled. Phases 1-2 folded the marketplace readers onto this tree;
+            # Phase 3 removed the legacy market_categories side table entirely.
             db.execute('CREATE TABLE IF NOT EXISTS topics (id TEXT PRIMARY KEY, parent_id TEXT REFERENCES topics(id), title TEXT NOT NULL, root TEXT, active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1)))')
             cols = {r['name'] for r in db.execute('PRAGMA table_info(topics)')}
             if 'root' not in cols:

@@ -19,15 +19,8 @@ from .publication_guard import require_unpublished
 from .listing_contract import Listing, ListingContent, create_draft
 from .preview_contract import canonical_json as _json, make_preview, PREVIEW_SCHEMA
 
-SCHEMA_VERSION = 2
-TABLES = ('market_schema', 'market_categories', 'market_drafts', 'market_commands')
-CATEGORIES = (
-    ('things', None, 'things', 'Вещи'),
-    ('home-repair', 'things', 'things', 'Дом и ремонт'),
-    ('plumbing', 'home-repair', 'things', 'Сантехника'),
-    ('toilets', 'plumbing', 'things', 'Унитазы'),
-    ('services', None, 'services', 'Услуги'),
-)
+SCHEMA_VERSION = 3
+TABLES = ('market_schema', 'market_drafts', 'market_commands')
 
 
 def _bounded_integer(value, minimum, maximum, code):
@@ -56,49 +49,39 @@ class DraftStore:
             raise DomainError('invalid_draft_limits')
 
     def initialize(self):
-        """Explicit opt-in, additive namespace version; unchanged room user_version."""
+        """Explicit opt-in schema; unchanged room user_version. Phase 3 removed the legacy
+        market_categories side table and the v1->v2 upgrade path: fresh schemas link
+        market_drafts.category_id to the unified topics catalog, and older on-disk
+        schemas are refused (no production data exists to preserve)."""
         with self.store._db(write=True) as db:
             names = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
             existing = names.intersection(TABLES)
             if existing:
-                if existing != set(TABLES):
+                if existing != set(TABLES) or 'market_categories' in names:
                     raise DomainError('unsupported_market_schema')
-                version = self._schema(db, allow_v1=True)
-                if version == 1:
-                    columns = {row['name'] for row in db.execute('PRAGMA table_info(market_drafts)')}
-                    if columns != {'id', 'user_id', 'category_id', 'content', 'revision',
-                                   'created_at', 'updated_at', 'expires_at'}:
-                        raise DomainError('unsupported_market_schema')
-                    db.execute("ALTER TABLE market_drafts ADD COLUMN status TEXT NOT NULL DEFAULT 'draft' CHECK(status IN ('draft','archived'))")
-                    db.execute('CREATE INDEX market_drafts_page ON market_drafts(user_id,status,created_at,id)')
-                    db.execute('UPDATE market_schema SET version=? WHERE singleton=1', (SCHEMA_VERSION,))
+                self._schema(db)
                 return
             # New sidecar tables in the SAME DB/snapshot; no drop/rewrite of room data.
+            # No legacy market_categories table: category_id references the unified topics
+            # catalog (RoomStore) as the single category source.
             db.execute('CREATE TABLE market_schema (singleton INTEGER PRIMARY KEY CHECK(singleton=1), version INTEGER NOT NULL)')
-            db.execute('CREATE TABLE market_categories (id TEXT PRIMARY KEY, parent_id TEXT REFERENCES market_categories(id), root TEXT NOT NULL, title TEXT NOT NULL, active INTEGER NOT NULL CHECK(active IN (0,1)))')
-            db.execute('CREATE TABLE market_drafts (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id), category_id TEXT NOT NULL REFERENCES market_categories(id), content TEXT NOT NULL, revision INTEGER NOT NULL CHECK(revision>0), created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, expires_at INTEGER NOT NULL, status TEXT NOT NULL DEFAULT \'draft\' CHECK(status IN (\'draft\',\'archived\')), CHECK(created_at<=updated_at AND updated_at<expires_at))')
+            db.execute('CREATE TABLE market_drafts (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id), category_id TEXT NOT NULL REFERENCES topics(id), content TEXT NOT NULL, revision INTEGER NOT NULL CHECK(revision>0), created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, expires_at INTEGER NOT NULL, status TEXT NOT NULL DEFAULT \'draft\' CHECK(status IN (\'draft\',\'archived\')), CHECK(created_at<=updated_at AND updated_at<expires_at))')
             db.execute('CREATE INDEX market_drafts_owner ON market_drafts(user_id)')
             db.execute('CREATE INDEX market_drafts_page ON market_drafts(user_id,status,created_at,id)')
             db.execute('CREATE TABLE market_commands (user_id TEXT NOT NULL REFERENCES users(id), client_id TEXT NOT NULL, operation TEXT NOT NULL, digest TEXT NOT NULL, result TEXT NOT NULL, created_at INTEGER NOT NULL, PRIMARY KEY(user_id,client_id))')
-            db.executemany('INSERT INTO market_categories VALUES (?,?,?,?,1)', CATEGORIES)
             db.execute('INSERT INTO market_schema VALUES (1,?)', (SCHEMA_VERSION,))
 
     @staticmethod
-    def _schema(db, *, allow_v1=False):
+    def _schema(db):
         try:
             rows = db.execute('SELECT singleton,version FROM market_schema').fetchall()
         except sqlite3.OperationalError as exc:
             if str(exc) == 'no such table: market_schema':
                 raise DomainError('market_migration_required') from None
             raise
-        if len(rows) != 1 or rows[0]['singleton'] != 1:
+        if len(rows) != 1 or rows[0]['singleton'] != 1 or rows[0]['version'] != SCHEMA_VERSION:
             raise DomainError('unsupported_market_schema')
-        version = rows[0]['version']
-        if version == 1 and not allow_v1:
-            raise DomainError('market_migration_required')
-        if version not in ((1, SCHEMA_VERSION) if allow_v1 else (SCHEMA_VERSION,)):
-            raise DomainError('unsupported_market_schema')
-        return version
+        return rows[0]['version']
 
     def _authorize(self, db, principal, scope, now):
         if (not isinstance(principal, Principal) or type(principal.scopes) is not frozenset
@@ -121,10 +104,9 @@ class DraftStore:
 
     @staticmethod
     def _category(db, category_id, root=None):
-        """Marketplace-facing validator over the UNIFIED topics tree (Phase 2 of the
-        market_categories consolidation). Same contract as before (invalid_category /
-        category_unavailable, bounded active ancestry, root match) but backed by
-        RoomStore.topics; market_categories stays as legacy seed/FK until Phase 3."""
+        """Marketplace-facing validator over the UNIFIED topics tree. Same contract as
+        before (invalid_category / category_unavailable, bounded active ancestry, root
+        match) but backed by RoomStore.topics — the single category source."""
         if not isinstance(category_id, str) or not re.fullmatch('[a-z][a-z0-9-]{0,63}', category_id):
             raise DomainError('invalid_category')
         row = db.execute('SELECT * FROM topics WHERE id=?', (category_id,)).fetchone()

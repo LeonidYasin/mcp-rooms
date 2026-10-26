@@ -165,9 +165,15 @@ fresh profile/key gate. Caddy всё ещё не менялся.
       идемпотентной миграцией; общий валидатор `RoomStore._topic` (active/root-ancestry)
       задействован в `rooms_create` и броузинге. `market_categories` продолжает работать —
       поведение не меняется. PR #29, green на 979b759 (3.10: 1031+42; 3.11–3.13: 1092).
-- [ ] Единый каталог, Фазы 2–3: перевод чтений `draft_store`/`photo_drafts`/`recovery`/
-      `publication_store` на `topics`; обновление candidate `REQUIRED`/тестов/docs; депрекейт
-      `market_categories`.
+- [x] **Единый каталог, Фаза 2 (реализовано)**: все чтения marketplace-категорий переведены с
+      `market_categories` на единый `topics` — `DraftStore._category`/`categories()`/`_preview`,
+      `PhotoDraftStore._document`, `recovery` (источник из `topics`). Поведение сохранено:
+      category_path останавливается на семантическом корне (`id==root`, путь карточки
+      `['things','home-repair','plumbing','toilets']` и веб-секции прежние), top-level броуз =
+      семантические listing-корни (`parent_id IS NOT NULL AND id=root AND active=1` → `['services','things']`).
+      `market_categories` остаётся созданным/сидимым как legacy-FK до Фазы 3. PR #30, green на cf28f5e.
+- [ ] Единый каталог, Фаза 3: удаление `market_categories` (таблица, seed, candidate `REQUIRED`),
+      депрекейт, перенос FK `market_drafts.category_id` на `topics`, обновление тестов/docs.
 - [x] **Срез B (реализовано)**: read-only веб-витрина открытых комнат по дереву тем (`/rooms`, `/rooms/topic/<id>`); только `open`, приватные/legacy не раскрываются, весь текст escaped.
 - [x] **Срез C (реализовано)**: read-only лента сообщений открытой комнаты (`/rooms/room/<id>` + `?cursor=`), bounded/kурсор, escaping, 404 на приватные/несуществующие.
 - [x] **Срез D (реализовано статически)**: production-prep комнат в docs/rooms-web-production.md (композиция `public_rooms=True`, app-пути, коллизия префикса и рекомендация). Деплой — отдельный owner-gate + пароль.

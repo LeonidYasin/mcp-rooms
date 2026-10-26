@@ -43,10 +43,18 @@ core существует, но M3b.3 transaction-time authority остаётс�
 - Новые изменения идут через `feat/standalone-identity` и отдельные owner-approved
   PR в `main`; merge требует отдельного решения владельца.
 - Старый Rooms TEST остановлен; production MCP Rooms отсутствует.
-- **Единый каталог, Фаза 1 (PR #29)**: `topics` — единый каталог (`root`/`active` + market
-  listing-поддерево под `market`, валидатор `RoomStore._topic`), аддитивно; `market_categories`
-  не менялся. CI green на 979b759 (3.10: 1031 passed, 42 skipped; 3.11–3.13: 1092 passed).
-  Фазы 2–3 консолидации — последующие срезы.
+- **Единый каталог, Фаза 1 (PR #29, смержен в main `6eb1004`)**: `topics` — единый каталог
+  (`root`/`active` + market listing-поддерево под `market`, валидатор `RoomStore._topic`),
+  аддитивно; `market_categories` не менялся. CI green на 979b759 (3.10: 1031 passed, 42 skipped;
+  3.11–3.13: 1092 passed).
+- **Единый каталог, Фаза 2 (PR #30 open, owner merge pending)**: все чтения marketplace-категорий
+  переведены с `market_categories` на единый `topics` (`DraftStore._category`/`categories()`/`_preview`,
+  `PhotoDraftStore._document`, `recovery`). Поведение сохранено: category_path останавливается на
+  семантическом корне (`id==root`) — пути карточек и веб-секции прежние; top-level броуз =
+  listing-корни (`['services','things']`). `market_categories` остаётся созданным/сидимым как legacy-FK.
+  CI green на cf28f5e (test 3.10–3.13, build, supervision, wheelhouse pass; deploy owner-gated).
+  Фаза 3 (удаление `market_categories`/candidate `REQUIRED`, депрекейт, перенос FK
+  `market_drafts.category_id` на `topics`) — последующий срез.
 
 ## Следующий gate
 

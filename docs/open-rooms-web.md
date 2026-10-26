@@ -8,8 +8,8 @@
 
 ## Решения владельца
 
-1. **Единое дерево тем** — базовый каталог тем в `RoomStore`; `market_categories` впоследствии
-   сведётся к нему. Комнаты и объявления ссылаются на единый каталог.
+1. **Единое дерево тем** — базовый каталог тем в `RoomStore`; legacy `market_categories` сведён
+   к нему и удалён (Фаза 3). Комнаты и объявления ссылаются на единый каталог.
 2. **Web** — анонимный **read-only** просмотр истории **открытых** комнат по дереву тем
    (bounded чтение, без записи; web остаётся наблюдением).
 3. **Приватность комнаты** — выбирается владельцем комнаты при создании и фиксируется
@@ -34,12 +34,12 @@
 не меняются). Семя покрывает домены: маркет/товары-услуги, транспорт·такси·доставка,
 найм/предложение работы, финансы·стартапы·поиск инвесторов, недвижимость, разное.
 Дерево — источник для категорий объявлений и категорий комнат (одно дерево);
-`market_categories` впоследствии сведётся к нему.
+legacy `market_categories` сведён к нему и удалён (Фаза 3).
 
 ### Единый каталог — Фаза 1 (реализовано, PR #29)
 
 Аддитивная консолидация: `topics` становится единым каталогом, ничего не ломая
-(`market_categories` и весь marketplace продолжают работать; `draft_store` не менялся).
+(на этом срезе `market_categories` и весь marketplace продолжали работать; `draft_store` не менялся).
 
 - `topics` получает listing-атрибуты: `root` (семантический корень, объявлен в seed) и
   `active` (`INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1))`).
@@ -59,8 +59,7 @@
 ### Единый каталог — Фаза 2 (реализовано, PR #30)
 
 Все чтения marketplace-категорий переведены с `market_categories` на единый `topics`
-(`market_categories` и весь marketplace продолжает работать; таблица остаётся созданной
-и сидимой как legacy-FK до Фазы 3).
+(на этом срезе таблица оставалась созданной и сидимой как legacy-FK до Фазы 3).
 
 - `DraftStore._category` (единый валидатор объявлений) читает `topics`; контракт прежний —
   `invalid_category`/`category_unavailable`, bounded active-ancestry, root-match с
@@ -74,10 +73,25 @@
   прежние (узел-обёртка `market` в путь карточки не входит).
 - `recovery` строит `categories` из `SELECT * FROM topics` и повторяет ту же остановку пути —
   сверка projection согласована с публикацией.
-- candidate `REQUIRED` на этом срезе не меняется: `market_categories` ещё в списке таблиц.
+- candidate `REQUIRED` на Фазе 2 не менялся: `market_categories` ещё была в списке таблиц.
 
-Фаза 3 (удаление `market_categories`/seed/candidate `REQUIRED`, депрекейт, перенос FK
-`market_drafts.category_id` на `topics`, обновление тестов/docs) — отдельный последующий срез.
+### Единый каталог — Фаза 3 (реализовано, PR #31)
+
+Вариант 2 (owner-approved): чистый отказ от старых БД, без переноса данных.
+
+- `market_categories` удалена полностью (таблица, seed, `TABLES`, локальный `CATEGORIES`-кортеж
+  в `draft_store`); `SCHEMA_VERSION` 2 → 3.
+- `market_drafts.category_id` — FK на `topics(id)`: единый каталог стал единственным источником
+  категорий объявлений.
+- `initialize()` не создаёт/не сеет legacy-таблицу и не содержит v1→v2 `ALTER`-пути; БД, где
+  ещё есть `market_categories` (или версия `market_schema` ≠ 3), отвергается
+  `unsupported_market_schema` (fail-closed), без DDL/drop данных комнат.
+- candidate `REQUIRED` больше не содержит `market_categories`; ожидаемая версия `market_schema` — 3.
+- Тесты: проверка «5 строк в market_categories» заменена проверкой отсутствия таблицы; фикстура
+  v1→v2 и её три теста удалены осознанно (путь миграции больше не существует), отказ старой схемы
+  остаётся покрытым `test_missing_and_future_schema_fail_closed`.
+- CI green на 5c1968e (3.10: 1028 passed, 42 skipped; 3.11–3.13: 1089 passed each;
+  build/supervision/wheelhouse pass; deploy skipping, owner-gated).
 
 ## Bounded-срезы
 

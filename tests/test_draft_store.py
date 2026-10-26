@@ -80,7 +80,7 @@ def test_opt_in_schema_and_room_compatibility(tmp_path):
     assert reopened.list('user:' + uid)['rooms'][0]['id'] == room['room_id']
     with reopened._db() as db:
         assert tuple(db.execute('PRAGMA ' + p).fetchone()[0] for p in ('application_id', 'user_version')) == old
-        assert db.execute('SELECT COUNT(*) FROM market_categories').fetchone()[0] == 5
+        assert not db.execute("SELECT 1 FROM sqlite_master WHERE name='market_categories'").fetchone()
         assert db.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
         assert not db.execute('PRAGMA foreign_key_check').fetchall()
 

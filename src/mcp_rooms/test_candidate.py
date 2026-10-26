@@ -89,7 +89,7 @@ def _database(path,expected_hash=None):
         tables={row[0] for row in db.execute("SELECT name FROM sqlite_schema WHERE type='table'")}
         if tables != REQUIRED|{'sqlite_sequence'}:
             raise DomainError('candidate_database_mismatch')
-        for table,ver in [('market_schema',2),('media_stage_schema',3),('publication_schema',1)]:
+        for table,ver in [('market_schema',3),('media_stage_schema',3),('publication_schema',1)]:
             rows=db.execute('SELECT singleton,version FROM '+table).fetchall()
             if len(rows)!=1 or tuple(rows[0])!=(1,ver):
                 raise DomainError('candidate_database_mismatch')

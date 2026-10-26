@@ -172,8 +172,12 @@ fresh profile/key gate. Caddy всё ещё не менялся.
       `['things','home-repair','plumbing','toilets']` и веб-секции прежние), top-level броуз =
       семантические listing-корни (`parent_id IS NOT NULL AND id=root AND active=1` → `['services','things']`).
       `market_categories` остаётся созданным/сидимым как legacy-FK до Фазы 3. PR #30, green на cf28f5e.
-- [ ] Единый каталог, Фаза 3: удаление `market_categories` (таблица, seed, candidate `REQUIRED`),
-      депрекейт, перенос FK `market_drafts.category_id` на `topics`, обновление тестов/docs.
+- [x] **Единый каталог, Фаза 3 (реализовано)**: `market_categories` удалена — `SCHEMA_VERSION` 3,
+      `TABLES` без legacy-таблицы, `initialize()` не создаёт/сеет её и отвергает старые БД
+      (`unsupported_market_schema`), FK `market_drafts.category_id` → `topics(id)`. Вариант 2:
+      миграция v1→v2 и её 3 теста удалены осознанно (переносить нечего). candidate `REQUIRED`
+      без `market_categories`, ожидаемая версия `market_schema` 3. PR #31, green на 5c1968e
+      (3.10: 1028+42; 3.11–3.13: 1089; build/supervision/wheelhouse pass, deploy owner-gated).
 - [x] **Срез B (реализовано)**: read-only веб-витрина открытых комнат по дереву тем (`/rooms`, `/rooms/topic/<id>`); только `open`, приватные/legacy не раскрываются, весь текст escaped.
 - [x] **Срез C (реализовано)**: read-only лента сообщений открытой комнаты (`/rooms/room/<id>` + `?cursor=`), bounded/kурсор, escaping, 404 на приватные/несуществующие.
 - [x] **Срез D (реализовано статически)**: production-prep комнат в docs/rooms-web-production.md (композиция `public_rooms=True`, app-пути, коллизия префикса и рекомендация). Деплой — отдельный owner-gate + пароль.

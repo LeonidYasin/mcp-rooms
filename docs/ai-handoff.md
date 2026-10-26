@@ -47,14 +47,19 @@ core существует, но M3b.3 transaction-time authority остаётс�
   (`root`/`active` + market listing-поддерево под `market`, валидатор `RoomStore._topic`),
   аддитивно; `market_categories` не менялся. CI green на 979b759 (3.10: 1031 passed, 42 skipped;
   3.11–3.13: 1092 passed).
-- **Единый каталог, Фаза 2 (PR #30 open, owner merge pending)**: все чтения marketplace-категорий
+- **Единый каталог, Фаза 2 (PR #30, смержен в main `16be2a5`)**: все чтения marketplace-категорий
   переведены с `market_categories` на единый `topics` (`DraftStore._category`/`categories()`/`_preview`,
   `PhotoDraftStore._document`, `recovery`). Поведение сохранено: category_path останавливается на
   семантическом корне (`id==root`) — пути карточек и веб-секции прежние; top-level броуз =
-  listing-корни (`['services','things']`). `market_categories` остаётся созданным/сидимым как legacy-FK.
-  CI green на cf28f5e (test 3.10–3.13, build, supervision, wheelhouse pass; deploy owner-gated).
-  Фаза 3 (удаление `market_categories`/candidate `REQUIRED`, депрекейт, перенос FK
-  `market_drafts.category_id` на `topics`) — последующий срез.
+  listing-корни (`['services','things']`). CI green на cf28f5e.
+- **Единый каталог, Фаза 3 (PR #31 open, owner merge pending; вариант 2)**: `market_categories`
+  удалена — `SCHEMA_VERSION` 3, `TABLES` без legacy-таблицы, `initialize()` больше не создаёт/сеет
+  её и отвергает старые БД (`unsupported_market_schema`), FK `market_drafts.category_id` → `topics(id)`.
+  Вариант 2 — чистый отказ от старых БД: миграция v1→v2 и её 3 теста удалены осознанно (переносить
+  нечего); отказ старой схемы покрыт `test_missing_and_future_schema_fail_closed`. candidate
+  `REQUIRED` без `market_categories`, ожидаемая версия `market_schema` 3. CI green на 5c1968e
+  (3.10: 1028 passed, 42 skipped; 3.11–3.13: 1089 passed; build/supervision/wheelhouse pass;
+  deploy owner-gated).
 
 ## Следующий gate
 

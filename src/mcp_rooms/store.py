@@ -15,12 +15,20 @@ import uuid
 # Compatibility aliases: existing clients/tests keep the same exception identity.
 from .domain import DomainError as RoomError, identifier as _id, text as _text
 
-# Base topic catalog seed (unified tree source for rooms; the marketplace categories are
-# eventually folded into it). Root has parent_id None. Slugs, not UUIDs.
+# Base topic catalog seed (unified tree source for rooms AND, after consolidation, the
+# marketplace). Root has parent_id None. root/active listing attributes are added by
+# _schema (additive migration); active defaults to 1 for every seeded node.
 TOPIC_SEED = (
     ('market', None, 'Маркет и товары'),
     ('market-goods', 'market', 'Товары и услуги'),
     ('market-used', 'market', 'Б/у вещи'),
+    # Listing-category subtree under market (folded in from market_categories seed):
+    # roots 'things' and 'services'.
+    ('things', 'market', 'Вещи'),
+    ('home-repair', 'things', 'Дом и ремонт'),
+    ('plumbing', 'home-repair', 'Сантехника'),
+    ('toilets', 'plumbing', 'Унитазы'),
+    ('services', 'market', 'Услуги'),
     ('transport', None, 'Транспорт'),
     ('taxi', 'transport', 'Такси'),
     ('delivery', 'transport', 'Доставка и курьеры'),
@@ -152,10 +160,36 @@ class RoomStore:
             db.execute('CREATE TABLE IF NOT EXISTS signup_budgets (scope TEXT NOT NULL, bucket INTEGER NOT NULL, used INTEGER NOT NULL, expires_at INTEGER NOT NULL, PRIMARY KEY(scope,bucket))')
             # Additive base topic catalog; rooms table and user_version are UNCHANGED.
             # room_topics is a side table (room -> topic/visibility, fixed at create).
-            db.execute('CREATE TABLE IF NOT EXISTS topics (id TEXT PRIMARY KEY, parent_id TEXT REFERENCES topics(id), title TEXT NOT NULL)')
+            # topics is the single catalog: root/active are listing-catalog attributes
+            # (same semantics as market_categories) added additively and backfilled.
+            # market_categories keeps operating until Phases 2-3 fold its readers onto this
+            # tree -- no behavior change in Phase 1.
+            db.execute('CREATE TABLE IF NOT EXISTS topics (id TEXT PRIMARY KEY, parent_id TEXT REFERENCES topics(id), title TEXT NOT NULL, root TEXT, active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1)))')
+            cols = {r['name'] for r in db.execute('PRAGMA table_info(topics)')}
+            if 'root' not in cols:
+                db.execute('ALTER TABLE topics ADD COLUMN root TEXT')
+            if 'active' not in cols:
+                db.execute('ALTER TABLE topics ADD COLUMN active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1))')
+            # Idempotent ensure-seed: fresh DBs insert everything; existing DBs gain any
+            # newly-added nodes. Seed order is parent-before-child so FKs hold.
+            db.executemany('INSERT OR IGNORE INTO topics(id,parent_id,title) VALUES (?,?,?)', TOPIC_SEED)
+            # Backfill topmost-ancestor root for rows still missing it (idempotent).
+            unrooted = db.execute('SELECT id, parent_id FROM topics WHERE root IS NULL').fetchall()
+            if unrooted:
+                parents = {r['id']: r['parent_id'] for r in db.execute('SELECT id, parent_id FROM topics')}
+
+                def _topmost(node):
+                    seen = set()
+                    while parents.get(node) is not None:
+                        if node in seen:
+                            return node
+                        seen.add(node)
+                        node = parents[node]
+                    return node
+
+                db.executemany('UPDATE topics SET root=? WHERE id=?',
+                               [(_topmost(r['id']), r['id']) for r in unrooted])
             db.execute("CREATE TABLE IF NOT EXISTS room_topics (room_id TEXT PRIMARY KEY REFERENCES rooms(id) ON DELETE CASCADE, topic_id TEXT NOT NULL REFERENCES topics(id), visibility TEXT NOT NULL CHECK(visibility IN ('private','open')))")
-            if db.execute('SELECT COUNT(*) FROM topics').fetchone()[0] == 0:
-                db.executemany('INSERT INTO topics VALUES (?,?,?)', TOPIC_SEED)
             db.execute('PRAGMA user_version=2')
 
     def _open_existing(self):
@@ -249,6 +283,28 @@ class RoomStore:
     def _message(row):
         return {k: row[k] for k in ('id', 'room_id', 'owner', 'text', 'reply_to', 'deleted', 'created_at', 'expires_at')}
 
+    @staticmethod
+    def _topic(db, topic_id, root=None):
+        """Unified topic validator: active + bounded root ancestry. Same semantics as
+        DraftStore._category but over the single topics tree. Used to gate topic
+        references (rooms_create) and browse of an inactive parent; Phases 2-3 fold
+        the marketplace readers onto this tree with the same root contract."""
+        _topic_id(topic_id)
+        row = db.execute('SELECT * FROM topics WHERE id=?', (topic_id,)).fetchone()
+        if not row or not row['active'] or (root is not None and row['root'] != root):
+            raise RoomError('topic_unavailable')
+        seen = set()
+        while row:
+            if row['id'] in seen or len(seen) >= 8 or not row['active']:
+                raise RoomError('topic_unavailable')
+            seen.add(row['id'])
+            if row['parent_id'] is None:
+                return topic_id
+            row = db.execute('SELECT * FROM topics WHERE id=?', (row['parent_id'],)).fetchone()
+            if row is None:
+                raise RoomError('topic_unavailable')
+        raise RoomError('topic_unavailable')
+
     def create(self, owner, title, description='', topic_id=None, visibility=None):
         title = _text(title, 80)
         description = _text(description, 300) if description != '' else ''
@@ -270,8 +326,7 @@ class RoomStore:
             db.execute('INSERT INTO rooms(id,owner,title,description,created_at) VALUES (?,?,?,?,?)', (room_id, owner, title, description, now))
             db.execute('INSERT INTO members VALUES (?,?)', (room_id, owner))
             if have_meta:
-                if not db.execute('SELECT 1 FROM topics WHERE id=?', (topic_id,)).fetchone():
-                    raise RoomError('topic_unavailable')
+                self._topic(db, topic_id)
                 db.execute("INSERT INTO room_topics(room_id,topic_id,visibility) VALUES (?,?,?)", (room_id, topic_id, visibility or "private"))
         result = {'room_id': room_id, 'owner': owner, 'title': title,
                   'visibility': (visibility or 'private') if have_meta else 'public_to_enrolled_users'}
@@ -298,13 +353,16 @@ class RoomStore:
                 'next_cursor': 'rooms:' + str(selected[-1]['seq'] if selected else after), 'has_more': len(rows) > limit}
 
     def topics(self, owner, parent_id=None):
-        """Bounded catalog children for the united topic tree; read-only scope."""
+        """Bounded catalog children for the united topic tree; read-only scope.
+        Listing-aware: an inactive/nonexistent parent is not served; children are active only."""
         where, params = 'parent_id IS ?', [None]
         if parent_id is not None:
             _topic_id(parent_id)
             where, params = 'parent_id = ?', [parent_id]
         with self._db() as db:
-            rows = db.execute('SELECT id, parent_id, title FROM topics WHERE ' + where + ' ORDER BY id LIMIT 101', params).fetchall()
+            if parent_id is not None:
+                self._topic(db, parent_id)
+            rows = db.execute('SELECT id, parent_id, title FROM topics WHERE ' + where + ' AND active=1 ORDER BY id LIMIT 101', params).fetchall()
         if len(rows) > 100:
             raise RoomError('topic_capacity')
         return {'topics': [dict(row) for row in rows]}
@@ -314,13 +372,16 @@ class RoomStore:
             raise RoomError('membership_capacity')
 
     def public_topics(self, parent_id=None):
-        """Anonymous bounded-1-level browse of the united topic tree; no principal."""
+        """Anonymous bounded-1-level browse of the united topic tree; no principal.
+        Listing-aware: an inactive/nonexistent parent is not served; children are active only."""
         where, params = 'parent_id IS ?', [None]
         if parent_id is not None:
             _topic_id(parent_id)
             where, params = 'parent_id = ?', [parent_id]
         with self._db() as db:
-            rows = db.execute('SELECT id, parent_id, title FROM topics WHERE ' + where + ' ORDER BY id LIMIT 101', params).fetchall()
+            if parent_id is not None:
+                self._topic(db, parent_id)
+            rows = db.execute('SELECT id, parent_id, title FROM topics WHERE ' + where + ' AND active=1 ORDER BY id LIMIT 101', params).fetchall()
         if len(rows) > 100: raise RoomError('topic_capacity')
         return {'topics': [dict(row) for row in rows]}
 

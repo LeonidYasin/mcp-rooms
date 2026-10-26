@@ -43,6 +43,10 @@ core существует, но M3b.3 transaction-time authority остаётс�
 - Новые изменения идут через `feat/standalone-identity` и отдельные owner-approved
   PR в `main`; merge требует отдельного решения владельца.
 - Старый Rooms TEST остановлен; production MCP Rooms отсутствует.
+- **Единый каталог, Фаза 1 (PR #29)**: `topics` — единый каталог (`root`/`active` + market
+  listing-поддерево под `market`, валидатор `RoomStore._topic`), аддитивно; `market_categories`
+  не менялся. CI green на 979b759 (3.10: 1031 passed, 42 skipped; 3.11–3.13: 1092 passed).
+  Фазы 2–3 консолидации — последующие срезы.
 
 ## Следующий gate
 

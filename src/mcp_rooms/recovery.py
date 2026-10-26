@@ -186,7 +186,7 @@ def _audit(root, resource, *, already_locked=False):
                         raise DomainError('recovery_media_mismatch')
                     rows.append(row)
                 ordered[lid]=rows
-            categories = {r['id']:dict(r) for r in db.execute('SELECT * FROM market_categories')}
+            categories = {r['id']: dict(r) for r in db.execute('SELECT * FROM topics')}
             now = int(time.time()*1000)
             for pub in db.execute('SELECT p.*, u.display_name AS author FROM listing_publications p JOIN users u ON u.id=p.user_id'):
                 card = json.loads(pub['projection']); lid=pub['listing_id']
@@ -203,7 +203,10 @@ def _audit(root, resource, *, already_locked=False):
                 while cid is not None:
                     if cid in seen or cid not in categories: raise DomainError('recovery_publication_mismatch')
                     seen.add(cid); category=categories[cid]
-                    path.append({k:category[k] for k in ('id','parent_id','root','title')}); cid=category['parent_id']
+                    path.append({k:category[k] for k in ('id','parent_id','root','title')})
+                    if category['id'] == category['root']:
+                        break
+                    cid = category['parent_id']
                 record=json.loads(canonical_json(DraftStore._record(draft)))
                 expected=public_card(record,list(reversed(path)),PhotoDraftStore._photos(ordered[lid]),pub['epoch'],pub['updated_at'],author=pub['author'])
                 if (draft['user_id']!=pub['user_id'] or draft['revision']!=pub['revision']

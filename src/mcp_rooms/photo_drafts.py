@@ -68,8 +68,12 @@ class PhotoDraftStore:
     def _document(self, db, draft, rows):
         path, category_id = [], draft['category_id']
         while category_id is not None:
-            row = db.execute('SELECT * FROM market_categories WHERE id=?', (category_id,)).fetchone()
-            path.append({field: row[field] for field in ('id','parent_id','root','title')})
+            row = db.execute('SELECT * FROM topics WHERE id=?', (category_id,)).fetchone()
+            if row is None:
+                raise DomainError('category_unavailable')
+            path.append({field: row[field] for field in ('id', 'parent_id', 'root', 'title')})
+            if row['id'] == row['root']:
+                break
             category_id = row['parent_id']
         record = json.loads(canonical_json(self.drafts._record(draft)))
         return make_photo_preview(record, list(reversed(path)), self.drafts.resource, self._photos(rows))

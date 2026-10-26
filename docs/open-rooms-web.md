@@ -56,33 +56,28 @@
   `rooms_create` и в броузинге `topics()`/`public_topics()`: отдаются только активные дети;
   неизвестный/неактивный родитель → `topic_unavailable` (как в `listings_categories`).
 
-Фазы 2–3 (перевод `draft_store`/`photo_drafts`/`recovery`/`publication_store` на `topics`,
-обновление candidate `REQUIRED`/тестов/docs, депрекейт `market_categories`) — отдельные
-последующие срезы.
+### Единый каталог — Фаза 2 (реализовано, PR #30)
 
-### Единый каталог — Фаза 1 (реализовано, PR #29)
+Все чтения marketplace-категорий переведены с `market_categories` на единый `topics`
+(`market_categories` и весь marketplace продолжает работать; таблица остаётся созданной
+и сидимой как legacy-FK до Фазы 3).
 
-Аддитивная консолидация: `topics` становится единым каталогом, ничего не ломая
-(`market_categories` и весь marketplace продолжают работать; `draft_store` не менялся).
+- `DraftStore._category` (единый валидатор объявлений) читает `topics`; контракт прежний —
+  `invalid_category`/`category_unavailable`, bounded active-ancestry, root-match с
+  `content.category` (семантический корень `things`/`services`).
+- `DraftStore.categories()` броузит `topics`. Top-level броуз = семантические listing-корни:
+  фильтр `parent_id IS NOT NULL AND id=root AND active=1` → ровно `['services','things']`,
+  как в legacy-тесте.
+- `DraftStore._preview` и `PhotoDraftStore._document` (category_path карточки/публикации)
+  читают `topics` и останавливают путь на семантическом корне (`id==root`) — путь объявления
+  остаётся `['things','home-repair','plumbing','toilets']`, веб-секции `things`/`services`
+  прежние (узел-обёртка `market` в путь карточки не входит).
+- `recovery` строит `categories` из `SELECT * FROM topics` и повторяет ту же остановку пути —
+  сверка projection согласована с публикацией.
+- candidate `REQUIRED` на этом срезе не меняется: `market_categories` ещё в списке таблиц.
 
-- `topics` получает listing-атрибуты: `root` (семантический корень, явно в seed) и
-  `active` (`INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1))`).
-- Семя теперь `(id, parent_id, title, root)`. Под `market` досеяно listing-поддерево
-  `things → home-repair → plumbing → toilets` и `services`; их семантические корни
-  `things`/`services` сохранены (root-match с `content.category` объявления), хотя узлы
-  висят под темой `market`.
-- Идемпотентная миграция на существующих БД: `ALTER TABLE` докатывает `root`/`active`,
-  `INSERT OR IGNORE` досевает недостающие узлы (порядок parent-before-child сохраняет FK),
-  `root` бэкфиллится из объявленного в seed (topmost — только defensiv-фолбэк). Reopen
-  идемпотентен.
-- Новый `RoomStore._topic(db, topic_id, root=None)` — единый валидатор (active +
-  bounded ancestry, те же семантики, что `DraftStore._category`). Задействован в
-  `rooms_create` и в броузинге `topics()`/`public_topics()`: отдаются только активные
-  дети; неизвестный/неактивный родитель → `topic_unavailable` (как в `listings_categories`).
-
-Фазы 2–3 (перевод `draft_store`/`photo_drafts`/`recovery`/`publication_store` на `topics`,
-обновление `REQUIRED`/тестов/docs, депрекейт `market_categories`) — отдельные последующие
-срезы.
+Фаза 3 (удаление `market_categories`/seed/candidate `REQUIRED`, депрекейт, перенос FK
+`market_drafts.category_id` на `topics`, обновление тестов/docs) — отдельный последующий срез.
 
 ## Bounded-срезы
 

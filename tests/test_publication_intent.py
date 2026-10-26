@@ -127,7 +127,7 @@ def test_taxonomy_change_without_revision_also_invalidates_preview(setup):
     preview = drafts.preview(a, lid)
     intent = confirm(drafts, a, lid, preview)
     with store._db(write=True) as db:
-        db.execute("UPDATE market_categories SET title='Другая рубрика' WHERE id='plumbing'")
+        db.execute("UPDATE topics SET title='Другая рубрика' WHERE id='plumbing'")
     assert drafts.get(a, lid)['listing']['revision'] == 1
     with pytest.raises(DomainError, match='preview_conflict'):
         confirm(drafts, a, lid, preview)

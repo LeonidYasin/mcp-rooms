@@ -142,7 +142,7 @@ def test_change_during_decode_never_commits_staged(env, kind, code):
             x.drafts.update(x.a, x.draft_id, content(title='Changed'), category_id='toilets', expected_revision=1, client_id=key())
         elif kind == 'category':
             with x.store._db(write=True) as db:
-                db.execute("UPDATE market_categories SET active=0 WHERE id='things'")
+                db.execute("UPDATE topics SET active=0 WHERE id='things'")
         else:
             x.now[0] += m.TTL_MS
     x.worker.hook = change

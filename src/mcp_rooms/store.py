@@ -15,33 +15,34 @@ import uuid
 # Compatibility aliases: existing clients/tests keep the same exception identity.
 from .domain import DomainError as RoomError, identifier as _id, text as _text
 
-# Base topic catalog seed (unified tree source for rooms AND, after consolidation, the
-# marketplace). Root has parent_id None. root/active listing attributes are added by
-# _schema (additive migration); active defaults to 1 for every seeded node.
+# Base topic catalog seed (id, parent_id, title, root). Unified tree source for rooms AND,
+# after consolidation, the marketplace. Root nodes have parent_id None; 'root' is the
+# semantic root used by the marketplace root-match (things/services are listing roots even
+# though they hang under the market topic). root/active are added by _schema additively.
 TOPIC_SEED = (
-    ('market', None, 'Маркет и товары'),
-    ('market-goods', 'market', 'Товары и услуги'),
-    ('market-used', 'market', 'Б/у вещи'),
+    ('market', None, 'Маркет и товары', 'market'),
+    ('market-goods', 'market', 'Товары и услуги', 'market'),
+    ('market-used', 'market', 'Б/у вещи', 'market'),
     # Listing-category subtree under market (folded in from market_categories seed):
-    # roots 'things' and 'services'.
-    ('things', 'market', 'Вещи'),
-    ('home-repair', 'things', 'Дом и ремонт'),
-    ('plumbing', 'home-repair', 'Сантехника'),
-    ('toilets', 'plumbing', 'Унитазы'),
-    ('services', 'market', 'Услуги'),
-    ('transport', None, 'Транспорт'),
-    ('taxi', 'transport', 'Такси'),
-    ('delivery', 'transport', 'Доставка и курьеры'),
-    ('hiring', None, 'Найм и работа'),
-    ('jobs', 'hiring', 'Предложения работы'),
-    ('resumes', 'hiring', 'Резюме и вакансии'),
-    ('finance', None, 'Финансы и стартапы'),
-    ('investors', 'finance', 'Поиск инвесторов'),
-    ('startups', 'finance', 'Стартапы'),
-    ('realestate', None, 'Недвижимость'),
-    ('home', 'realestate', 'Жильё'),
-    ('commercial', 'realestate', 'Коммерческая'),
-    ('misc', None, 'Разное'),
+    # semantic roots 'things' and 'services' are preserved for the root-match contract.
+    ('things', 'market', 'Вещи', 'things'),
+    ('home-repair', 'things', 'Дом и ремонт', 'things'),
+    ('plumbing', 'home-repair', 'Сантехника', 'things'),
+    ('toilets', 'plumbing', 'Унитазы', 'things'),
+    ('services', 'market', 'Услуги', 'services'),
+    ('transport', None, 'Транспорт', 'transport'),
+    ('taxi', 'transport', 'Такси', 'transport'),
+    ('delivery', 'transport', 'Доставка и курьеры', 'transport'),
+    ('hiring', None, 'Найм и работа', 'hiring'),
+    ('jobs', 'hiring', 'Предложения работы', 'hiring'),
+    ('resumes', 'hiring', 'Резюме и вакансии', 'hiring'),
+    ('finance', None, 'Финансы и стартапы', 'finance'),
+    ('investors', 'finance', 'Поиск инвесторов', 'finance'),
+    ('startups', 'finance', 'Стартапы', 'finance'),
+    ('realestate', None, 'Недвижимость', 'realestate'),
+    ('home', 'realestate', 'Жильё', 'realestate'),
+    ('commercial', 'realestate', 'Коммерческая', 'realestate'),
+    ('misc', None, 'Разное', 'misc'),
 )
 
 _VISIBLE = frozenset({'private', 'open'})
@@ -170,13 +171,17 @@ class RoomStore:
                 db.execute('ALTER TABLE topics ADD COLUMN root TEXT')
             if 'active' not in cols:
                 db.execute('ALTER TABLE topics ADD COLUMN active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1))')
-            # Idempotent ensure-seed: fresh DBs insert everything; existing DBs gain any
-            # newly-added nodes. Seed order is parent-before-child so FKs hold.
-            db.executemany('INSERT OR IGNORE INTO topics(id,parent_id,title) VALUES (?,?,?)', TOPIC_SEED)
-            # Backfill topmost-ancestor root for rows still missing it (idempotent).
-            unrooted = db.execute('SELECT id, parent_id FROM topics WHERE root IS NULL').fetchall()
+            # Idempotent ensure-seed: fresh DBs insert everything (with declared root);
+            # existing DBs gain any newly-added nodes. Seed order is parent-before-child
+            # so FKs hold.
+            db.executemany('INSERT OR IGNORE INTO topics(id,parent_id,title,root) VALUES (?,?,?,?)', TOPIC_SEED)
+            # Backfill root for rows still missing it (idempotent). Use the declared
+            # seed root (keeps the market listing subtree's semantic roots things/services);
+            # fall back to topmost ancestor only for any unexpected non-seed row.
+            unrooted = db.execute("SELECT id, parent_id FROM topics WHERE root IS NULL").fetchall()
             if unrooted:
                 parents = {r['id']: r['parent_id'] for r in db.execute('SELECT id, parent_id FROM topics')}
+                seed_root = {row[0]: row[3] for row in TOPIC_SEED}
 
                 def _topmost(node):
                     seen = set()
@@ -188,7 +193,7 @@ class RoomStore:
                     return node
 
                 db.executemany('UPDATE topics SET root=? WHERE id=?',
-                               [(_topmost(r['id']), r['id']) for r in unrooted])
+                               [(seed_root.get(r['id']) or _topmost(r['id']), r['id']) for r in unrooted])
             db.execute("CREATE TABLE IF NOT EXISTS room_topics (room_id TEXT PRIMARY KEY REFERENCES rooms(id) ON DELETE CASCADE, topic_id TEXT NOT NULL REFERENCES topics(id), visibility TEXT NOT NULL CHECK(visibility IN ('private','open')))")
             db.execute('PRAGMA user_version=2')
 

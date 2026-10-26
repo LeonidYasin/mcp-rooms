@@ -236,7 +236,7 @@ def test_category_root_and_parent_disabled(setup):
         with pytest.raises(DomainError):
             drafts.create(a, content(), category_id=category, client_id=key())
     with store._db(write=True) as db:
-        db.execute("UPDATE market_categories SET active=0 WHERE id='home-repair'")
+        db.execute("UPDATE topics SET active=0 WHERE id='home-repair'")
     with pytest.raises(DomainError, match='category_unavailable'):
         create(drafts, a)
     assert counts(store) == (0, 0)

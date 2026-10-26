@@ -121,9 +121,13 @@ class DraftStore:
 
     @staticmethod
     def _category(db, category_id, root=None):
+        """Marketplace-facing validator over the UNIFIED topics tree (Phase 2 of the
+        market_categories consolidation). Same contract as before (invalid_category /
+        category_unavailable, bounded active ancestry, root match) but backed by
+        RoomStore.topics; market_categories stays as legacy seed/FK until Phase 3."""
         if not isinstance(category_id, str) or not re.fullmatch('[a-z][a-z0-9-]{0,63}', category_id):
             raise DomainError('invalid_category')
-        row = db.execute('SELECT * FROM market_categories WHERE id=?', (category_id,)).fetchone()
+        row = db.execute('SELECT * FROM topics WHERE id=?', (category_id,)).fetchone()
         if not row or not row['active'] or (root is not None and row['root'] != root):
             raise DomainError('category_unavailable')
         # Check bounded ancestry as well, so disabling a parent disables descendants.
@@ -134,7 +138,7 @@ class DraftStore:
             seen.add(row['id'])
             if row['parent_id'] is None:
                 return category_id
-            row = db.execute('SELECT * FROM market_categories WHERE id=?', (row['parent_id'],)).fetchone()
+            row = db.execute('SELECT * FROM topics WHERE id=?', (row['parent_id'],)).fetchone()
             if row is None:
                 raise DomainError('category_unavailable')
         raise DomainError('category_unavailable')
@@ -291,13 +295,18 @@ class DraftStore:
                     'has_more': has_more, 'next_cursor': next_cursor}
 
     def categories(self, principal, *, parent_id=None):
-        """Bounded immediate children, no public API or runtime category editing."""
+        """Bounded immediate children of the unified topics tree; no public API or
+        runtime category editing. Top level serves the semantic listing roots
+        (things/services: id==root and hanging under a room topic)."""
         with self.store._db() as db:
             self._schema(db)
             self._authorize(db, principal, 'listings:read', self.store.clock())
-            if parent_id is not None:
+            if parent_id is None:
+                where, params = 'parent_id IS NOT NULL AND id=root AND active=1', ()
+            else:
                 self._category(db, parent_id)
-            rows = db.execute('SELECT * FROM market_categories WHERE parent_id IS ? AND active=1 ORDER BY id LIMIT 101', (parent_id,)).fetchall()
+                where, params = 'parent_id = ? AND active=1', (parent_id,)
+            rows = db.execute('SELECT * FROM topics WHERE ' + where + ' ORDER BY id LIMIT 101', params).fetchall()
             if len(rows) > 100:
                 raise DomainError('category_capacity')
             result = []
@@ -341,10 +350,16 @@ class DraftStore:
         record = json.loads(_json(self._record(row)))
         self._category(db, row['category_id'], record['listing']['content']['category'])
         path, category_id = [], row['category_id']
-        # _category checked existence, active ancestry, depth and cycles above.
+        # Walk the unified tree up to the semantic listing root (things/services);
+        # the parent chain continues into room topics (e.g. 'market'), which are not
+        # part of a listing's category path.
         while category_id is not None:
-            category = db.execute('SELECT * FROM market_categories WHERE id=?', (category_id,)).fetchone()
+            category = db.execute('SELECT * FROM topics WHERE id=?', (category_id,)).fetchone()
+            if category is None:
+                raise DomainError('category_unavailable')
             path.append({field: category[field] for field in ('id', 'parent_id', 'root', 'title')})
+            if category['id'] == category['root']:
+                break
             category_id = category['parent_id']
         return make_preview(record, list(reversed(path)), self.resource)
 

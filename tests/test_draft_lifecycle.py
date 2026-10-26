@@ -159,7 +159,7 @@ def test_category_children_and_hidden_parent(setup):
     assert drafts.categories(a, parent_id='plumbing')['categories'][0]['id'] == 'toilets'
     assert drafts.categories(a, parent_id='toilets')['categories'] == []
     with store._db(write=True) as db:
-        db.execute("UPDATE market_categories SET active=0 WHERE id='home-repair'")
+        db.execute("UPDATE topics SET active=0 WHERE id='home-repair'")
     for parent in ('home-repair', 'plumbing', 'toilets', 'unknown'):
         with pytest.raises(DomainError, match='category_unavailable'):
             drafts.categories(a, parent_id=parent)
@@ -268,8 +268,8 @@ def test_schema_query_failure_not_misreported_as_missing_migration():
 def test_category_read_bound_does_not_silently_truncate(setup):
     store, auth, drafts, a, b, now = setup
     with store._db(write=True) as db:
-        db.executemany('INSERT INTO market_categories VALUES (?,NULL,?,?,1)',
-                       [(f'cat{i}', 'things', f'Category {i}') for i in range(101)])
+        db.executemany('INSERT INTO topics(id,parent_id,title,root,active) VALUES (?,?,?,?,?)',
+                       [(f'cat{i}', 'market', f'Category {i}', f'cat{i}', 1) for i in range(101)])
     with pytest.raises(DomainError, match='category_capacity'):
         drafts.categories(a)
 

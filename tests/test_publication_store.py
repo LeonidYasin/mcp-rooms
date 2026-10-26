@@ -205,7 +205,7 @@ def test_stale_or_unauthorized_consent_never_publishes(market,change):
     elif change=='photo_order':
         attach(x,[],revision=2)
     elif change=='category':
-        with x.store._db(write=True) as db: db.execute("UPDATE market_categories SET title='New name' WHERE id='things'")
+        with x.store._db(write=True) as db: db.execute("UPDATE topics SET title='New name' WHERE id='things'")
     elif change=='expiry': x.now[0]=consent['valid_until']
     elif change=='revoke': x.auth.revoke(x.a.credential_id); expected='authentication_required'
     elif change=='disable':
@@ -240,7 +240,7 @@ def test_uniform_public_unavailability(market,kind):
         with x.store._db(write=True) as db: db.execute('UPDATE users SET disabled=1 WHERE id=?',(x.a.user_id,))
     elif kind=='expired': x.now[0]=x.drafts.get(x.a,lid)['listing']['expires_at']
     elif kind=='parent_disabled':
-        with x.store._db(write=True) as db: db.execute("UPDATE market_categories SET active=0 WHERE id='things'")
+        with x.store._db(write=True) as db: db.execute("UPDATE topics SET active=0 WHERE id='things'")
     elif kind=='tampered':
         with x.store._db(write=True) as db: db.execute("UPDATE market_drafts SET content=REPLACE(content,'Унитаз','Other') WHERE id=?",(lid,))
         # Fixture title is independent of localization; change a canonical field.
@@ -364,7 +364,7 @@ def test_withdraw_audit_failure_rolls_back_state_and_receipt(market,monkeypatch)
 
 def test_withdraw_remains_available_when_category_or_photo_is_broken(market):
     x=market; publish(x)
-    with x.store._db(write=True) as db:db.execute("UPDATE market_categories SET active=0 WHERE id='things'")
+    with x.store._db(write=True) as db:db.execute("UPDATE topics SET active=0 WHERE id='things'")
     next(x.root.iterdir()).write_bytes(b'broken')
     assert withdraw(x)['state']=='withdrawn'
     fails('listing_unavailable',lambda:x.market.public_get(x.draft_id))

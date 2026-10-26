@@ -159,7 +159,15 @@ fresh profile/key gate. Caddy всё ещё не менялся.
       фикс при создании; базовый каталог тем в `RoomStore` (`topics` + `room_topics`,
       `rooms`/`user_version` не меняются); `rooms_create`/`rooms_list` расширены,
       `rooms_topics` — просмотр дерева (9-й rooms tool). Дизайн: docs/open-rooms-web.md.
-- [ ] Единый каталог: `market_categories` впоследствии сводится к базовому каталогу тем.
+- [x] **Единый каталог, Фаза 1 (реализовано)**: `topics` становится единым каталогом — добавлены
+      `root` (явный в seed, бэкфилл) и `active` (default 1); market listing-поддерево
+      (`things`→`home-repair`→`plumbing`→`toilets`, `services`) досеяно под `market`
+      идемпотентной миграцией; общий валидатор `RoomStore._topic` (active/root-ancestry)
+      задействован в `rooms_create` и броузинге. `market_categories` продолжает работать —
+      поведение не меняется. PR #29, green на 979b759 (3.10: 1031+42; 3.11–3.13: 1092).
+- [ ] Единый каталог, Фазы 2–3: перевод чтений `draft_store`/`photo_drafts`/`recovery`/
+      `publication_store` на `topics`; обновление candidate `REQUIRED`/тестов/docs; депрекейт
+      `market_categories`.
 - [x] **Срез B (реализовано)**: read-only веб-витрина открытых комнат по дереву тем (`/rooms`, `/rooms/topic/<id>`); только `open`, приватные/legacy не раскрываются, весь текст escaped.
 - [x] **Срез C (реализовано)**: read-only лента сообщений открытой комнаты (`/rooms/room/<id>` + `?cursor=`), bounded/kурсор, escaping, 404 на приватные/несуществующие.
 - [x] **Срез D (реализовано статически)**: production-prep комнат в docs/rooms-web-production.md (композиция `public_rooms=True`, app-пути, коллизия префикса и рекомендация). Деплой — отдельный owner-gate + пароль.

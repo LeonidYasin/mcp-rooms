@@ -165,3 +165,90 @@ def test_private_room_same_code_path_web_flag_only(store, monkeypatch):
     assert store.web_room(priv)['room']['title'] == 'Приват'
     assert any(r['id'] == priv for r in store.web_rooms()['rooms'])
     assert store.web_room_messages(priv)['messages'] == []
+
+# --- Phase 1 "Единый каталог": root/active + market listing subtree + _topic validator ---
+# Additive Phase 1 of the market_categories -> base topic-tree consolidation. market_categories
+# itself keeps working (unchanged); topics gains listing attributes and the folded-in market
+# subtree under 'market'. No behavior change for rooms with only seeded active topics.
+
+def test_market_listing_subtree_seeded(store):
+    market = {t['id'] for t in store.topics(A, parent_id='market')['topics']}
+    assert {'things', 'services', 'market-goods', 'market-used'} <= market
+    assert {t['id'] for t in store.topics(A, parent_id='things')['topics']} == {'home-repair'}
+    assert {t['id'] for t in store.topics(A, parent_id='home-repair')['topics']} == {'plumbing'}
+    assert {t['id'] for t in store.topics(A, parent_id='plumbing')['topics']} == {'toilets'}
+
+
+def test_topic_roots_and_active_backfilled(store):
+    with store._db() as db:
+        rows = {r['id']: r for r in db.execute('SELECT id, parent_id, root, active FROM topics')}
+    assert rows['transport']['root'] == 'transport'
+    assert rows['taxi']['root'] == 'transport'
+    assert rows['market-goods']['root'] == 'market' and rows['market-used']['root'] == 'market'
+    assert rows['toilets']['root'] == 'things' and rows['services']['root'] == 'services'
+    assert rows['market']['root'] == 'market'
+    assert all(v['active'] == 1 for v in rows.values())
+
+
+def test_create_with_folded_market_topic(store):
+    r = store.create(A, 'Унитаз любой', topic_id='toilets', visibility='open')
+    assert r['topic_id'] == 'toilets'
+    assert store.list(A)['rooms'][0]['topic_id'] == 'toilets'
+
+
+def test_topic_validator_root_active_and_ancestry(store):
+    with store._db(write=True) as db:
+        assert store._topic(db, 'toilets') == 'toilets'
+        assert store._topic(db, 'toilets', root='things') == 'toilets'
+        error('topic_unavailable', lambda: store._topic(db, 'toilets', root='services'))
+        error('topic_unavailable', lambda: store._topic(db, 'nope'))
+        # deactivating an ancestor makes descendants unavailable
+        db.execute("UPDATE topics SET active=0 WHERE id='plumbing'")
+        assert store._topic(db, 'market') == 'market'  # unrelated branch untouched
+        error('topic_unavailable', lambda: store._topic(db, 'toilets'))
+        assert store._topic(db, 'things') == 'things'  # parent itself stays active
+
+
+def test_create_rejects_inactive_topic(store):
+    with store._db(write=True) as db:
+        db.execute("UPDATE topics SET active=0 WHERE id='services'")
+    error('topic_unavailable', lambda: store.create(A, 'x', topic_id='services'))
+
+
+def test_browse_validates_parent_and_serves_active_children(store):
+    with store._db(write=True) as db:
+        db.execute("UPDATE topics SET active=0 WHERE id='things'")
+    error('topic_unavailable', lambda: store.topics(A, parent_id='things'))
+    error('topic_unavailable', lambda: store.topics(A, parent_id='automobile'))
+    error('topic_unavailable', lambda: store.public_topics(parent_id='automobile'))
+    assert {'market', 'transport'} <= {t['id'] for t in store.topics(A)['topics']}
+    assert 'taxi' in {t['id'] for t in store.public_topics(parent_id='transport')['topics']}
+
+
+def test_additive_migration_adds_columns_and_market_subtree(tmp_path):
+    import sqlite3
+    path = tmp_path / 'old.db'
+    db = sqlite3.connect(str(path))
+    db.execute('PRAGMA application_id=' + str(RoomStore.APPLICATION_ID))
+    db.execute('PRAGMA user_version=2')
+    db.execute('CREATE TABLE topics (id TEXT PRIMARY KEY, parent_id TEXT REFERENCES topics(id), title TEXT NOT NULL)')
+    db.executemany('INSERT INTO topics VALUES (?,?,?)', [
+        ('market', None, 'Маркет и товары'), ('market-goods', 'market', 'Товары и услуги'),
+        ('transport', None, 'Транспорт'), ('taxi', 'transport', 'Такси'),
+    ])
+    db.commit(); db.close()
+    store = RoomStore(path)
+    with store._db() as db:
+        cols = {r['name'] for r in db.execute('PRAGMA table_info(topics)')}
+        assert {'root', 'active'} <= cols
+        roots = {r['id']: r['root'] for r in db.execute('SELECT id, root FROM topics')}
+        assert roots['taxi'] == 'transport' and roots['market-goods'] == 'market'
+        assert roots['toilets'] == 'things' and roots['services'] == 'services'
+        assert roots['market'] == 'market'
+        all_ids = {r['id'] for r in db.execute('SELECT id FROM topics')}
+        assert {'things', 'home-repair', 'plumbing', 'toilets', 'services'} <= all_ids
+    # idempotent on a second open: nothing left unrooted, columns stable
+    again = RoomStore(path)
+    with again._db() as db:
+        assert db.execute('SELECT COUNT(*) FROM topics WHERE root IS NULL').fetchone()[0] == 0
+        assert {'root', 'active'} <= {r['name'] for r in db.execute('PRAGMA table_info(topics)')}
